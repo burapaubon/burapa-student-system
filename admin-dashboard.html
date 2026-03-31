@@ -1300,6 +1300,14 @@ const noData = document.getElementById("noWeekly")
 
 if(!data || !data.labels || data.labels.length === 0){
 
+const hasData = data.present?.some(v => v > 0) || data.absent?.some(v => v > 0)
+
+if(!hasData){
+canvas.style.display = "none"
+noData.style.display = "block"
+return
+}
+  
 if(weeklyChartInstance){
 weeklyChartInstance.destroy()
 }
@@ -1351,6 +1359,14 @@ const noData = document.getElementById("noMonthly")
 
 if(!data || !data.labels || data.labels.length === 0){
 
+const hasData = data.present?.some(v => v > 0) || data.absent?.some(v => v > 0)
+
+if(!hasData){
+canvas.style.display = "none"
+noData.style.display = "block"
+return
+}
+  
 if(monthlyChartInstance){
 monthlyChartInstance.destroy()
 }
@@ -1521,7 +1537,7 @@ if(!confirm("ต้องการลบ "+room+" ใช่หรือไม่
 
 try{
 
-const res = await fetch(API + "?mode=deleteRoom&room=" + room + "&token=" + token)
+const res = await fetch(API + "?mode=deleteRoom&room=" + encodeURIComponent(room) + "&token=" + token)
 
 if(!res.ok) throw new Error("network")
 
@@ -1834,7 +1850,7 @@ async function resetTodayAll(e){
 
 if(loadingNow) return
 
-const btn = e.target
+const btn = e.currentTarget
 if(btn.disabled) return
 
 if(!confirm("คุณต้องการรีเซ็ตสถิติทุกห้องในวันนี้ใช่ไหม?")) return
