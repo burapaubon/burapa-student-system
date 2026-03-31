@@ -857,77 +857,6 @@ font-weight:600;
 </div>
 </div>
 
-<div class="card card-rooms">
-<div class="card-header">
-<span>รายการห้องเรียนทั้งหมด <span id="roomCount"></span></span>
-  
-<div class="header-actions">
-<button onclick="addRoom()" class="btn-main">+ เพิ่มห้อง</button>
-<button onclick="toggleSort()" class="btn-sub" id="sortBtn">จัดลำดับห้อง</button>
-</div>
-</div>
-<div id="classList"></div>
-</div>
-
-<div class="card system-status">
-<h3>สถานะระบบ</h3>
-<div id="sttAPI" class="status-box">API: -</div>
-<div id="sttDB" class="status-box">Database: -</div>
-<div id="sttMSG" class="status-box">Messaging API: -</div>
-<div id="sttREC" class="status-box">Records: -</div>
-</div>
-
-<div class="card reset-card">
-<h3>จัดการข้อมูลสถิติ</h3>
-
-<div class="control-section">
-<div class="control-title">รีเซ็ตข้อมูลวันนี้</div>
-<button class="btn-control warn" onclick="resetTodayAll(event)">
-รีเซ็ตข้อมูลวันนี้ทั้งหมด
-</button>
-</div>
-
-<div class="control-section">
-<div class="control-title">รีเซ็ตตามช่วงเวลา (ตั้งแต่-จนถึง)</div>
-<div class="date-row">
-<input type="date" id="startDate">
-<input type="date" id="endDate">
-</div>
-<button class="btn-control warn" onclick="resetRange()">
-รีเซ็ตตามช่วงเวลา
-</button>
-</div>
-
-<div class="control-section danger-box">
-<div class="control-title">ล้างข้อมูลทั้งหมด</div>
-<button class="btn-control danger" onclick="resetAll()">
-ล้างข้อมูลทั้งระบบ
-</button>
-</div>
-</div>
-
-<div class="card">
-<h3>ตั้งค่าภาคเรียน / ปีการศึกษา</h3>
-
-<div class="field">
-<label>ภาคเรียน</label>
-<select id="termInput" class="select-modern">
-<option value="">-- เลือกภาคเรียน --</option>
-<option value="1">1</option>
-<option value="2">2</option>
-</select>
-</div>
-
-<div class="field">
-<label>ปีการศึกษา (พ.ศ.)</label>
-<select id="yearInput" class="select-modern"></select>
-</div>
-
-<button class="btn-main" onclick="changeTermYear(event)" style="width:100%; padding:12px;">
-บันทึกการตั้งค่า
-</button>
-</div>
-
 <div class="card">
 <div class="card-header" style="justify-content:center; font-weight:700;">
 Export แบบรายงานสถิติ
@@ -1000,6 +929,78 @@ Export รายงาน
 </div>
 </div>
 </div>
+  
+<div class="card card-rooms">
+<div class="card-header">
+<span>รายการห้องเรียนทั้งหมด <span id="roomCount"></span></span>
+  
+<div class="header-actions">
+<button onclick="addRoom()" class="btn-main">+ เพิ่มห้อง</button>
+<button onclick="toggleSort()" class="btn-sub" id="sortBtn">จัดลำดับห้อง</button>
+</div>
+</div>
+<div id="classList"></div>
+</div>
+
+<div class="card system-status">
+<h3>สถานะระบบ</h3>
+<div id="sttAPI" class="status-box">API: -</div>
+<div id="sttDB" class="status-box">Database: -</div>
+<div id="sttMSG" class="status-box">Messaging API: -</div>
+<div id="sttREC" class="status-box">Records: -</div>
+</div>
+
+<div class="card reset-card">
+<h3>จัดการข้อมูลสถิติ</h3>
+
+<div class="control-section">
+<div class="control-title">รีเซ็ตข้อมูลวันนี้</div>
+<button class="btn-control warn" onclick="resetTodayAll(event)">
+รีเซ็ตข้อมูลวันนี้ทั้งหมด
+</button>
+</div>
+
+<div class="control-section">
+<div class="control-title">รีเซ็ตตามช่วงเวลา (ตั้งแต่-จนถึง)</div>
+<div class="date-row">
+<input type="date" id="startDate">
+<input type="date" id="endDate">
+</div>
+<button class="btn-control warn" onclick="resetRange()">
+รีเซ็ตตามช่วงเวลา
+</button>
+</div>
+
+<div class="control-section danger-box">
+<div class="control-title">ล้างข้อมูลทั้งหมด</div>
+<button class="btn-control danger" onclick="resetAll()">
+ล้างข้อมูลทั้งระบบ
+</button>
+</div>
+</div>
+
+<div class="card">
+<h3>ตั้งค่าภาคเรียน / ปีการศึกษา</h3>
+
+<div class="field">
+<label>ภาคเรียน</label>
+<select id="termInput" class="select-modern">
+<option value="">-- เลือกภาคเรียน --</option>
+<option value="1">1</option>
+<option value="2">2</option>
+</select>
+</div>
+
+<div class="field">
+<label>ปีการศึกษา (พ.ศ.)</label>
+<select id="yearInput" class="select-modern"></select>
+</div>
+
+<button class="btn-main" onclick="changeTermYear(event)" style="width:100%; padding:12px;">
+บันทึกการตั้งค่า
+</button>
+</div>
+
 </div>
 </main>
   
