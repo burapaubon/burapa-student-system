@@ -1035,7 +1035,12 @@ async function loadTerm(){
 try{
 
 const res = await fetchWithTimeout(API + "?mode=getterm&t=" + Date.now())
-const data = await res.json()
+let data
+try{
+data = await res.json()
+}catch{
+throw new Error("invalid json")
+}
 
 const term = data.term
 const year = data.year
@@ -1638,7 +1643,8 @@ function startAutoRefresh(){
   
 load()
   
-refreshTimer=setInterval(()=>{
+if(refreshTimer) clearInterval(refreshTimer)
+refreshTimer = setInterval(()=>{
 if(!loadingNow && document.visibilityState === "visible"){
 load()
 }
@@ -2039,31 +2045,8 @@ select.appendChild(opt)
 }
 }
 
-async function loadSignature(){
+async function saveSignature(e){
 
-try{
-
-const res = await fetch(API + "?mode=getsigconfig&t=" + Date.now())
-const data = await res.json()
-
-document.getElementById("mon").value = data.mon || ""
-document.getElementById("tue").value = data.tue || ""
-document.getElementById("wed").value = data.wed || ""
-document.getElementById("thu").value = data.thu || ""
-document.getElementById("fri").value = data.fri || ""
-
-document.getElementById("assistant").value = data.assistant || ""
-document.getElementById("deputy").value = data.deputy || ""
-document.getElementById("director").value = data.director || ""
-
-}catch(e){
-console.log("โหลดชื่อไม่สำเร็จ")
-  
-}
-
-}
-  
-function saveSignature(e){
 const btn = e.target
 btn.disabled = true
 btn.innerText = "กำลังบันทึก..."
@@ -2087,26 +2070,20 @@ const data = await res.json()
 if(data.status === "success"){
   
 alert("บันทึกเรียบร้อย")
-  
 loadSignature()
-  
 document.getElementById("sigForm").style.display = "none"
   
 }else{
-  
 alert("บันทึกไม่สำเร็จ")
-  
 }
 
 }catch(e){
-  
 alert("เกิดข้อผิดพลาด")
-  
 }
 
 btn.disabled = false
 btn.innerText = "บันทึกข้อมูลผู้ลงนาม"
-  
+
 }
 
 function toggleSigForm(){
