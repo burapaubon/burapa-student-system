@@ -2107,14 +2107,14 @@ headers: {
 },
 body: JSON.stringify({
 mode: "updatesigconfig",
-mon: mon.value,
-tue: tue.value,
-wed: wed.value,
-thu: thu.value,
-fri: fri.value,
-assistant: assistant.value,
-deputy: deputy.value,
-director: director.value,
+mon: document.getElementById("mon").value,
+tue: document.getElementById("tue").value,
+wed: document.getElementById("wed").value,
+thu: document.getElementById("thu").value,
+fri: document.getElementById("fri").value,
+assistant: document.getElementById("assistant").value,
+deputy: document.getElementById("deputy").value,
+director: document.getElementById("director").value,
 token: token
 })
 })
