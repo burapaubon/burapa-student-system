@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teacher Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
+<style>
+
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+font-family:'Prompt',sans-serif;
+}
+
+body{
+min-height:100vh;
+display:flex;
+flex-direction:column;
+background:linear-gradient(180deg,#f6f7fb,#eef1f8);
+}
+
+header{
+background:linear-gradient(135deg,#c1121f,#e63946,#ff6b6b);
+background-size:200% 200%;
+animation:gradientMove 6s ease infinite;
+border-bottom:4px solid rgba(255,255,255,0.25);
+color:white;
+text-align:center;
+padding:22px 10px;
+box-shadow:0 10px 25px rgba(0,0,0,.15);
+position:relative;
+overflow:hidden;
+z-index:1;
+backdrop-filter: blur(2px);
+}
+
+header::before{
+content:"";
+position:absolute;
+top:0;
+left:0;
+width:200%;
+height:100%;
+background:
+radial-gradient(rgba(255,255,255,.12) 2px, transparent 2px);
+background-size:40px 40px;
+animation:dotsMove 30s linear infinite;
+opacity:.35;
+pointer-events:none;
+}
+
+header::after{
+content:"";
+position:absolute;
+top:0;
+left:-120%;
+width:240%;
+height:100%;
+
+background:linear-gradient(
+120deg,
+rgba(255,255,255,0) 0%,
+rgba(255,255,255,.25) 40%,
+rgba(255,255,255,.35) 50%,
+rgba(255,255,255,.25) 60%,
+rgba(255,255,255,0) 100%
+);
+  
+filter:blur(28px);
+animation:shine 6s linear infinite;
+pointer-events:none;
+}
+
+@keyframes gradientMove{
+0%{background-position:0% 50%}
+50%{background-position:100% 50%}
+100%{background-position:0% 50%}
+}
+
+@keyframes dotsMove{
+0%{transform:translateX(0)}
+100%{transform:translateX(-400px)}
+}
+
+@keyframes shine{
+0%{transform:translateX(-100%)}
+100%{transform:translateX(100%)}
+}
+  
+.logo{
+width:clamp(80px,16vw,110px);
+margin-bottom:4px;
+animation:float 4s ease-in-out infinite;
+filter:
+drop-shadow(0 8px 14px rgba(0,0,0,.3))
+drop-shadow(0 0 25px rgba(255,255,255,.35));
+}
+
+@keyframes float{
+0%{transform:translateY(0)}
+50%{transform:translateY(-6px)}
+100%{transform:translateY(0)}
+}
+  
+.system-name{font-size:13px;}
+.school-name{font-size:26px;font-weight:700;}
+
+.back{
+position:absolute;
+left:12px;
+top:12px;
+color:white;
+text-decoration:none;
+font-size:13px;
+background:rgba(255,255,255,.2);
+padding:6px 10px;
+border-radius:8px;
+cursor:pointer;
+}
+
+.term{
+font-size:16px;
+margin-top:3px;
+}
+
+.time{
+font-size:14px;
+margin-top:2px;
+}
+  
+main{
+flex:1;
+max-width:1100px;
+margin:auto;
+padding:16px;
+width:100%;
+}
+
+.stats{
+display:grid;
+grid-template-columns:repeat(5,1fr);
+gap:12px;
+margin-bottom:16px;
+}
+
+.stat{
+background:white;
+padding:14px;
+border-radius:16px;
+text-align:center;
+box-shadow:0 8px 20px rgba(0,0,0,.08);
+}
+
+.stat h3{font-size:12px;color:#666;}
+
+.num{
+font-size:26px;
+font-weight:700;
+margin-top:4px;
+transition:transform .3s;
+}
+
+.num:hover{
+transform:scale(1.1);
+}
+
+.present{color:#6BCB77}
+.sick{color:#ff8fab}
+.leave{color:#ffd166}
+.absent{color:#f28482}
+
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:16px;
+}
+
+.card-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:0 4px;
+margin-bottom:6px;
+flex-shrink:0;
+}
+
+.card-header span:first-child{
+font-size:16px;
+font-weight:600;
+}
+  
+.card{
+background:white;
+border-radius:18px;
+padding:16px;
+box-shadow:0 10px 25px rgba(0,0,0,.08);
+display:flex;
+flex-direction:column;
+gap:12px;
+transition:.25s ease;
+height:420px;
+}
+
+.card:hover{
+transform:translateY(-2px);
+box-shadow:0 14px 30px rgba(0,0,0,.12);
+}
+  
+.card-title{
+text-align:center;
+font-size:16px;
+font-weight:600;
+margin-bottom:4px;
+}
+  
+.chartBox{
+flex:1;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+padding:16px 0 12px;
+position:relative;
+min-height:0;
+}
+
+.chartBox canvas{
+width:100% !important;
+height:100% !important;
+max-width:260px;
+max-height:260px;
+}
+
+.noData{
+position:absolute;
+text-align:center;
+font-size:16px;
+color:#888;
+font-weight:500;
+}
+  
+#classList{
+flex:1;
+overflow-y:auto;
+margin-top:8px;
+padding-right:4px;
+scroll-behavior:smooth;
+-webkit-overflow-scrolling:touch;
+}
+
+#classList::-webkit-scrollbar{
+width:6px;
+}
+
+#classList::-webkit-scrollbar-thumb{
+background:#e5e7eb;
+border-radius:10px;
+}
+
+.divider{
+height:1px;
+background:#e5e7eb;
+margin:6px 0 10px;
+border:none;
+}
+
+#roomCount{
+font-size:12px;
+color:#9ca3af;
+background:#f3f4f6;
+padding:2px 8px;
+border-radius:999px;
+}
+
+.status{
+font-size:13px;
+font-weight:700;
+white-space:nowrap;
+}
+  
+.class{
+padding:14px 10px;
+border-bottom:1px solid #f1f5f9;
+border-radius:14px;
+transition:.2s ease;
+}
+
+.class:hover{
+background:#f9fafb;
+}
+
+.class-top{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:10px;
+}
+
+.status-badge{
+font-size:12px;
+padding:6px 10px;
+border-radius:999px;
+font-weight:600;
+white-space:nowrap;
+}
+
+.status-badge.ok{
+background:#dcfce7;
+color:#166534;
+}
+
+.status-badge.pending{
+background:#fee2e2;
+color:#991b1b;
+}
+  
+.class-top div{
+font-size:18px;
+font-weight:700;
+color:#333;
+}
+  
+.green{
+color:#6BCB77;
+}
+
+.red{
+color:#e63946;
+animation:blink 2s infinite;
+}
+
+button{
+border:none;
+padding:9px 14px;
+border-radius:12px;
+font-size:12px;
+cursor:pointer;
+font-weight:500;
+transition:.2s;
+display:inline-flex;
+align-items:center;
+justify-content:center;
+}
+
+.buttons{
+margin-top:10px;
+display:flex;
+gap:8px;
+flex-wrap:wrap;
+}
+
+button:hover{
+transform:translateY(-1px);
+box-shadow:0 4px 10px rgba(0,0,0,.15);
+}
+
+button:active{
+transform:scale(0.97);
+}
+  
+.btn-edit{background:#ffd166;}
+  
+.btn-main{
+background:linear-gradient(135deg,#e63946,#ff6b6b);
+color:white;
+}
+  
+.btn-sub{background:#eef1f6;}
+
+footer{
+background:linear-gradient(135deg,#c1121f,#e63946,#ff6b6b);
+color:white;
+text-align:center;
+font-size:10px;
+padding:8px;
+}
+
+#loading{
+position:fixed;
+inset:0;
+background:white;
+display:flex;
+align-items:center;
+justify-content:center;
+flex-direction:column;
+z-index:999;
+opacity:1;
+transition:opacity .6s ease;
+}
+  
+.loader{
+width:45px;
+height:45px;
+border:4px solid #eee;
+border-top:4px solid #e63946;
+border-radius:50%;
+animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+to{transform:rotate(360deg)}
+}
+
+@media (max-width:768px){
+
+.stats{
+grid-template-columns:1fr 1fr;
+}
+
+.stat:first-child{
+grid-column:1/3;
+}
+
+.grid{
+grid-template-columns:1fr;
+}
+
+.card{
+height:auto;
+}
+
+.chartBox canvas{
+width:100% !important;
+max-width:320px;
+max-height:320px;
+}
+
+.class-top{
+flex-direction:column;
+gap:4px;
+align-items:center;
+text-align:center;
+}
+
+.buttons{
+flex-direction:column;
+}
+
+button{
+width:100%;
+}
+
+}
+
+@keyframes blink{
+0%{opacity:1}
+50%{opacity:.4}
+100%{opacity:1}
+}
+  
+</style>
+</head>
+
+<body>
+
+<script src="ui-effects.js"></script>
+  
+<div id="loading">
+<div class="loader"></div>
+<div style="margin-top:12px;font-size:14px;color:#555">
+กำลังเปิดหน้า Dashboard...
+</div>
+</div>
+
+<header>
+
+<a class="back" href="index.html">← กลับหน้าแรก</a>
+  
+<img src="burapa-logo.png" class="logo">
+
+<div class="system-name">ระบบบริหารจัดการสถิตินักเรียน</div>
+<div class="school-name">โรงเรียนเทศบาลบูรพาอุบล</div>
+
+<div class="term" id="termDisplay" style="display:none;"></div>
+<div class="time" id="clock"></div>
+
+</header>
+
+<main>
+
+<div class="stats">
+
+<div class="stat">
+<h3>นักเรียนทั้งหมด</h3>
+<div class="num" id="total">0</div>
+</div>
+
+<div class="stat">
+<h3>มาเรียนวันนี้</h3>
+<div class="num present" id="present">0</div>
+</div>
+
+<div class="stat">
+<h3>ป่วย</h3>
+<div class="num sick" id="sick">0</div>
+</div>
+
+<div class="stat">
+<h3>ลา</h3>
+<div class="num leave" id="leave">0</div>
+</div>
+
+<div class="stat">
+<h3>ขาด</h3>
+<div class="num absent" id="absent">0</div>
+</div>
+</div>
+
+<div class="grid">
+
+<div class="card">
+
+<div class="card-header">แผนภูมิสรุปสถิติวันนี้</div>
+
+<div class="chartBox">
+
+<canvas id="chart"></canvas>
+
+<div id="noData" class="noData">
+ยังไม่มีการบันทึกสถิติในวันนี้
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="card-header">
+<span>รายการห้องเรียนทั้งหมด</span>
+<span id="roomCount"></span>
+</div>
+
+<hr class="divider">
+<div id="classList"></div>
+</div>
+</div>
+</main>
+
+<footer>
+ระบบบริหารจัดการสถิตินักเรียน (BURAPA STUDENT SYSTEM)
+<br>
+โรงเรียนเทศบาลบูรพาอุบล
+<br>
+สำนักการศึกษา เทศบาลนครอุบลราชธานี
+</footer>
+
+<script>
+  
+const API="https://script.google.com/macros/s/AKfycbyV4PNjlFskTfF0Ol6xrZdWpSCJm54bi33l0M66QpluNo8X6B7Js8LZRtuY7T05KsShoQ/exec"
+
+loadTermFromAPI()
+
+async function loadTermFromAPI(){
+
+let el = document.getElementById("termDisplay")
+
+try{
+
+const res = await fetch(API + "?mode=getterm&t=" + Date.now())
+const data = await res.json()
+
+if(data.term && data.year){
+
+el.innerHTML =
+"ภาคเรียนที่ " + data.term + " ปีการศึกษา " + data.year
+
+el.style.display = "block"
+
+localStorage.setItem("term", data.term)
+localStorage.setItem("year", data.year)
+
+return
+
+}else{
+throw new Error("no data")
+}
+
+}catch(e){
+
+console.warn("โหลดเทอมไม่ได้ → ใช้ backup")
+
+let term = localStorage.getItem("term")
+let year = localStorage.getItem("year")
+
+if(term && year){
+
+el.innerHTML =
+"ภาคเรียนที่ " + term + " ปีการศึกษา " + year
+
+el.style.display = "block"
+
+}else{
+
+el.style.display = "none"
+
+}
+
+}
+
+}
+  
+
+let chartInstance=null
+let loadingNow=false
+
+async function load(){
+
+if(loadingNow)return
+loadingNow=true
+
+try{
+
+const res=await fetch(API+"?mode=getdashboard&t="+Date.now(),{cache:"no-store"})
+
+if(!res.ok)throw new Error()
+
+const dash=await res.json()
+
+renderDash(dash)
+renderRooms(dash.rooms||[])
+hideLoading()
+
+}catch(e){
+
+console.error(e)
+
+renderDash({present:0,sick:0,leave:0,absent:0})
+renderRooms([])
+hideLoading()
+}
+
+loadingNow=false
+}
+
+function hideLoading(){
+
+const loading=document.getElementById("loading")
+
+if(!loading)return
+
+loading.style.opacity="0"
+
+setTimeout(()=>{
+loading.style.display="none"
+},300)
+
+}
+
+function animateNumber(id,value){
+
+let el=document.getElementById(id)
+
+if(parseInt(el.innerText)===value) return
+
+let duration=600
+let startTime=null
+
+function step(timestamp){
+
+if(!startTime) startTime=timestamp
+
+let progress=timestamp-startTime
+let percent=Math.min(progress/duration,1)
+
+let current=Math.floor(percent*value)
+
+el.innerText=current
+
+if(percent<1){
+requestAnimationFrame(step)
+}else{
+el.innerText=value
+}
+
+}
+
+requestAnimationFrame(step)
+
+}
+  
+function renderDash(d){
+
+let total = d.total || 0
+let present = d.present || 0
+let sick = d.sick || 0
+let leave = d.leave || 0
+let absent = d.absent || 0
+let unknown = total - (present + sick + leave + absent)
+if(unknown < 0) unknown = 0
+
+let sum = present + sick + leave + absent + unknown
+
+let noData=document.getElementById("noData")
+let canvas=document.getElementById("chart")
+
+if(sum===0){
+canvas.style.display="none"
+noData.style.display="block"
+}else{
+canvas.style.display="block"
+noData.style.display="none"
+}
+
+animateNumber("total",total)
+animateNumber("present",present)
+animateNumber("sick",sick)
+animateNumber("leave",leave)
+animateNumber("absent",absent)
+
+let labels
+let colors
+let data
+
+if(sum===0){
+
+labels=["ยังไม่บันทึกสถิติในวันนี้"]
+colors=["#d9d9d9"]
+data=[1]
+
+}else{
+
+labels=["มาเรียน","ป่วย","ลา","ขาด","ยังไม่มีข้อมูล"]
+colors=["#22c55e","#ff8fab","#ffd166","#f87171","#9ca3af"]
+data=[present,sick,leave,absent,unknown]
+}
+
+if(!canvas) return
+
+let ctx=canvas.getContext("2d")
+
+if(chartInstance){
+
+chartInstance.data.labels = labels
+chartInstance.data.datasets[0].data = data
+chartInstance.data.datasets[0].backgroundColor = colors
+chartInstance.update()
+
+}else{
+
+chartInstance=new Chart(ctx,{
+type:"pie",
+data:{
+labels:labels,
+datasets:[{
+data:data,
+backgroundColor:colors,
+borderWidth:2,
+borderColor:"#fff"
+}]
+},
+plugins:[ChartDataLabels],
+options:{
+animation:{
+animateRotate:true,
+animateScale:true,
+duration:900,
+easing:"easeOutQuart"
+},
+layout:{
+padding:{
+bottom:10
+}
+},
+plugins:{
+legend:{
+position:"bottom",
+labels:{
+padding:12,
+boxWidth:10,
+boxHeight:10
+}
+},
+datalabels:{
+color:"#fff",
+font:{weight:"bold"},
+formatter:(v,ctx)=>{
+let sum=ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0)
+
+if(ctx.chart.data.labels.length===1){
+return ""
+}
+
+let percent=(v/sum*100).toFixed(1)
+
+if(percent<0.1 && v>0){
+return "<0.1%"
+}
+
+return percent+"%"
+}
+}
+}
+}
+})
+
+}
+
+}
+
+function renderRooms(rooms){
+
+document.getElementById("roomCount").innerText="("+rooms.length+" ห้อง)"
+  
+let html=""
+
+if(rooms.length===0){
+
+document.getElementById("classList").innerHTML=
+"<div style='text-align:center;padding:30px;color:#999'>ไม่พบข้อมูลห้องเรียน</div>"
+
+return
+}
+  
+rooms.forEach(r=>{
+
+let status = r.submitted
+?'<span class="status-badge ok">✔ บันทึกสถิติแล้ว</span>'
+:'<span class="status-badge pending">⚠ ยังไม่ได้บันทึกสถิติ</span>'
+
+html+=`
+<div class="class">
+
+<div class="class-top">
+
+<div>
+${r.room}
+<br>
+<small style="color:#888">มีนักเรียนทั้งหมด ${r.total || 0} คน</small>
+</div>
+
+${status}
+
+</div>
+
+<div class="buttons">
+
+${r.submitted
+?`<button class="btn-edit" onclick="location.href='form.html?room=${r.room}&edit=1&from=teacher'">แก้ไขสถิติวันนี้</button>`
+:`<button class="btn-main" onclick="location.href='form.html?room=${r.room}&from=teacher'">เริ่มบันทึกสถิติวันนี้</button>`
+}
+
+<button class="btn-sub" onclick="location.href='form.html?room=${r.room}&backdate=1&from=teacher'">
+แก้ไขสถิติย้อนหลัง
+</button>
+
+</div>
+
+</div>
+`
+
+})
+
+document.getElementById("classList").innerHTML=html
+
+}
+
+load()
+
+let refreshTimer
+
+function startAutoRefresh(){
+clearInterval(refreshTimer)
+refreshTimer=setInterval(load,15000)
+}
+
+startAutoRefresh()
+
+function updateClock(){
+
+let now=new Date()
+
+let days=["วันอาทิตย์","วันจันทร์","วันอังคาร","วันพุธ","วันพฤหัสบดี","วันศุกร์","วันเสาร์"]
+let months=["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"]
+
+let day=days[now.getDay()]
+let date=now.getDate()
+let month=months[now.getMonth()]
+let year=now.getFullYear()+543
+
+let h=String(now.getHours()).padStart(2,"0")
+let m=String(now.getMinutes()).padStart(2,"0")
+let s=String(now.getSeconds()).padStart(2,"0")
+
+document.getElementById("clock").innerHTML=
+day+"ที่ "+date+" "+month+" พ.ศ."+year+" เวลา "+h+":"+m+":"+s+" น."
+
+}
+
+setInterval(updateClock,1000)
+updateClock()
+
+</script>
+</body>
+</html>
