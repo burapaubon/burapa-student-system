@@ -611,21 +611,34 @@ el.style.display = "none"
 let chartInstance=null
 let loadingNow=false
 
+let firstLoad = true
+  
 async function load(){
 
 if(loadingNow)return
+
+if(!firstLoad && document.hidden) return
+  
 loadingNow=true
 
 try{
 
-const res=await fetch(API+"?mode=getdashboard&t="+Date.now(),{cache:"no-store"})
+const controller = new AbortController()
+const timeout = setTimeout(() => controller.abort(), 8000)
 
+const res = await fetch(API+"?mode=getdashboard&t="+Date.now(),{
+cache:"no-store",
+signal: controller.signal
+})
+
+clearTimeout(timeout)
+  
 if(!res.ok)throw new Error()
 
 const dash=await res.json()
 
 renderDash(dash)
-renderRooms(dash.rooms||[])
+renderRooms(Array.isArray(dash.rooms) ? dash.rooms : [])
 hideLoading()
 
 }catch(e){
@@ -638,6 +651,9 @@ hideLoading()
 }
 
 loadingNow=false
+
+firstLoad=false
+  
 }
 
 function hideLoading(){
@@ -650,7 +666,7 @@ loading.style.opacity="0"
 
 setTimeout(()=>{
 loading.style.display="none"
-},300)
+},600)
 
 }
 
@@ -658,7 +674,7 @@ function animateNumber(id,value){
 
 let el=document.getElementById(id)
 
-if(parseInt(el.innerText)===value) return
+if(Number(el.innerText) === value) return
 
 let duration=600
 let startTime=null
@@ -670,7 +686,10 @@ if(!startTime) startTime=timestamp
 let progress=timestamp-startTime
 let percent=Math.min(progress/duration,1)
 
-let current=Math.floor(percent*value)
+let start = Number(el.dataset.value ?? el.innerText ?? 0) || 0
+el.dataset.value = value
+let diff = value - start
+let current = Math.floor(start + diff * percent)
 
 el.innerText=current
 
@@ -688,14 +707,14 @@ requestAnimationFrame(step)
   
 function renderDash(d){
 
-let total = d.total || 0
-let present = d.present || 0
-let sick = d.sick || 0
-let leave = d.leave || 0
-let absent = d.absent || 0
-let unknown = total - (present + sick + leave + absent)
-if(unknown < 0) unknown = 0
-
+let total = isNaN(Number(d.total)) ? 0 : Number(d.total)
+let present = Number(d.present) || 0
+let sick = Number(d.sick) || 0
+let leave = Number(d.leave) || 0
+let absent = Number(d.absent) || 0
+let sumKnown = present + sick + leave + absent
+if(sumKnown > total) total = sumKnown
+let unknown = Math.max(0, total - (present + sick + leave + absent))
 let sum = present + sick + leave + absent + unknown
 
 let noData=document.getElementById("noData")
@@ -721,31 +740,36 @@ let data
 
 if(sum===0){
 
-labels=["ยังไม่บันทึกสถิติในวันนี้"]
-colors=["#d9d9d9"]
-data=[1]
+if(chartInstance instanceof Chart){
+chartInstance.destroy()
+chartInstance = null
+}
+
+return
 
 }else{
 
 labels=["มาเรียน","ป่วย","ลา","ขาด","ยังไม่มีข้อมูล"]
 colors=["#22c55e","#ff8fab","#ffd166","#f87171","#9ca3af"]
 data=[present,sick,leave,absent,unknown]
+
 }
 
-if(!canvas) return
-
-let ctx=canvas.getContext("2d")
-
+if (!(canvas instanceof HTMLCanvasElement)) return;
+  
+const ctx = canvas.getContext("2d");
+  
+if (!ctx) return;
+  
 if(chartInstance){
+  
+chartInstance.destroy()
 
-chartInstance.data.labels = labels
-chartInstance.data.datasets[0].data = data
-chartInstance.data.datasets[0].backgroundColor = colors
-chartInstance.update()
+chartInstance = null
+  
+}
 
-}else{
-
-chartInstance=new Chart(ctx,{
+chartInstance = new Chart(ctx,{
 type:"pie",
 data:{
 labels:labels,
@@ -756,7 +780,7 @@ borderWidth:2,
 borderColor:"#fff"
 }]
 },
-plugins:[ChartDataLabels],
+plugins: typeof ChartDataLabels !== "undefined" ? [ChartDataLabels] : [],
 options:{
 animation:{
 animateRotate:true,
@@ -764,44 +788,21 @@ animateScale:true,
 duration:900,
 easing:"easeOutQuart"
 },
-layout:{
-padding:{
-bottom:10
-}
-},
 plugins:{
-legend:{
-position:"bottom",
-labels:{
-padding:12,
-boxWidth:10,
-boxHeight:10
-}
-},
+legend:{ position:"bottom" },
 datalabels:{
 color:"#fff",
 font:{weight:"bold"},
 formatter:(v,ctx)=>{
 let sum=ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0)
-
-if(ctx.chart.data.labels.length===1){
-return ""
-}
-
+if(ctx.chart.data.labels.length===1) return ""
 let percent=(v/sum*100).toFixed(1)
-
-if(percent<0.1 && v>0){
-return "<0.1%"
-}
-
-return percent+"%"
+return percent<0.1 && v>0 ? "<0.1%" : percent+"%"
 }
 }
 }
 }
 })
-
-}
 
 }
 
@@ -831,7 +832,7 @@ html+=`
 <div class="class-top">
 
 <div>
-${r.room}
+${escapeHTML(r.room)}
 <br>
 <small style="color:#888">มีนักเรียนทั้งหมด ${r.total || 0} คน</small>
 </div>
@@ -843,11 +844,14 @@ ${status}
 <div class="buttons">
 
 ${r.submitted
-?`<button class="btn-edit" onclick="location.href='form.html?room=${r.room}&edit=1&from=teacher'">แก้ไขสถิติวันนี้</button>`
-:`<button class="btn-main" onclick="location.href='form.html?room=${r.room}&from=teacher'">เริ่มบันทึกสถิติวันนี้</button>`
+?`<button class="btn-edit" onclick="if(this.dataset.clicked)return;
+this.dataset.clicked=1; location.href='form.html?room=${encodeURIComponent(r.room)}&edit=1&from=teacher'">แก้ไขสถิติวันนี้</button>`
+:`<button class="btn-main" onclick="if(this.dataset.clicked)return;
+this.dataset.clicked=1; location.href='form.html?room=${encodeURIComponent(r.room)}&from=teacher'">เริ่มบันทึกสถิติวันนี้</button>`
 }
 
-<button class="btn-sub" onclick="location.href='form.html?room=${r.room}&backdate=1&from=teacher'">
+<button class="btn-sub" onclick="if(this.dataset.clicked)return;
+this.dataset.clicked=1; location.href='form.html?room=${encodeURIComponent(r.room)}&backdate=1&from=teacher'">
 แก้ไขสถิติย้อนหลัง
 </button>
 
@@ -867,12 +871,40 @@ load()
 let refreshTimer
 
 function startAutoRefresh(){
+
 clearInterval(refreshTimer)
-refreshTimer=setInterval(load,15000)
+  
+refreshTimer = setInterval(load,30000)
+  
 }
 
 startAutoRefresh()
+  
+document.addEventListener("visibilitychange", () => {
 
+if (document.hidden) {
+
+clearInterval(refreshTimer)
+
+}else{
+
+startAutoRefresh()
+load()
+
+}
+
+})
+
+function escapeHTML(str){
+return String(str).replace(/[&<>"']/g, m => ({
+"&":"&amp;",
+"<":"&lt;",
+">":"&gt;",
+"\"":"&quot;",
+"'":"&#039;"
+}[m]))
+}
+  
 function updateClock(){
 
 let now=new Date()
