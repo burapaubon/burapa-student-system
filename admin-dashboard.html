@@ -1,0 +1,2137 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<script src="session.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+<style>
+  
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+font-family:'Prompt',sans-serif;
+}
+
+body{
+min-height:100vh;
+display:flex;
+flex-direction:column;
+background:linear-gradient(180deg,#f6f7fb,#eef1f8);
+}
+ 
+header{
+background:linear-gradient(135deg,#c1121f,#e63946,#ff6b6b);
+background-size:200% 200%;
+animation:gradientMove 6s ease infinite;
+border-bottom:4px solid rgba(255,255,255,0.25);
+color:white;
+text-align:center;
+padding:22px 10px;
+box-shadow:0 10px 25px rgba(0,0,0,.15);
+position:relative;
+overflow:hidden;
+z-index:1;
+backdrop-filter: blur(2px);
+}
+
+header::before{
+content:"";
+position:absolute;
+top:0;
+left:0;
+width:200%;
+height:100%;
+background:
+radial-gradient(rgba(255,255,255,.12) 2px, transparent 2px);
+background-size:40px 40px;
+animation:dotsMove 30s linear infinite;
+opacity:.35;
+pointer-events:none;
+}
+
+header::after{
+content:"";
+position:absolute;
+top:0;
+left:-120%;
+width:240%;
+height:100%;
+
+background:linear-gradient(
+120deg,
+rgba(255,255,255,0) 0%,
+rgba(255,255,255,.25) 40%,
+rgba(255,255,255,.35) 50%,
+rgba(255,255,255,.25) 60%,
+rgba(255,255,255,0) 100%
+);
+  
+filter:blur(28px);
+animation:shine 6s linear infinite;
+pointer-events:none;
+}
+
+@keyframes gradientMove{
+0%{background-position:0% 50%}
+50%{background-position:100% 50%}
+100%{background-position:0% 50%}
+}
+
+@keyframes dotsMove{
+0%{transform:translateX(0)}
+100%{transform:translateX(-400px)}
+}
+
+@keyframes shine{
+0%{transform:translateX(-100%)}
+100%{transform:translateX(100%)}
+}
+  
+.logo{
+width:clamp(80px,16vw,110px);
+margin-bottom:4px;
+animation:float 4s ease-in-out infinite;
+filter:
+drop-shadow(0 8px 14px rgba(0,0,0,.3))
+drop-shadow(0 0 25px rgba(255,255,255,.35));
+}
+
+@keyframes float{
+0%{transform:translateY(0)}
+50%{transform:translateY(-6px)}
+100%{transform:translateY(0)}
+}
+  
+.system-name{font-size:13px;}
+.school-name{font-size:26px;font-weight:700;}
+
+.back{
+position:absolute;
+left:12px;
+top:12px;
+color:white;
+text-decoration:none;
+font-size:13px;
+background:rgba(255,255,255,.2);
+padding:6px 10px;
+border-radius:8px;
+cursor:pointer;
+}
+
+.term{
+font-size:16px;
+margin-top:3px;
+}
+
+.time{
+font-size:14px;
+margin-top:2px;
+}
+  
+main{
+flex:1;
+max-width:1100px;
+margin:auto;
+padding:16px;
+width:100%;
+}
+
+.stats{
+display:grid;
+grid-template-columns:repeat(5,1fr);
+gap:12px;
+margin-bottom:16px;
+}
+
+.stat{
+background:white;
+padding:14px;
+border-radius:16px;
+text-align:center;
+box-shadow:0 8px 20px rgba(0,0,0,.08);
+}
+
+.stat h3{font-size:12px;color:#666;}
+  
+.num{
+font-size:26px;
+font-weight:700;
+margin-top:4px;
+transition:transform .3s;
+}
+
+.num:hover{
+transform:scale(1.1);
+}
+
+.present{color:#6BCB77}
+.sick{color:#ff8fab}
+.leave{color:#ffd166}
+.absent{color:#f28482}
+
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:16px;
+align-items:stretch;
+}
+
+.card{
+background:white;
+border-radius:18px;
+padding:16px;
+box-shadow:0 10px 25px rgba(0,0,0,.08);
+display:flex;
+flex-direction:column;
+gap:12px;
+transition:.25s ease;
+height:420px;
+justify-content:space-between;
+}
+
+.card-center {
+justify-content: center;
+align-items: center;
+text-align: center;
+}
+
+.card-center .card-scroll{
+justify-content:center;
+display:flex;
+flex-direction:column;
+}
+  
+.card-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:0 4px;
+margin-bottom:6px;
+flex-shrink:0;
+}
+
+.card-header button{
+padding:6px 10px;
+font-size:11px;
+border-radius:8px;
+}
+  
+.card-header span:first-child{
+font-size:16px;
+font-weight:600;
+}
+  
+.card:hover{
+transform:translateY(-2px);
+box-shadow:0 14px 30px rgba(0,0,0,.12);
+}
+
+.card h3{
+text-align:center;
+margin-bottom:12px;
+flex-shrink:0;
+}
+  
+.chartBox{
+flex:1;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+padding:16px 0 12px;
+position:relative;
+min-height:0;
+}
+
+.chartBox canvas{
+width:100% !important;
+height:100% !important;
+max-width:260px;
+max-height:260px;
+}
+
+.noData{
+position:absolute;
+text-align:center;
+font-size:16px;
+color:#888;
+font-weight:500;
+}
+  
+#classList{
+flex:1;
+overflow-y:auto;
+margin-top:8px;
+padding-right:4px;
+scroll-behavior:smooth;
+-webkit-overflow-scrolling:touch;
+}
+
+#classList::-webkit-scrollbar{
+width:6px;
+}
+
+#classList::-webkit-scrollbar-thumb{
+background:#e5e7eb;
+border-radius:10px;
+}
+  
+.class{
+padding:14px 10px;
+border-bottom:1px solid #f1f5f9;
+border-radius:14px;
+transition:.2s ease;
+}
+
+.class:hover{
+background:#f9fafb;
+}
+
+.class-top{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:10px;
+}
+
+.class-top div{
+font-size:18px;
+font-weight:700;
+color:#333;
+}
+
+.btn-reset{
+background:#f87171;
+color:white;
+}
+  
+.status{
+font-size:13px;
+font-weight:700;
+}
+  
+.green{
+color:#6BCB77;
+}
+
+.red{
+color:#e63946;
+animation:blink 1.4s infinite;
+}
+
+.p {
+align-items: center;
+}
+  
+.buttons{
+margin-top:12px;
+display:flex;
+flex-wrap: wrap;
+gap:8px;
+justify-content: center;
+}
+
+button {
+border: none; 
+outline: none;
+border-radius: 12px;
+cursor: pointer;
+transition: all 0.3s ease;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 6px;
+font-weight: 500;
+}
+  
+.buttons button {
+flex: 0 1 calc(33.33% - 8px);
+min-width: 110px;
+padding: 12px 8px;
+margin-bottom: 0;
+border: none;
+border-radius: 12px;
+font-size: 12px;
+cursor: pointer;
+font-weight: 500;
+transition: .2s;
+}
+  
+button:hover{
+transform:translateY(-1px);
+box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+.btn-edit{
+background:#fbbf24;
+color:#78350f;
+font-weight:600;
+box-shadow:0 4px 10px rgba(251,191,36,.3);
+}
+
+.btn-edit:hover{
+background:#f59e0b;
+box-shadow:0 6px 14px rgba(245,158,11,.4);
+}
+  
+.btn-main{
+background:linear-gradient(135deg,#e63946,#ff6b6b);
+color:white;
+}
+  
+.btn-sub{background:#e5e7eb; color:#374151;}
+
+button:disabled{
+opacity:.6;
+cursor:not-allowed;
+}
+
+.reset-card{
+gap:14px;
+}
+
+.control-section{
+background:#f8fafc;
+padding:8px;
+border-radius:12px;
+display:flex;
+flex-direction:column;
+gap:6px;
+border:1px solid #e5e7eb;
+}
+
+.control-section:hover{
+background:#f1f5f9;
+}
+  
+.control-title{
+font-size:13px;
+font-weight:600;
+color:#374151;
+}
+
+.date-row{
+display:flex;
+gap:8px;
+}
+
+.date-row input{
+flex:1;
+padding:6px;
+border-radius:8px;
+border:1px solid #ddd;
+}
+
+.btn-control{
+border:none;
+padding:10px;
+border-radius:10px;
+font-size:13px;
+cursor:pointer;
+font-weight:600;
+transition:.2s;
+}
+
+.btn-control.warn{
+background:#fde68a;
+color:#92400e;
+}
+
+.btn-control.warn:hover{
+  background:#fcd34d;
+}
+
+.btn-control.danger{
+background:#ef4444;
+color:white;
+}
+
+.btn-control.danger:hover{
+background:#dc2626;
+}
+
+.danger-box{
+border:1px solid #fecaca;
+background:#fff1f2;
+}
+
+.btn-reset-soft{
+background:#fb923c;
+color:white;
+}
+
+.btn-reset-soft:hover{
+background:#fcd34d;
+}
+
+.btn-reset-danger{
+background:#ef4444;
+color:white;
+}
+
+.date-range{
+display:flex;
+gap:8px;
+flex-wrap:wrap;
+justify-content:center;
+}
+
+.date-range input{
+padding:6px;
+border-radius:8px;
+border:1px solid #ddd;
+}
+
+.field{
+display:flex;
+flex-direction:column;
+gap:4px;
+margin-bottom:10px;
+}
+
+.field label{
+font-size:13px;
+color:#555;
+font-weight:500;
+}
+
+.export-section{
+display:flex;
+flex-direction:column;
+gap:12px;
+}
+
+.export-group{
+background:#f8fafc;
+padding:12px;
+border-radius:12px;
+border:1px solid #e5e7eb;
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+.export-group-title{
+font-size:13px;
+font-weight:600;
+color:#374151;
+}
+
+.export-actions{
+display:flex;
+flex-direction:column;
+gap:8px;
+}
+
+.export-actions button{
+width:100%;
+padding:12px;
+font-size:13px;
+}
+  
+input[type="date"].select-modern {
+width: 100% !important;
+display: block;
+box-sizing: border-box;
+padding: 12px;
+font-size: 16px;
+-webkit-appearance: none;
+appearance: none;
+}
+
+.field input[type="date"] {
+width: 100% !important;
+}
+  
+.select-modern{
+padding:10px 12px;
+border-radius:12px;
+border:1px solid #e5e7eb;
+font-size:14px;
+background:#fff;
+cursor:pointer;
+transition:.25s;
+outline:none;
+}
+
+.select-modern:hover{
+border-color:#e63946;
+}
+
+.select-modern:focus{
+border-color:#e63946;
+box-shadow:0 0 0 3px rgba(230,57,70,0.15);
+}
+  
+footer{
+background:linear-gradient(135deg,#c1121f,#e63946,#ff6b6b);
+color:white;
+text-align:center;
+font-size:10px;
+padding:8px;
+}
+
+#loading{
+position:fixed;
+inset:0;
+background:white;
+display:flex;
+align-items:center;
+justify-content:center;
+flex-direction:column;
+z-index:999;
+opacity:1;
+transition:opacity .6s ease;
+}
+  
+.loader{
+width:45px;
+height:45px;
+border:4px solid #eee;
+border-top:4px solid #e63946;
+border-radius:50%;
+animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+to{transform:rotate(360deg)}
+}
+
+.status-badge{
+font-size:12px;
+padding:6px 10px;
+border-radius:999px;
+font-weight:600;
+white-space:nowrap;
+}
+
+.status-badge.ok{
+background:#dcfce7;
+color:#166534;
+}
+
+.status-badge.pending{
+background:#fee2e2;
+color:#991b1b;
+}
+  
+.updateBy{
+display:inline;
+margin-left:4px;
+}
+
+.card-scroll{
+overflow-y:auto;
+flex:1;
+padding-right:6px;
+display:flex;
+flex-direction:column;
+justify-content:flex-start;
+}
+
+.card button{
+flex-shrink:0;
+}
+  
+.card-scroll::-webkit-scrollbar{
+width:6px;
+}
+
+.card-scroll::-webkit-scrollbar-thumb{
+background:#e5e7eb;
+border-radius:10px;
+}
+
+#sigForm{
+transition: all .3s ease;
+}
+  
+@media (max-width:768px){
+
+.stats{
+grid-template-columns:1fr 1fr;
+}
+
+.stat:first-child{
+grid-column:1/3;
+}
+
+.grid{
+grid-template-columns:1fr;
+}
+
+.card{
+height:auto;
+}
+
+.updateText{
+display:block;
+text-align:center;
+width:100%;
+}
+  
+.chartBox canvas{
+width:100% !important;
+max-width:320px;
+max-height:320px;
+}
+
+.class-top{
+flex-direction:column;
+gap:4px;
+align-items:center;
+text-align:center;
+}
+
+.buttons{
+flex-direction:column;
+}
+
+.buttons button {
+flex: 1 1 100%;
+width: 100%;
+}
+  
+}
+
+@keyframes blink{
+0%{opacity:1}
+50%{opacity:.4}
+100%{opacity:1}
+}
+
+.status-box{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:12px 14px;
+border-radius:12px;
+font-size:14px;
+background:#f8fafc;
+box-shadow:0 2px 6px rgba(0,0,0,.05);
+transition:.2s;
+}
+
+.ok{ border-left:5px solid #22c55e; }
+.warn{ border-left:5px solid #f59e0b; }
+.err{ border-left:5px solid #ef4444; }
+  
+.system-status{
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+.status-box:hover{
+transform:translateY(-1px);
+}
+  
+.system-status div{
+margin:6px 0;
+font-size:15px;
+}
+</style>
+</head>
+  
+<body>                  
+  
+<script src="ui-effects.js"></script>
+  
+<div id="loading">
+<div class="loader"></div>
+<div style="margin-top:12px;font-size:14px;color:#555">
+กำลังเปิดหน้าบริหารจัดการระบบ...
+</div>
+</div>
+
+<header>
+
+  
+<a class="back" onclick="logout()">← ออกจากระบบ</a>
+  
+<img src="burapa-logo.png" class="logo">
+
+<div class="system-name">ระบบบริหารจัดการสถิตินักเรียน</div>
+<div class="school-name">สำหรับผู้บริหารและผู้ดูแลระบบ</div>
+
+<div class="term" id="termDisplay"></div>
+<div class="time" id="clock"></div>
+</header>
+
+<div id="alertBar" style="
+background:#fff3cd;
+color:#856404;
+padding:10px;
+text-align:center;
+font-size:14px;
+display:none;
+font-weight:600;
+">
+</div>
+  
+<main>
+
+<div class="stats">
+  
+<div class="stat total">
+<h3>นักเรียนทั้งหมด</h3>
+<div class="num" id="total">0</div>
+</div>
+
+<div class="stat">
+<h3>มาเรียนวันนี้</h3>
+<div class="num present" id="present">0</div>
+</div>
+
+<div class="stat">
+<h3>ป่วย</h3>
+<div class="num sick" id="sick">0</div>
+</div>
+
+<div class="stat">
+<h3>ลา</h3>
+<div class="num leave" id="leave">0</div>
+</div>
+
+<div class="stat">
+<h3>ขาด</h3>
+<div class="num absent" id="absent">0</div>
+</div>
+</div>
+
+<div class="grid">
+
+<div class="card">
+<div class="card-header">แผนภูมิสรุปสถิติวันนี้</div>
+<div class="chartBox">
+<canvas id="chart"></canvas>
+<div id="noData" class="noData"></div>
+</div>
+</div>
+
+<div class="card">
+<div class="card-header">แผนภูมิสรุปสถิติรายสัปดาห์</div>
+<div class="chartBox">
+<canvas id="weeklyChart"></canvas>
+</div>
+</div>
+
+<div class="card">
+<div class="card-header">แผนภูมิสรุปสถิติรายเดือน</div>
+<div class="chartBox">
+<canvas id="monthlyChart"></canvas>
+</div>
+</div>
+
+<div class="card card-rooms">
+<div class="card-header">
+<span>รายการห้องเรียนทั้งหมด <span id="roomCount"></span></span>
+<div style="display:flex;gap:6px;">
+<button onclick="addRoom()" class="btn-main">+ เพิ่มห้อง</button>
+<button onclick="toggleSort()" class="btn-sub" id="sortBtn">จัดลำดับห้อง</button>
+</div>
+</div>
+<div id="classList"></div>
+</div>
+
+<div class="card system-status">
+<h3>สถานะระบบ</h3>
+<div id="sttAPI" class="status-box">API: -</div>
+<div id="sttDB" class="status-box">Database: -</div>
+<div id="sttMSG" class="status-box">Messaging API: -</div>
+<div id="sttREC" class="status-box">Records: -</div>
+</div>
+
+<div class="card reset-card">
+<h3>จัดการข้อมูลสถิติ</h3>
+
+<div class="control-section">
+<div class="control-title">รีเซ็ตข้อมูลวันนี้</div>
+<button class="btn-control warn" onclick="resetTodayAll(event)">
+รีเซ็ตข้อมูลวันนี้ทั้งหมด
+</button>
+</div>
+
+<div class="control-section">
+<div class="control-title">รีเซ็ตตามช่วงเวลา (ตั้งแต่-จนถึง)</div>
+<div class="date-row">
+<input type="date" id="startDate">
+<input type="date" id="endDate">
+</div>
+<button class="btn-control warn" onclick="resetRange()">
+รีเซ็ตตามช่วงเวลา
+</button>
+</div>
+
+<div class="control-section danger-box">
+<div class="control-title">ล้างข้อมูลทั้งหมด</div>
+<button class="btn-control danger" onclick="resetAll()">
+ล้างข้อมูลทั้งระบบ
+</button>
+</div>
+</div>
+
+<div class="card">
+<h3>ตั้งค่าภาคเรียน / ปีการศึกษา</h3>
+
+<div class="field">
+<label>ภาคเรียน</label>
+<select id="termInput" class="select-modern">
+<option value="">-- เลือกภาคเรียน --</option>
+<option value="1">1</option>
+<option value="2">2</option>
+</select>
+</div>
+
+<div class="field">
+<label>ปีการศึกษา (พ.ศ.)</label>
+<select id="yearInput" class="select-modern"></select>
+</div>
+
+<button class="btn-main" onclick="changeTermYear(event)" style="width:100%; padding:12px;">
+บันทึกการตั้งค่า
+</button>
+</div>
+
+<div class="card">
+<div class="card-header" style="justify-content:center; font-weight:700;">
+Export แบบรายงานสถิติ
+</div>
+
+<div class="card-scroll export-section">
+<div class="export-group">
+<div class="export-group-title">เลือกวันที่ต้องการรายงาน</div>
+
+<input type="date" id="reportDate" class="select-modern">
+</div>
+
+<div class="export-group export-actions">
+<button class="btn-main" onclick="printReport()">
+Export รายงาน
+</button>
+
+<button class="btn-sub" onclick="toggleSigForm()">
+แก้ไขรายชื่อผู้ลงนาม
+</button>
+</div>
+
+<div id="sigForm" class="export-group" style="display:none;">
+<div class="export-group-title">ตั้งค่าชื่อผู้ลงนาม</div>
+
+<div class="field">
+<label>ครูเวรวันจันทร์</label>
+<input type="text" id="mon" class="select-modern">
+</div>
+
+<div class="field">
+<label>ครูเวรวันอังคาร</label>
+<input type="text" id="tue" class="select-modern">
+</div>
+
+<div class="field">
+<label>ครูเวรวันพุธ</label>
+<input type="text" id="wed" class="select-modern">
+</div>
+
+<div class="field">
+<label>ครูเวรวันพฤหัสบดี</label>
+<input type="text" id="thu" class="select-modern">
+</div>
+
+<div class="field">
+<label>ครูเวรวันศุกร์</label>
+<input type="text" id="fri" class="select-modern">
+</div>
+
+<div class="field">
+<label>ผช.ผอ.ฝ่ายบริหารทั่วไป</label>
+<input type="text" id="assistant" class="select-modern">
+</div>
+
+<div class="field">
+<label>รองผู้อำนวยการ</label>
+<input type="text" id="deputy" class="select-modern">
+</div>
+
+<div class="field">
+<label>ผู้อำนวยการ</label>
+<input type="text" id="director" class="select-modern">
+</div>
+
+<button class="btn-main" onclick="saveSignature()" style="width:100%; padding:12px;">
+บันทึกข้อมูลผู้ลงนาม
+</button>
+
+</div>
+</div>
+</div>
+</div>
+</main>
+  
+<footer>
+ระบบบริหารจัดการสถิตินักเรียน (BURAPA STUDENT SYSTEM)
+<br>
+โรงเรียนเทศบาลบูรพาอุบล
+<br>
+สำนักการศึกษา เทศบาลนครอุบลราชธานี
+</footer>
+
+<script>
+
+const token = localStorage.getItem("adminToken")
+
+if(!token){
+alert("กรุณาเข้าสู่ระบบก่อน")
+location.replace("admin-login.html")
+}
+
+function fetchWithTimeout(url, options = {}, timeout = 20000){
+return Promise.race([
+fetch(url, options),
+new Promise((_, reject) =>
+setTimeout(() => reject(new Error("timeout")), timeout)
+)
+])
+}
+  
+const API="https://script.google.com/macros/s/AKfycbyV4PNjlFskTfF0Ol6xrZdWpSCJm54bi33l0M66QpluNo8X6B7Js8LZRtuY7T05KsShoQ/exec"
+  
+function logout(){
+
+if(!confirm("คุณต้องการออกจากระบบหรือไม่")) return
+
+localStorage.removeItem("adminToken")
+localStorage.removeItem("loginTime")
+
+location.replace("index.html")
+
+}
+
+async function loadTerm(){
+
+try{
+
+const res = await fetchWithTimeout(API + "?mode=getterm&t=" + Date.now())
+const data = await res.json()
+
+const term = data.term
+const year = data.year
+
+generateYearOptions()
+
+const termEl = document.getElementById("termDisplay")
+
+if(term && year){
+
+termEl.style.display = "block"
+termEl.innerHTML = "ภาคเรียนที่ " + term + " ปีการศึกษา " + year
+
+document.getElementById("termInput").value = term
+document.getElementById("yearInput").value = year
+
+}else{
+
+termEl.style.display = "none"
+
+}
+
+}catch(e){
+
+document.getElementById("termDisplay").style.display = "none"
+
+}
+}
+
+let chartInstance=null
+let controller;
+let loadingNow=false
+let firstLoad = true
+let sortableInstance;
+let sortMode = false;
+  
+async function load(){
+
+if(loadingNow) return
+loadingNow = true
+
+if(controller){
+controller.abort()
+}
+
+controller = new AbortController()
+
+try{
+
+const res = await fetchWithTimeout(
+API + "?mode=getdashboard&t=" + Date.now(),
+{
+cache: "no-store",
+signal: controller.signal
+},
+10000
+)
+
+if(!res.ok){
+throw new Error("api")
+}
+
+const dash = await res.json()
+
+if(!dash || typeof dash !== "object"){
+throw new Error("invalid data")
+}
+    
+renderDash(dash)
+renderRooms(dash.rooms || [])
+renderWeeklyChart(dash.weekly || {})
+renderMonthlyChart(dash.monthly || {})
+
+}catch(e){
+
+console.error(e)
+
+if(!firstLoad){
+if(e.message === "timeout"){
+alert("เกิดข้อผิดพลาด รีเฟรชใหม่อีกครั้ง")
+}else{
+alert("โหลดข้อมูลไม่สำเร็จ")
+}
+}
+
+renderDash({present:0,sick:0,leave:0,absent:0})
+renderRooms([])
+
+}finally{
+
+hideLoading()
+loadingNow = false
+firstLoad = false
+
+}
+  
+}
+
+function hideLoading(){
+
+const loading=document.getElementById("loading")
+
+if(!loading)return
+
+loading.style.opacity="0"
+
+setTimeout(()=>{
+loading.style.display="none"
+},600)
+
+}
+
+function animateNumber(id,value){
+
+let el=document.getElementById(id)
+if(!el) return
+
+if(parseInt(el.innerText)===value) return
+
+let duration=800
+let startTime=null
+
+function step(timestamp){
+
+if(!startTime) startTime=timestamp
+
+let progress=timestamp-startTime
+let percent=Math.min(progress/duration,1)
+
+let current=Math.floor(percent*value)
+
+el.innerText=current
+
+if(percent<1){
+requestAnimationFrame(step)
+}else{
+el.innerText=value
+}
+
+}
+
+requestAnimationFrame(step)
+
+}
+
+function renderDash(d){
+  
+let total = d.total || 0
+let present = d.present || 0
+let sick = d.sick || 0
+let leave = d.leave || 0
+let absent = d.absent || 0
+let used = present + sick + leave + absent
+let unknown = Math.max(0, total - used)
+if(unknown < 0) unknown = 0
+
+let sum = present + sick + leave + absent + unknown
+
+let noData=document.getElementById("noData")
+let canvas=document.getElementById("chart")
+
+if(sum===0){
+canvas.style.display="none"
+noData.style.display="block"
+}else{
+canvas.style.display="block"
+noData.style.display="none"
+}
+
+animateNumber("total",total)
+animateNumber("present",present)
+animateNumber("sick",sick)
+animateNumber("leave",leave)
+animateNumber("absent",absent)
+
+let labels
+let colors
+let data
+
+if(sum===0){
+
+labels=["ยังไม่บันทึกสถิติในวันนี้"]
+colors=["#d9d9d9"]
+data=[1]
+
+}else{
+
+labels=["มาเรียน","ป่วย","ลา","ขาด","ยังไม่มีข้อมูล"]
+colors=["#22c55e","#ff8fab","#ffd166","#f87171","#9ca3af"]
+data=[present,sick,leave,absent,unknown]
+}
+
+if(!canvas) return
+let ctx=canvas.getContext("2d")
+
+if(chartInstance){
+chartInstance.data.labels = labels
+chartInstance.data.datasets[0].data = data
+chartInstance.update()
+}else{
+chartInstance = new Chart(ctx,{
+type:"pie",
+data:{
+labels:labels,
+datasets:[{
+data:data,
+backgroundColor:colors,
+borderWidth:2,
+borderColor:"#fff"
+}]
+},
+plugins:[ChartDataLabels],
+options:{
+animation:{
+animateRotate:true,
+animateScale:true,
+duration:900,
+easing:"easeOutQuart"
+},
+plugins:{
+legend:{
+position:"bottom",
+align:"center",
+labels:{
+padding:16,
+boxWidth:12,
+boxHeight:12
+}
+},
+datalabels:{
+color:"#fff",
+font:{weight:"bold"},
+formatter:(v,ctx)=>{
+let sum=ctx.chart.data.datasets[0].data.reduce((a,b)=>a+(b||0),0)
+
+if(sum===0) return ""
+if(ctx.chart.data.labels.length===1) return ""
+
+let percent=(v/sum*100).toFixed(1)
+
+if(percent<0.1 && v>0){
+return "<0.1%"
+}
+
+return percent+"%"
+}
+}
+}
+}
+})
+}
+
+}
+
+let weeklyChartInstance = null
+let monthlyChartInstance = null
+  
+function renderWeeklyChart(data){
+
+const canvas = document.getElementById("weeklyChart")
+
+if(!data || !data.labels || data.labels.length === 0){
+
+if(weeklyChartInstance){
+weeklyChartInstance.destroy()
+}
+
+canvas.style.display = "none"
+return
+}
+
+canvas.style.display = "block"
+  
+const ctx = canvas.getContext("2d")
+
+if(weeklyChartInstance){
+weeklyChartInstance.destroy()
+}
+weeklyChartInstance = new Chart(ctx,{
+type:"line",
+data:{
+labels:data.labels,
+datasets:[
+{
+label:"มาเรียน",
+data:data.present,
+tension:0.4
+},
+{
+label:"ขาด",
+data:data.absent,
+tension:0.4
+}
+]
+},
+options:{
+responsive:true,
+plugins:{
+legend:{position:"bottom"}
+}
+}
+})
+}
+
+function renderMonthlyChart(data){
+
+const canvas = document.getElementById("monthlyChart")
+
+if(!data || !data.labels || data.labels.length === 0){
+
+if(monthlyChartInstance){
+monthlyChartInstance.destroy()
+}
+
+canvas.style.display = "none"
+return
+}
+
+canvas.style.display = "block"
+  
+const ctx = canvas.getContext("2d")
+
+if(monthlyChartInstance){
+  monthlyChartInstance.destroy()
+}
+  
+monthlyChartInstance = new Chart(ctx,{
+type:"bar",
+data:{
+labels:data.labels,
+datasets:[
+{
+label:"มาเรียน",
+data:data.present
+},
+{
+label:"ขาด",
+data:data.absent
+}
+]
+},
+options:{
+responsive:true,
+plugins:{
+legend:{position:"bottom"}
+}
+}
+})
+}
+  
+function renderRooms(rooms){
+
+let html=""
+
+document.getElementById("roomCount").innerText="("+rooms.length+" ห้อง)"
+
+if(rooms.length===0){
+
+document.getElementById("classList").innerHTML =
+"<div style='text-align:center;padding:30px;color:#999'>ไม่พบข้อมูลห้องเรียน กรุณารีเฟรชใหม่</div>"
+
+document.getElementById("alertBar").style.display="none"
+
+return
+  
+}
+
+let done = rooms.filter(r => r.submitted).length
+
+let pending = rooms.filter(r => !r.submitted).length
+let alertBar = document.getElementById("alertBar")
+
+if(done === 0){
+
+alertBar.style.display="block"
+alertBar.innerHTML="⚠ ยังไม่มีการบันทึกสถิติในวันนี้"
+
+}else if(pending > 0){
+
+alertBar.style.display="block"
+alertBar.innerHTML="⚠ ยังมี "+pending+" ห้องที่ยังไม่ได้บันทึกสถิติวันนี้"
+
+}else{
+
+alertBar.style.display="none"
+
+}
+
+rooms.forEach(r=>{
+
+let status = r.submitted
+?'<span class="status-badge ok">✔ บันทึกสถิติแล้ว</span>'
+:'<span class="status-badge pending">⚠ ยังไม่ได้บันทึกสถิติ</span>'
+
+html+=`
+<div class="class" data-room="${r.room}">
+
+<div class="class-top">
+
+<div>
+${r.room}
+<br>
+<small style="color:#888">
+มีนักเรียนทั้งหมด ${r.total || 0} คน
+</small>
+</div>
+
+${status}
+
+</div>
+
+<div style="margin-top:6px;font-size:12px;color:#9ca3af">
+${renderUpdateInfo(r)}
+</div>
+
+<div class="buttons">
+<button onclick="editRoom('${encodeURIComponent(r.room)}')" class="btn-edit">
+แก้ไขชื่อห้อง
+</button>
+
+<button onclick="deleteRoom('${encodeURIComponent(r.room)}')" class="btn-reset-danger">
+- ลบห้อง
+</button>
+
+${r.submitted
+?`<button class="btn-edit" onclick="location.href='form.html?room=${encodeURIComponent(r.room)}&edit=1&from=admin'">แก้ไขสถิติวันนี้</button>`
+:`<button class="btn-main" onclick="location.href='form.html?room=${encodeURIComponent(r.room)}&from=admin'">เริ่มบันทึกสถิติวันนี้</button>`
+}
+
+<button class="btn-sub" onclick="location.href='form.html?room=${encodeURIComponent(r.room)}&backdate=1&from=admin'">
+แก้ไขสถิติย้อนหลัง
+</button>
+
+<button class="btn-reset-soft" onclick="resetRoom(event,'${encodeURIComponent(r.room)}')">
+รีเซ็ตสถิติวันนี้
+</button>
+
+</div>
+
+</div>
+`
+})
+
+document.getElementById("classList").innerHTML=html
+
+}
+  
+let refreshTimer
+
+async function editRoom(oldRoom){
+
+oldRoom = decodeURIComponent(oldRoom)
+
+let newName = prompt("แก้ไขชื่อห้อง", oldRoom)
+
+if(!newName || newName === oldRoom) return
+
+const res = await fetch(API + `?mode=editRoom&old=${encodeURIComponent(oldRoom)}&new=${encodeURIComponent(newName)}`)
+const data = await res.json()
+
+if(data.status === "success"){
+alert("แก้ไขชื่อห้องสำเร็จ กรุณาทำการรีเฟรช")
+load()
+}else{
+alert("แก้ไขชื่อห้องไม่สำเร็จ ลองใหม่อีกครั้ง")
+}
+
+}
+
+async function deleteRoom(room){
+
+room = decodeURIComponent(room)
+
+if(!confirm("ต้องการลบ "+room+" ใช่หรือไม่?")) return
+
+try{
+
+const res = await fetch(API + "?mode=deleteRoom&room=" + room + "&token=" + token)
+
+if(!res.ok) throw new Error("network")
+
+const data = await res.json()
+
+if(data.status === "success"){
+  
+alert("ลบห้องเรียบร้อยแล้ว กรุณาทำการรีเฟรช")
+  
+load()
+  
+}else{
+  
+alert("ทำการลบห้องไม่สำเร็จ ลองใหม่อีกครั้ง")
+}
+
+}catch(e){
+  
+alert("เกิดข้อผิดพลาด ลองใหม่อีกครั้ง")
+  
+}
+
+}
+  
+async function checkSystemStatusOnce(){
+
+try{
+
+const start = performance.now()
+
+const res = await fetchWithTimeout(
+API + "?mode=statuscheck&t=" + Date.now(),
+{ cache: "no-store" },
+20000
+)
+
+if(!res.ok) throw new Error("api error")
+
+let data
+
+try{
+data = await res.json()
+}catch{
+throw new Error("not json")
+}
+
+const ms = Math.round(performance.now() - start)
+
+const apiOk = data.apiOk ?? false
+const dbOk = data.dbOk ?? false
+const msgOk = data.msgOk ?? false
+const rec = data.totalRecords ?? 0
+
+let apiEl = document.getElementById("sttAPI")
+let apiStatus = "ok"
+
+if(!apiOk) apiStatus = "err"
+else if(ms > 2000) apiStatus = "warn"
+
+apiEl.className = "status-box " + apiStatus
+apiEl.innerHTML = `API <b>${ms} ms</b>`
+
+let dbEl = document.getElementById("sttDB")
+dbEl.className = "status-box " + (dbOk ? "ok" : "err")
+dbEl.innerHTML = `Database <b>${dbOk ? "Online" : "Error"}</b>`
+
+let msgEl = document.getElementById("sttMSG")
+msgEl.className = "status-box " + (msgOk ? "ok" : "err")
+msgEl.innerHTML = `Messaging <b>${msgOk ? "Connected" : "Fail"}</b>`
+
+let recEl = document.getElementById("sttREC")
+
+let recStatus = "ok"
+if(rec < 10) recStatus = "warn"
+
+recEl.className = "status-box " + recStatus
+recEl.innerHTML = `Records <b>${rec}</b>`
+
+}catch(e){
+
+console.error("STATUS ERROR:", e)
+
+document.getElementById("sttAPI").innerHTML = "API ERROR"
+document.getElementById("sttDB").innerHTML = "DB ERROR"
+document.getElementById("sttMSG").innerHTML = "MSG ERROR"
+document.getElementById("sttREC").innerHTML = "REC ERROR"
+
+document.getElementById("sttAPI").className = "status-box err"
+document.getElementById("sttDB").className = "status-box err"
+document.getElementById("sttMSG").className = "status-box err"
+document.getElementById("sttREC").className = "status-box err"
+  
+}
+  
+}
+  
+function startAutoRefresh(){
+  
+load()
+  
+refreshTimer=setInterval(()=>{
+if(!loadingNow && document.visibilityState === "visible"){
+load()
+}
+},30000)
+}
+
+startAutoRefresh()
+checkSystemStatusOnce()
+
+function updateClock(){
+
+let now=new Date()
+
+let days=["วันอาทิตย์","วันจันทร์","วันอังคาร","วันพุธ","วันพฤหัสบดี","วันศุกร์","วันเสาร์"]
+let months=["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"]
+
+let day=days[now.getDay()]
+let date=now.getDate()
+let month=months[now.getMonth()]
+let year=now.getFullYear()+543
+
+let h=String(now.getHours()).padStart(2,"0")
+let m=String(now.getMinutes()).padStart(2,"0")
+let s=String(now.getSeconds()).padStart(2,"0")
+
+document.getElementById("clock").innerHTML=
+day+"ที่ "+date+" "+month+" พ.ศ."+year+" เวลา "+h+":"+m+":"+s+" น."
+
+}
+
+let clockTimer = setInterval(updateClock,1000)
+updateClock()
+
+function formatThaiDate(dateText){
+if(!dateText) return ""
+
+let parts = dateText.includes("-") 
+? dateText.split("-") 
+: dateText.split("/")
+
+if(parts.length !== 3) return dateText
+
+let year = parseInt(parts[0])
+let month = parts[1]
+let day = parts[2]
+
+if(isNaN(year)) return dateText
+
+year += 543
+
+return `${day.padStart(2,"0")}/${month.padStart(2,"0")}/${year}`
+}
+  
+function renderUpdateInfo(r){
+if(!r.lastUpdateTime){
+return `<span style="color:#9ca3af;font-size:12px">ยังไม่มีข้อมูล</span>`;
+}
+
+let dateText = r.lastUpdateDate || r.date || r.updateDate || "";
+dateText = formatThaiDate(dateText);
+
+let time = (r.lastUpdateTime || "").replace("น.","").trim();
+let source = (r.updatedBy || "").toLowerCase();
+let isAuto = source.includes("autofill");
+
+let color = isAuto ? "#9ca3af" : "#ea580c";
+let text = isAuto ? "A" : "T";
+
+return `
+<span class="updateText" style="color:${color};font-size:12px;font-weight:500">
+สถิติล่าสุด ${dateText} เวลา ${time} น. 
+<span class="updateBy">(${text})</span>
+</span>
+  `;
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+const el = document.getElementById("classList");
+if(el){
+sortableInstance = Sortable.create(el, {
+animation: 150,
+disabled:true,
+onEnd: function(evt){
+const newOrder = Array.from(el.children).map(c => c.dataset.room);
+fetch(API + "?mode=updateRoomOrder&order=" + encodeURIComponent(JSON.stringify(newOrder)))
+.then(res => res.json())
+.then(d => {
+if(d.status !== "success"){
+alert("บันทึกลำดับไม่สำเร็จ กรุณาลองใหม่")
+}
+})
+.catch(()=>{
+alert("ระบบจัดเรียงห้องไม่ได้ ลองใหม่อีกครั้ง")
+})
+}
+});
+}
+});
+
+function toggleSort(){
+
+sortMode = !sortMode
+
+sortableInstance.option("disabled", !sortMode)
+
+const btn = document.getElementById("sortBtn")
+
+if(sortMode){
+btn.innerText = "บันทึกลำดับห้อง"
+btn.classList.remove("btn-sub")
+btn.classList.add("btn-main")
+  
+alert("ทำการเข้าโหมดจัดลำดับห้องแล้ว")
+  
+}else{
+  
+btn.innerText = "จัดลำดับห้อง"
+btn.classList.remove("btn-main")
+btn.classList.add("btn-sub")
+  
+alert("บันทึกลำดับห้องเรียบร้อยแล้ว")
+  
+load()
+  
+}
+
+}
+
+async function addRoom(){
+
+if(loadingNow) return
+
+let name = prompt("พิมพ์ชื่อห้อง เช่น ชั้นประถมศึกษาปีที่ 1")
+  
+if(!name) return
+
+loadingNow = true
+
+try{
+const res = await fetch(API + "?mode=addRoom&room=" + encodeURIComponent(name))
+
+if(!res.ok) throw new Error()
+
+const data = await res.json()
+
+if(data.status === "success"){
+  
+alert("ระบบเพิ่มห้องสำเร็จ กรุณาทำการรีเฟรช")
+  
+load()
+  
+}else{
+  
+alert("ทำการเพิ่มห้องไม่สำเร็จ ลองใหม่อีกครั้ง")
+  
+}
+
+}catch(e){
+  
+alert("เกิดข้อผิดพลาด ลองใหม่อีกครั้ง")
+  
+}
+
+loadingNow = false
+  
+}
+  
+async function resetRoom(e, room){
+
+room = decodeURIComponent(room)
+
+if(!confirm("คุณต้องการรีเซ็ตสถิตวันนี้ของ "+room+" ใช่ไหม?")) return
+
+if(loadingNow) return
+loadingNow = true
+
+const btn = e.currentTarget
+btn.disabled = true
+btn.innerText = "กำลังรีเซ็ต..."
+
+try{
+
+const res = await fetch(API + "?mode=resetRoom&room=" + encodeURIComponent(room))
+
+if(!res.ok){
+  
+throw new Error()
+  
+}
+
+alert("ทำการรีเซ็ตสถิติ "+room+" วันนี้สำเร็จ")
+  
+load()
+
+} catch(e){
+  
+alert("รีเซ็ตไม่สำเร็จ กรุณาลองใหม่อีกครั้ง")
+  
+}
+
+btn.innerText = "รีเซ็ตสถิติวันนี้"
+btn.disabled = false
+
+loadingNow = false
+  
+}
+
+async function resetTodayAll(e){
+
+if(loadingNow) return
+
+const btn = e.target
+if(btn.disabled) return
+
+if(!confirm("คุณต้องการรีเซ็ตสถิติทุกห้องในวันนี้ใช่ไหม?")) return
+
+btn.disabled = true
+btn.innerText = "กำลังรีเซ็ต..."
+
+loadingNow = true
+
+try{
+
+const res = await fetch(API+"?mode=resetTodayAll")
+
+if(!res.ok){
+  
+throw new Error()
+  
+}
+
+alert("ทำการรีเซ็ตสถิติทุกห้องในวันนี้สำเร็จ")
+  
+load()
+
+}catch(e){
+  
+alert("เกิดข้อผิดพลาด ลองใหม่อีกครั้ง")
+  
+}
+
+btn.disabled = false
+btn.innerText = "รีเซ็ตข้อมูลวันนี้ทั้งหมด"
+  
+loadingNow = false
+  
+}
+  
+async function resetRange(){
+
+if(loadingNow) return
+
+let start=document.getElementById("startDate").value
+let end=document.getElementById("endDate").value
+
+if(!start || !end){
+  
+alert("กรุณาเลือกวันที่")
+  
+return
+  
+}
+
+if(!confirm("รีเซ็ตข้อมูลช่วง "+start+" ถึง "+end+" ใช่หรือไม่")) return
+
+if(new Date(start) > new Date(end)){
+  
+alert("วันที่เริ่มต้องไม่มากกว่าวันที่สิ้นสุด")
+  
+return
+  
+}
+  
+loadingNow = true
+
+try{
+
+const res = await fetch(API+`?mode=resetRange&start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`)
+
+if(!res.ok){
+  
+throw new Error()
+  
+}
+
+alert("รีเซ็ตสถิติแบบเลือกช่วงวันสำเร็จ")
+  
+load()
+
+}catch(e){
+  
+alert("เกิดข้อผิดพลาด ลองใหม่อีกครั้ง")
+  
+}
+
+loadingNow = false
+}
+
+async function resetAll(){
+
+if(loadingNow) return
+
+if(!confirm("⚠ คุณต้องการล้างข้อมูลสถิติในระบบทั้งหมดใช่หรือไม่")) return
+if(!confirm("❗ ข้อมูลสถิติจะหายทั้งหมด ยืนยันอีกครั้ง")) return
+  
+let confirmText = prompt("พิมพ์ 'RESET' เพื่อยืนยัน")
+
+if(confirmText !== "RESET"){
+  
+alert("ยกเลิกการล้างข้อมูล")
+  
+return
+  
+}
+  
+loadingNow = true
+
+try{
+
+const res = await fetch(API+"?mode=resetAll")
+
+if(!res.ok){
+throw new Error()
+}
+
+alert("ล้างข้อมูลสถิติในระบบทั้งหมดแล้ว")
+load()
+
+}catch(e){
+alert("เกิดข้อผิดพลาด ลองใหม่อีกครั้ง")
+}
+
+loadingNow = false
+}
+
+async function changeTermYear(e){
+  
+const btn = e.target
+  
+btn.disabled = true
+btn.innerText = "กำลังบันทึก..."
+
+const term = document.getElementById("termInput").value
+const year = document.getElementById("yearInput").value
+
+if(!term || !year){
+  
+alert("กรุณาเลือกให้ครบ")
+  
+btn.disabled = false
+btn.innerText = "บันทึกการตั้งค่า"
+  
+return
+  
+}
+
+try{
+
+const res = await fetch(API+`?mode=updateTerm&term=${encodeURIComponent(term)}&year=${encodeURIComponent(year)}`)
+
+if(!res.ok) throw new Error()
+
+const data = await res.json()
+
+if(data.status !== "success"){
+  
+throw new Error()
+  
+}
+
+alert("เปลี่ยนภาคเรียน / ปีการศึกษาเรียบร้อยแล้ว")
+
+loadTerm()
+
+}catch(e){
+
+alert("เกิดข้อผิดพลาดในการบันทึก กรุณาลองใหม่อีกครั้ง")
+
+}
+
+btn.disabled = false
+btn.innerText = "บันทึกการตั้งค่า"
+  
+}
+
+function generateYearOptions(){
+
+const select = document.getElementById("yearInput")
+const currentYear = new Date().getFullYear() + 543
+
+select.innerHTML = ""
+
+for(let i = currentYear + 1; i >= currentYear - 5; i--){
+const opt = document.createElement("option")
+opt.value = i
+opt.textContent = i
+select.appendChild(opt)
+}
+}
+
+async function loadSignature(){
+
+try{
+
+const res = await fetch(API + "?mode=getsigconfig&t=" + Date.now())
+const data = await res.json()
+
+document.getElementById("mon").value = data.mon || ""
+document.getElementById("tue").value = data.tue || ""
+document.getElementById("wed").value = data.wed || ""
+document.getElementById("thu").value = data.thu || ""
+document.getElementById("fri").value = data.fri || ""
+
+document.getElementById("assistant").value = data.assistant || ""
+document.getElementById("deputy").value = data.deputy || ""
+document.getElementById("director").value = data.director || ""
+
+}catch(e){
+console.log("โหลดชื่อไม่สำเร็จ")
+  
+}
+
+}
+  
+async function saveSignature(){
+
+const btn = event.target
+btn.disabled = true
+btn.innerText = "กำลังบันทึก..."
+
+const url = API + `?mode=updatesigconfig
+&mon=${encodeURIComponent(mon.value)}
+&tue=${encodeURIComponent(tue.value)}
+&wed=${encodeURIComponent(wed.value)}
+&thu=${encodeURIComponent(thu.value)}
+&fri=${encodeURIComponent(fri.value)}
+&assistant=${encodeURIComponent(assistant.value)}
+&deputy=${encodeURIComponent(deputy.value)}
+&director=${encodeURIComponent(director.value)}`
+
+try{
+
+const res = await fetch(url)
+const data = await res.json()
+
+if(data.status === "success"){
+  
+alert("บันทึกเรียบร้อย")
+  
+loadSignature()
+  
+document.getElementById("sigForm").style.display = "none"
+  
+}else{
+  
+alert("บันทึกไม่สำเร็จ")
+  
+}
+
+}catch(e){
+  
+alert("เกิดข้อผิดพลาด")
+  
+}
+
+btn.disabled = false
+btn.innerText = "บันทึกข้อมูลผู้ลงนาม"
+  
+}
+
+function toggleSigForm(){
+
+const form = document.getElementById("sigForm")
+const container = form.closest(".card-scroll")
+
+if(form.style.display === "none"){
+form.style.display = "block"
+
+setTimeout(()=>{
+container.scrollTo({
+top: form.offsetTop - 10,
+behavior: "smooth"
+})
+},100)
+
+}else{
+  
+form.style.display = "none"
+  
+}
+
+}
+  
+function printReport(){
+
+const btn = event.target
+const date = document.getElementById("reportDate").value
+
+if(!date){
+  
+alert("กรุณาเลือกวันที่ต้องการทำแบบรายงาน")
+  
+return
+  
+}
+
+btn.disabled = true
+btn.innerText = "กำลังสร้างรายงาน..."
+
+window.open(
+"report.html?date=" + date,
+"_blank"
+)
+
+setTimeout(()=>{
+  
+btn.disabled = false
+btn.innerText = "Export รายงาน"
+  
+},1500)
+
+}
+  
+generateYearOptions()
+  
+loadTerm()
+  
+window.addEventListener("DOMContentLoaded", () => {
+loadSignature()
+})
+  
+document.getElementById("reportDate").valueAsDate = new Date()
+</script>
+</body>
+</html>
