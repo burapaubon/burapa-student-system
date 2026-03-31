@@ -2066,26 +2066,59 @@ select.appendChild(opt)
 }
 }
 
+async function loadSignature(){
+
+try{
+
+const res = await fetch(API + "?mode=getsigconfig&t=" + Date.now())
+
+if(!res.ok) throw new Error()
+
+const data = await res.json()
+
+document.getElementById("mon").value = data.mon || ""
+document.getElementById("tue").value = data.tue || ""
+document.getElementById("wed").value = data.wed || ""
+document.getElementById("thu").value = data.thu || ""
+document.getElementById("fri").value = data.fri || ""
+document.getElementById("assistant").value = data.assistant || ""
+document.getElementById("deputy").value = data.deputy || ""
+document.getElementById("director").value = data.director || ""
+
+}catch(e){
+
+console.error("โหลดรายชื่อไม่สำเร็จ", e)
+
+}
+}
+  
 async function saveSignature(e){
 
 const btn = e.target
 btn.disabled = true
 btn.innerText = "กำลังบันทึก..."
 
-const url = API + `?mode=updatesigconfig
-&mon=${encodeURIComponent(mon.value)}
-&tue=${encodeURIComponent(tue.value)}
-&wed=${encodeURIComponent(wed.value)}
-&thu=${encodeURIComponent(thu.value)}
-&fri=${encodeURIComponent(fri.value)}
-&assistant=${encodeURIComponent(assistant.value)}
-&deputy=${encodeURIComponent(deputy.value)}
-&director=${encodeURIComponent(director.value)}
-&token=${token}`
-
 try{
 
-const res = await fetch(url)
+const res = await fetch(API, {
+method: "POST",
+headers: {
+"Content-Type": "application/json"
+},
+body: JSON.stringify({
+mode: "updatesigconfig",
+mon: mon.value,
+tue: tue.value,
+wed: wed.value,
+thu: thu.value,
+fri: fri.value,
+assistant: assistant.value,
+deputy: deputy.value,
+director: director.value,
+token: token
+})
+})
+
 const data = await res.json()
 
 if(data.status === "success"){
