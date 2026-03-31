@@ -1035,8 +1035,8 @@ function logout(){
 
 if(!confirm("คุณต้องการออกจากระบบหรือไม่")) return
 
-localStorage.removeItem("adminToken")
-localStorage.removeItem("loginTime")
+sessionStorage.removeItem("adminToken")
+sessionStorage.removeItem("loginTime")
 
 location.replace("index.html")
 
@@ -1148,8 +1148,7 @@ alert("โหลดข้อมูลไม่สำเร็จ")
 }
 }
 
-renderDash({present:0,sick:0,leave:0,absent:0})
-renderRooms([])
+console.warn("โหลดข้อมูลไม่สำเร็จ ใช้ข้อมูลเดิมแทน");
 
 }finally{
 
