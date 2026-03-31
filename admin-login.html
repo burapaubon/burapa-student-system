@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-store" />
+<title>Login as Admin</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+<style>
+
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+font-family:'Prompt',sans-serif;
+}
+
+html,body{
+max-width:100%;
+overflow-x:hidden;
+}
+  
+body{
+min-height:100vh;
+display:flex;
+flex-direction:column;
+
+background:
+linear-gradient(180deg,#ffffff,#f8f9fc),
+radial-gradient(circle at 15% 20%, rgba(230,57,70,.06), transparent 45%),
+radial-gradient(circle at 85% 80%, rgba(230,57,70,.05), transparent 45%);
+}
+
+header{
+background:linear-gradient(135deg,#c1121f,#e63946,#ff6b6b);
+background-size:200% 200%;
+animation:gradientMove 6s ease infinite;
+border-bottom:4px solid rgba(255,255,255,0.25);
+color:white;
+text-align:center;
+padding:22px 10px;
+box-shadow:0 10px 25px rgba(0,0,0,.15);
+position:relative;
+overflow:hidden;
+z-index:1;
+backdrop-filter: blur(2px);
+}
+
+header::before{
+content:"";
+position:absolute;
+top:0;
+left:0;
+width:200%;
+height:100%;
+background:
+radial-gradient(rgba(255,255,255,.12) 2px, transparent 2px);
+background-size:40px 40px;
+animation:dotsMove 30s linear infinite;
+opacity:.35;
+pointer-events:none;
+}
+
+header::after{
+content:"";
+position:absolute;
+top:0;
+left:-120%;
+width:240%;
+height:100%;
+
+background:linear-gradient(
+120deg,
+rgba(255,255,255,0) 0%,
+rgba(255,255,255,.25) 40%,
+rgba(255,255,255,.35) 50%,
+rgba(255,255,255,.25) 60%,
+rgba(255,255,255,0) 100%
+);
+  
+filter:blur(28px);
+animation:shine 6s linear infinite;
+pointer-events:none;
+}
+
+@keyframes gradientMove{
+0%{background-position:0% 50%}
+50%{background-position:100% 50%}
+100%{background-position:0% 50%}
+}
+
+@keyframes dotsMove{
+0%{transform:translateX(0)}
+100%{transform:translateX(-400px)}
+}
+
+@keyframes shine{
+0%{transform:translateX(-100%)}
+100%{transform:translateX(100%)}
+}
+  
+.logo{
+width:clamp(80px,16vw,110px);
+margin-bottom:4px;
+animation:float 4s ease-in-out infinite;
+filter:
+drop-shadow(0 8px 14px rgba(0,0,0,.3))
+drop-shadow(0 0 25px rgba(255,255,255,.35));
+}
+
+@keyframes float{
+0%{transform:translateY(0)}
+50%{transform:translateY(-6px)}
+100%{transform:translateY(0)}
+}
+  
+.system-name{font-size:13px;}
+.school-name{font-size:26px;font-weight:700;}
+
+.back{
+position:absolute;
+left:12px;
+top:12px;
+color:white;
+text-decoration:none;
+font-size:13px;
+background:rgba(255,255,255,.2);
+padding:6px 10px;
+border-radius:8px;
+cursor:pointer;
+}
+
+.term{
+font-size:16px;
+margin-top:3px;
+}
+
+.time{
+font-size:14px;
+margin-top:2px;
+}
+
+main{
+flex:1;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:20px;
+}
+
+.card{
+width:100%;
+max-width:420px;
+background:white;
+border-radius:22px;
+padding:28px 26px;
+box-shadow:
+0 40px 80px rgba(0,0,0,.10),
+0 12px 30px rgba(0,0,0,.08);
+border-top:6px solid #e63946;
+text-align:center;
+}
+
+.card h2{
+font-size:18px;
+margin-bottom:6px;
+}
+
+.card p{
+font-size:12px;
+color:#666;
+margin-bottom:16px;
+}
+
+.input{
+width:100%;
+padding:12px;
+border-radius:10px;
+border:1px solid #ddd;
+margin-bottom:10px;
+font-size:14px;
+outline:none;
+transition:.2s;
+}
+
+.input:focus{
+border-color:#e63946;
+box-shadow:0 0 0 2px rgba(230,57,70,.15);
+}
+
+.btn{
+display:flex;
+align-items:center;
+justify-content:center;
+gap:10px;
+width:100%;
+padding:14px;
+border:none;
+border-radius:12px;
+font-size:15px;
+font-weight:500;
+cursor:pointer;
+transition:.25s;
+}
+
+.btn-admin{
+background:linear-gradient(135deg,#ffd166,#ffe29a);
+}
+
+.btn:hover{
+transform:translateY(-2px);
+box-shadow:0 8px 20px rgba(0,0,0,.12);
+}
+
+footer{
+background:linear-gradient(135deg,#c1121f,#e63946,#ff6b6b);
+color:white;
+text-align:center;
+font-size:10px;
+padding:8px 10px;
+line-height:1.5;
+}
+
+#loading{
+position:fixed;
+inset:0;
+background:white;
+display:flex;
+align-items:center;
+justify-content:center;
+flex-direction:column;
+z-index:999;
+opacity:1;
+transition:opacity .6s ease;
+}
+
+.loader{
+width:45px;
+height:45px;
+border:4px solid #eee;
+border-top:4px solid #e63946;
+border-radius:50%;
+animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+to{transform:rotate(360deg)}
+}
+  
+</style>
+</head>
+
+<body>
+  
+<script src="ui-effects.js"></script>
+  
+<div id="loading">
+<div class="loader"></div>
+<div style="margin-top:12px;font-size:14px;color:#555">
+กำลังเปิดหน้า Login...
+</div>
+</div>
+  
+<header>
+
+  
+<a class="back" href="index.html">← กลับหน้าแรก</a>
+
+<img src="burapa-logo.png" class="logo">
+
+<div class="system-name">
+ระบบบริหารจัดการสถิตินักเรียน
+</div>
+
+<div class="school-name">
+โรงเรียนเทศบาลบูรพาอุบล
+</div>
+
+<div class="term" id="termDisplay" style="display:none;"></div>
+<div class="time" id="clock"></div>
+</header>
+
+<main>
+
+<div class="card">
+
+<h2>สำหรับผู้บริหาร / ผู้ดูแลระบบ</h2>
+
+<p>กรอก Username และ Password เพื่อเข้าสู่ระบบ</p>
+
+<input id="user" class="input" placeholder="Username" required>
+<input id="pass" class="input" type="password" placeholder="Password" required>
+
+<button id="loginBtn" class="btn btn-admin" onclick="loginAdmin()">
+<i class="bi bi-shield-lock"></i>
+<span id="btnText">เข้าสู่ระบบ</span>
+</button>
+
+</div>
+
+</main>
+
+<footer>
+ระบบบริหารจัดการสถิตินักเรียน (BURAPA STUDENT SYSTEM)
+<br>
+โรงเรียนเทศบาลบูรพาอุบล
+<br>
+สำนักการศึกษา เทศบาลนครอุบลราชธานี
+</footer>
+
+<script>
+  
+const API_URL = "https://script.google.com/macros/s/AKfycbyV4PNjlFskTfF0Ol6xrZdWpSCJm54bi33l0M66QpluNo8X6B7Js8LZRtuY7T05KsShoQ/exec"
+  
+async function loginAdmin(){
+
+const btn = document.getElementById("loginBtn")
+if(btn.disabled) return
+const btnText = document.getElementById("btnText")
+
+btn.disabled = true
+setTimeout(()=>{
+btn.disabled=false
+btnText.innerHTML="เข้าสู่ระบบ"
+},3000)
+  
+const u=document.getElementById("user").value.trim()
+const p=document.getElementById("pass").value.trim()
+
+if(!u || !p){
+alert("กรุณากรอก Username และ Password")
+btn.disabled = true
+btnText.innerHTML = "กำลังเข้าสู่ระบบ..."
+return
+}
+  
+try{
+
+const formData = new FormData()
+
+formData.append("mode","login")
+formData.append("username",u)
+formData.append("password",p)
+
+const res = await fetch(API_URL,{
+method:"POST",
+body:formData
+})
+
+if(!res.ok){
+throw new Error("server error")
+}
+  
+const data = await res.json()
+
+if(data.status==="success"){
+
+localStorage.setItem("adminToken",data.token)
+localStorage.setItem("loginTime",Date.now())
+
+location.replace("admin-dashboard.html")
+
+}else{
+
+alert("Username หรือ Password ไม่ถูกต้อง")
+
+document.getElementById("pass").value=""
+  
+btn.disabled=false
+btnText.innerHTML="เข้าสู่ระบบ"
+
+}
+
+}catch(err){
+btn.disabled = false
+btnText.innerHTML = "เข้าสู่ระบบ"
+  
+alert("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาติดต่อผู้ดูแลระบบ")
+
+}
+
+}
+
+document.getElementById("pass").addEventListener("keydown",function(e){
+if(e.key==="Enter"){
+loginAdmin()
+}
+})
+  
+async function loadTerm(){
+
+let el = document.getElementById("termDisplay")
+
+try{
+
+const res = await fetch(API_URL + "?mode=getterm&t=" + Date.now())
+const data = await res.json()
+
+if(data.term != null && data.year != null){
+
+el.innerHTML =
+"ภาคเรียนที่ " + data.term + " ปีการศึกษา " + data.year
+
+el.style.display = "block"
+
+localStorage.setItem("term", data.term)
+localStorage.setItem("year", data.year)
+
+return
+}
+
+}catch(e){
+console.warn("โหลดเทอมไม่สำเร็จ")
+}
+
+let term = localStorage.getItem("term")
+let year = localStorage.getItem("year")
+
+if(term && year){
+
+el.innerHTML =
+"ภาคเรียนที่ " + term + " ปีการศึกษา " + year
+
+el.style.display = "block"
+
+}else{
+
+el.style.display = "none"
+
+}
+
+}
+
+function updateClock(){
+
+let now=new Date()
+
+let days=["วันอาทิตย์","วันจันทร์","วันอังคาร","วันพุธ","วันพฤหัสบดี","วันศุกร์","วันเสาร์"]
+let months=["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"]
+
+let day=days[now.getDay()]
+let date=now.getDate()
+let month=months[now.getMonth()]
+let year=now.getFullYear()+543
+
+let h=String(now.getHours()).padStart(2,"0")
+let m=String(now.getMinutes()).padStart(2,"0")
+let s=String(now.getSeconds()).padStart(2,"0")
+
+document.getElementById("clock").innerHTML=
+day+"ที่ "+date+" "+month+" พ.ศ."+year+" เวลา "+h+":"+m+":"+s+" น."
+}
+
+updateClock()
+setInterval(updateClock,1000)
+
+window.onload=function(){
+
+const token = localStorage.getItem("adminToken")
+const loginTime = localStorage.getItem("loginTime")
+
+if(loginTime){
+
+const diff = Date.now() - loginTime
+
+if(diff > 3600000){
+
+localStorage.clear()
+location.href="admin-login.html"
+
+}
+
+}
+
+setTimeout(()=>{
+let loading=document.getElementById("loading")
+loading.style.opacity="0"
+
+setTimeout(()=>{
+loading.style.display="none"
+},200)
+
+},400)
+
+}
+  
+</script>
+</body>
+</html>
