@@ -556,6 +556,37 @@ width:100%;
   
 const API="https://script.google.com/macros/s/AKfycbyV4PNjlFskTfF0Ol6xrZdWpSCJm54bi33l0M66QpluNo8X6B7Js8LZRtuY7T05KsShoQ/exec"
 
+async function fetchWithRetry(url, options = {}, retries = 3){
+
+for(let i=0;i<retries;i++){
+try{
+
+const controller = new AbortController()
+const timeout = setTimeout(() => controller.abort(), 15000)
+
+const res = await fetch(url, {
+...options,
+signal: controller.signal
+})
+
+clearTimeout(timeout)
+
+if(!res.ok) throw new Error("HTTP " + res.status)
+
+return await res.json()
+
+}catch(e){
+
+if(i === retries - 1) throw e
+
+await new Promise(r => setTimeout(r, 1500))
+
+}
+
+}
+
+}
+  
 loadTermFromAPI()
 
 async function loadTermFromAPI(){
@@ -564,8 +595,9 @@ let el = document.getElementById("termDisplay")
 
 try{
 
-const res = await fetch(API + "?mode=getterm&t=" + Date.now())
-const data = await res.json()
+const data = await fetchWithRetry(
+API + "?mode=getterm&t=" + Date.now()
+)
 
 if(data.term && data.year){
 
@@ -616,46 +648,82 @@ let firstLoad = true
 async function load(){
 
 if(loadingNow)return
-
 if(!firstLoad && document.hidden) return
-  
-loadingNow=true
+
+loadingNow = true
+
+if(firstLoad){
+showLoading()
+}
+
+let slowTimer = setTimeout(()=>{
+if(loadingNow){
+showError("⏳ ระบบกำลังซิงค์ข้อมูล")
+}
+},8000)
 
 try{
 
-const controller = new AbortController()
-const timeout = setTimeout(() => controller.abort(), 15000)
+const dash = await fetchWithRetry(
+API+"?mode=getdashboard&t="+Date.now(),
+{ cache:"no-store" },
+3
+)
 
-const res = await fetch(API+"?mode=getdashboard&t="+Date.now(),{
-cache:"no-store",
-signal: controller.signal
-})
+clearTimeout(slowTimer)
 
-clearTimeout(timeout)
-  
-if(!res.ok)throw new Error()
-
-const dash=await res.json()
+if(!dash || typeof dash !== "object"){
+throw new Error("invalid data")
+}
 
 renderDash(dash)
-renderRooms(Array.isArray(dash.rooms) ? dash.rooms : [])
+let rooms = Array.isArray(dash.rooms) ? dash.rooms : []
+renderRooms(rooms)
+
 hideLoading()
 
 }catch(e){
 
 console.error(e)
 
-renderDash({present:0,sick:0,leave:0,absent:0})
-renderRooms([])
-hideLoading()
+showError("❌ โหลดข้อมูลไม่สำเร็จ\nลองรีเฟรชใหม่อีกครั้ง")
+
+setTimeout(() => {
+if(!document.hidden) load()
+}, 5000)
+
+} finally {
+
+clearTimeout(slowTimer)
+  
+loadingNow = false
+firstLoad = false
+
 }
 
-loadingNow=false
+}
 
-firstLoad=false
+function showLoading(){
+let noData = document.getElementById("noData")
+let canvas = document.getElementById("chart")
+
+canvas.style.display = "none"
+noData.style.display = "block"
+noData.innerText = "⏳ กำลังโหลดข้อมูล..."
   
 }
+  
+function showError(msg){
 
+let noData = document.getElementById("noData")
+let canvas = document.getElementById("chart")
+
+canvas.style.display = "none"
+noData.style.display = "block"
+noData.innerText = msg
+
+}
+  
 function hideLoading(){
 
 const loading=document.getElementById("loading")
@@ -667,7 +735,7 @@ loading.style.opacity="0"
 setTimeout(()=>{
 loading.style.display="none"
 },600)
-
+  
 }
 
 function animateNumber(id,value){
@@ -762,13 +830,21 @@ const ctx = canvas.getContext("2d");
 if (!ctx) return;
   
 if(chartInstance){
+
+try{
   
 chartInstance.destroy()
-
+  
+}catch(e){}
+  
 chartInstance = null
   
 }
 
+if (typeof ChartDataLabels !== "undefined") {
+Chart.register(ChartDataLabels)
+}
+  
 chartInstance = new Chart(ctx,{
 type:"pie",
 data:{
@@ -845,13 +921,13 @@ ${status}
 
 ${r.submitted
 ?`<button class="btn-edit" onclick="if(this.dataset.clicked)return;
-this.dataset.clicked=1; location.href='form.html?room=${encodeURIComponent(r.room)}&edit=1&from=teacher'">แก้ไขสถิติวันนี้</button>`
+this.dataset.clicked=1; this.disabled = true; location.href='form.html?room=${encodeURIComponent(r.room)}&edit=1&from=teacher'">แก้ไขสถิติวันนี้</button>`
 :`<button class="btn-main" onclick="if(this.dataset.clicked)return;
-this.dataset.clicked=1; location.href='form.html?room=${encodeURIComponent(r.room)}&from=teacher'">เริ่มบันทึกสถิติวันนี้</button>`
+this.dataset.clicked=1; this.disabled = true; location.href='form.html?room=${encodeURIComponent(r.room)}&from=teacher'">เริ่มบันทึกสถิติวันนี้</button>`
 }
 
 <button class="btn-sub" onclick="if(this.dataset.clicked)return;
-this.dataset.clicked=1; location.href='form.html?room=${encodeURIComponent(r.room)}&backdate=1&from=teacher'">
+this.dataset.clicked=1; this.disabled = true; location.href='form.html?room=${encodeURIComponent(r.room)}&backdate=1&from=teacher'">
 แก้ไขสถิติย้อนหลัง
 </button>
 
@@ -888,6 +964,7 @@ clearInterval(refreshTimer)
 
 }else{
 
+firstLoad = true
 startAutoRefresh()
 load()
 
