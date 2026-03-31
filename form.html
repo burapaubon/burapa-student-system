@@ -734,7 +734,7 @@ if(!inputs || inputs.length === 0) return
 
 inputs.forEach(i=>{
 
-if(i.value < 0) i.value = 0
+if(Number(i.value) < 0) i.value = 0
 
 i.value = Math.floor(i.value)
 
@@ -916,6 +916,7 @@ calculate()
 
 }catch(e){
 console.error(e)
+alert("โหลดข้อมูลไม่สำเร็จ")
 }
 finally{
 hideLoading()
