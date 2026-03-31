@@ -2100,44 +2100,38 @@ btn.innerText = "กำลังบันทึก..."
 
 try{
 
-const res = await fetch(API, {
-method: "POST",
-headers: {
-"Content-Type": "application/json"
-},
-body: JSON.stringify({
-mode: "updatesigconfig",
-mon: document.getElementById("mon").value,
-tue: document.getElementById("tue").value,
-wed: document.getElementById("wed").value,
-thu: document.getElementById("thu").value,
-fri: document.getElementById("fri").value,
-assistant: document.getElementById("assistant").value,
-deputy: document.getElementById("deputy").value,
-director: document.getElementById("director").value,
-token: token
-})
-})
+const url = API + `?mode=updatesigconfig
+&mon=${encodeURIComponent(document.getElementById("mon").value)}
+&tue=${encodeURIComponent(document.getElementById("tue").value)}
+&wed=${encodeURIComponent(document.getElementById("wed").value)}
+&thu=${encodeURIComponent(document.getElementById("thu").value)}
+&fri=${encodeURIComponent(document.getElementById("fri").value)}
+&assistant=${encodeURIComponent(document.getElementById("assistant").value)}
+&deputy=${encodeURIComponent(document.getElementById("deputy").value)}
+&director=${encodeURIComponent(document.getElementById("director").value)}
+&token=${token}`
+
+const res = await fetch(url)
+
+if(!res.ok) throw new Error()
 
 const data = await res.json()
 
 if(data.status === "success"){
-  
 alert("บันทึกเรียบร้อย")
 loadSignature()
 document.getElementById("sigForm").style.display = "none"
-  
 }else{
 alert("บันทึกไม่สำเร็จ")
 }
 
 }catch(e){
+console.error(e)
 alert("เกิดข้อผิดพลาด")
 }
 
 btn.disabled = false
 btn.innerText = "บันทึกข้อมูลผู้ลงนาม"
-
 }
 
 function toggleSigForm(){
