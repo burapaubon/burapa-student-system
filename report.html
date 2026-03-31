@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>แบบรายงานสถิตินักเรียนประจำวัน</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun&display=swap" rel="stylesheet">
+  
+<style>
+body{
+font-family:'Sarabun',Tahoma,sans-serif;
+background:#f9fafb;
+margin:0;
+padding:0;
+-webkit-font-smoothing: antialiased;
+}
+
+.report{
+width:210mm;
+max-width:100%;
+margin:20px auto;
+padding:10mm 10mm 15mm 10mm;
+background:white;
+box-sizing:border-box;
+box-shadow:none !important;
+page-break-inside:auto;
+font-family:'Sarabun',Tahoma,sans-serif;
+page-break-inside:auto;
+}
+
+h2{
+  text-align:center;
+  margin-bottom:4px;
+}
+
+.date{
+  text-align:center;
+  margin-bottom:15px;
+  font-size:15px;
+  color:#555;
+}
+
+h2, .date{
+  page-break-after: avoid;
+}
+  
+.section{
+  page-break-inside:auto;
+  margin-top:10px;
+  page-break-before: auto;
+}
+  
+table{
+  width:99%;
+  border-collapse:collapse;
+  font-size:13.5px;
+  page-break-before:auto;
+  page-break-inside:auto;
+  table-layout: fixed;
+}
+  
+td, th{
+  border:1px solid #000;
+  padding:5px 3px;
+  text-align:center;
+  word-break:break-word;
+  white-space:normal;
+  page-break-inside: auto;
+}
+
+table, thead, tbody, tr, td, th{
+  break-inside: avoid !important;
+}
+
+tr, td, th{
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+}
+  
+td:first-child{
+  white-space:normal;
+}
+  
+th{
+  background:#e5e7eb;
+  font-weight:600;
+}
+
+tr{
+  page-break-inside: avoid !important;
+  page-break-after:auto;
+  break-inside: avoid !important;
+}
+  
+.summary, .footer{
+  page-break-inside: avoid;
+}
+  
+thead{
+  display: table-header-group;
+}  
+
+thead th{
+  background:#e5e7eb !important;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+} 
+
+th:first-child, td:first-child{
+  width:200px;
+}
+
+.total{
+  background:#fde68a;
+  font-weight:bold;
+}
+
+.primary{
+  background:#fde68a;
+}
+
+.secondary{
+  background:#86efac;
+}
+
+.total-all{
+  background:#93c5fd;
+}
+
+.primary, .secondary, .total-all{
+-webkit-print-color-adjust: exact;
+print-color-adjust: exact;
+}
+
+.summary{
+margin-top:50px;
+font-size:14px;
+line-height:2.4;
+padding-top:20px;
+border-top:2px solid #000;
+text-align:center;
+letter-spacing:0.5px;
+font-family:'Sarabun',sans-serif;
+page-break-before:auto;
+break-inside: avoid;
+}
+  
+.summary br{
+margin-bottom:10px;
+}
+
+.sum-row{
+font-weight:bold;
+-webkit-print-color-adjust: exact;
+print-color-adjust: exact;
+page-break-inside: avoid !important;
+break-inside: avoid;
+}
+
+tr:last-child{
+page-break-after: avoid;
+page-break-inside: avoid;
+}
+
+.footer{
+margin-top:50px;
+display:grid;
+grid-template-columns: repeat(2, 1fr);
+gap:50px 60px;
+text-align:center;
+font-size:14px;
+break-inside: avoid;
+page-break-before: avoid;
+}
+
+.sign{
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:10px;
+}
+
+.line{
+width:80%;
+border-bottom:1px solid #000;
+height:20px;
+}
+
+.footer div{
+width:100%;
+}
+
+.actions{
+margin:30px auto 60px;
+display:flex;
+justify-content:center;
+gap:15px;
+}
+
+.btn{
+padding:10px 20px;
+border:none;
+border-radius:8px;
+font-size:14px;
+cursor:pointer;
+transition:0.2s;
+font-family:'Prompt',sans-serif;
+}
+
+.btn.primary{
+background:#ef4444;
+color:white;
+}
+
+.btn.primary:hover{
+background:#dc2626;
+}
+
+.btn.secondary{
+background:#e5e7eb;
+}
+
+.btn.secondary:hover{
+background:#d1d5db;
+}
+
+.section-break{
+page-break-inside: avoid;
+}
+  
+@media print{
+  
+*{
+-webkit-print-color-adjust: exact !important;
+print-color-adjust: exact !important;
+}
+  
+body{
+background:white;
+-webkit-font-smoothing: antialiased;
+zoom: 100%;
+}
+  
+.report{
+box-shadow:none;
+margin:0 !important;
+padding-top:10mm;
+padding:5mm 10mm 10mm 10mm !important;
+page-break-before: avoid;
+overflow:hidden;
+}
+
+.actions, button{
+display:none !important;
+}
+
+@page{ 
+size:A4;
+margin:10mm;
+  
+}
+  
+}
+</style>
+</head>
+
+<body>
+
+<div id="loading" style="
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:rgba(255,255,255,0.9);
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:20px;
+z-index:9999;
+">
+กำลังสร้างแบบรายงาน...
+</div>
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  
+<div class="report" id="report">
+
+<h2>รายงานสถิตินักเรียนประจำวัน</h2>
+<div class="date" id="dateText"></div>
+
+<div class="section">
+<table>
+<thead>
+<tr>
+<th rowspan="2">ชั้น</th>
+<th colspan="3">นักเรียนทั้งหมด</th>
+<th colspan="3">มาเรียนวันนี้</th>
+<th rowspan="2">ป่วย</th>
+<th rowspan="2">ลา</th>
+<th rowspan="2">ขาด</th>
+</tr>
+<tr>
+<th>ชาย</th>
+<th>หญิง</th>
+<th>รวม</th>
+<th>ชาย</th>
+<th>หญิง</th>
+<th>รวม</th>
+</tr>
+</thead>
+
+<tbody id="dataBody"></tbody>
+</table>
+</div>
+  
+<div class="summary" id="summary"></div>
+
+<div class="footer">
+<div class="sign">
+<div class="line"></div>
+<div id="teacherName">( - )</div>
+<div>ครูเวรประจำวัน</div>
+</div>
+
+<div class="sign">
+<div class="line"></div>
+<div id="assistantName">( - )</div>
+<div>ผช.ผอ.ฝ่ายบริหารทั่วไป</div>
+</div>
+
+<div class="sign">
+<div class="line"></div>
+<div id="deputyName">( - )</div>
+<div>รองผู้อำนวยการสถานศึกษา</div>
+</div>
+
+<div class="sign">
+<div class="line"></div>
+<div id="directorName">( - )</div>
+<div>ผู้อำนวยการสถานศึกษา</div>
+</div>
+</div>
+
+</div>
+
+<div class="actions">
+<button class="btn primary" onclick="downloadPDF()">ดาวน์โหลด PDF</button>
+<button class="btn secondary" onclick="window.print()">พิมพ์เอกสาร</button>
+</div>
+
+<script>
+
+let isLoaded = false
+  
+const API="https://script.google.com/macros/s/AKfycbyV4PNjlFskTfF0Ol6xrZdWpSCJm54bi33l0M66QpluNo8X6B7Js8LZRtuY7T05KsShoQ/exec"
+
+const params = new URLSearchParams(location.search)
+const date = params.get("date") || new Date().toISOString().split("T")[0]
+  
+async function downloadPDF(){
+  
+if(!isLoaded){
+  
+alert("โปรดรอสักครู่...")
+  
+return
+  
+}
+
+const loadingEl = document.getElementById("loading")
+
+try{
+  
+loadingEl.style.display = "flex"
+loadingEl.innerHTML = "กำลังสร้าง PDF...<br><small>โปรดรอสักครู่</small>"
+
+const element = document.getElementById("report")
+
+await document.fonts.ready
+await new Promise(r => setTimeout(r, 200))
+element.style.width = "210mm"
+
+const canvas = await html2canvas(element, {
+scale: 2,
+useCORS: true,
+letterRendering: true,
+backgroundColor: "#ffffff"
+})
+
+const { jsPDF } = window.jspdf
+const pdf = new jsPDF("p", "mm", "a4")
+
+const margin = 12
+const imgWidth = 210 - (margin * 2)
+const pageHeight = 297
+const imgHeight = canvas.height * imgWidth / canvas.width
+
+const pageHeightPx = canvas.height * (pageHeight / imgHeight)
+
+let renderedHeight = 0
+
+while (renderedHeight < canvas.height) {
+
+const pageCanvas = document.createElement("canvas")
+const pageCtx = pageCanvas.getContext("2d")
+
+pageCanvas.width = canvas.width
+const safePadding = 10
+pageCanvas.height = pageHeightPx - safePadding
+
+pageCtx.fillStyle = "#ffffff"
+pageCtx.fillRect(0, 0, pageCanvas.width, pageCanvas.height)
+
+pageCtx.drawImage(
+canvas,
+0, renderedHeight,
+canvas.width, pageHeightPx,
+0, 0,
+canvas.width, pageHeightPx
+)
+
+const imgDataPage = pageCanvas.toDataURL("image/png")
+
+if (renderedHeight > 0) pdf.addPage()
+
+pdf.addImage(imgDataPage, "PNG", margin, margin, imgWidth, pageHeight - (margin * 2) - 2)
+
+renderedHeight += pageCanvas.height
+  
+}
+
+const fileDate = formatFileDate(date)
+pdf.save(`burapa-stu-${fileDate}.pdf`)
+
+}catch(e){
+alert("สร้าง PDF ไม่สำเร็จ")
+console.error(e)
+
+} finally {
+  
+loadingEl.style.display = "none"
+  
+}
+  
+}
+
+if(!date){
+  
+document.getElementById("dateText").innerText = "-"
+  
+}else{
+  
+document.getElementById("dateText").innerHTML = formatThaiDate(date)
+  
+}
+
+function formatFileDate(dateStr){
+const d = new Date(dateStr)
+
+const day = d.getDate().toString().padStart(2,"0")
+const month = (d.getMonth()+1).toString().padStart(2,"0")
+const year = d.getFullYear() + 543
+
+return `${day}-${month}-${year}`
+  
+}
+  
+function formatThaiDate(dateStr){
+  
+const d = new Date(dateStr)
+
+const day = d.toLocaleDateString('th-TH',{ weekday:'long' }).replace("วัน","")
+  
+const dNum = d.getDate()
+  
+const month = d.toLocaleDateString('th-TH',{ month:'long' })
+  
+const year = d.getFullYear() + 543
+
+return `
+วัน&nbsp;&nbsp;&nbsp;&nbsp;${day}
+&nbsp;&nbsp;&nbsp;&nbsp;ที่&nbsp;&nbsp;&nbsp;&nbsp;${dNum}
+&nbsp;&nbsp;&nbsp;&nbsp;เดือน&nbsp;&nbsp;&nbsp;&nbsp;${month}
+&nbsp;&nbsp;&nbsp;&nbsp;พ.ศ.&nbsp;&nbsp;&nbsp;&nbsp;${year}
+`
+}
+
+document.getElementById("loading").innerText = "กำลังโหลดข้อมูล..."
+  
+async function fetchWithFallback(dateStr){
+
+let d = new Date(dateStr)
+
+for(let i=0;i<365;i++){
+    
+const tryDate = d.toISOString().split("T")[0]
+
+try{
+  
+const res = await fetch(API + "?mode=report&date=" + tryDate)
+const data = await res.json()
+
+if(data && data.length > 0){
+
+return { data, fallbackDate: tryDate }
+
+}
+
+}catch(e){}
+
+d.setDate(d.getDate()-1)
+  
+}
+
+return { data:[], fallbackDate:null }
+  
+}
+  
+async function loadReport(){
+
+let data = []
+let isFallback = false
+
+try{
+const result = await fetchWithFallback(date)
+data = result.data
+isFallback = result.fallbackDate !== date
+
+if(data.length === 0){
+  
+document.getElementById("dataBody").innerHTML = `
+
+<tr><td colspan="10">ไม่พบข้อมูล</td></tr>
+`
+  
+document.getElementById("loading").style.display = "none"
+  
+return
+  
+}
+
+}catch(e){
+  
+alert("โหลดข้อมูลไม่สำเร็จ")
+  
+document.getElementById("loading").style.display = "none"
+  
+return
+  
+}
+
+let html=""
+  
+document.getElementById("loading").innerText = "กำลังสร้างรายงาน..."
+document.getElementById("dataBody").innerHTML = `<tr><td colspan="10">กำลังสร้าง Report...</td></tr>`;
+
+let levels = {}
+
+let totalAll = 0
+let totalMale = 0
+let totalFemale = 0
+
+let totalPresent = 0
+let totalPresentMale = 0
+let totalPresentFemale = 0
+
+let totalSick = 0
+let totalLeave = 0
+let totalAbsent = 0
+  
+data.forEach(r=>{
+
+const level = getLevel(r.room)
+
+if(!levels[level]){
+levels[level] = {
+rows:[],
+total:0,
+male:0,
+female:0,
+present:0,
+presentMale:0,
+presentFemale:0,
+sick:0,
+leave:0,
+absent:0
+  
+}
+  
+}
+
+const total = Number(r.total)||0
+const male = Number(r.male)||0
+const female = Number(r.female)||0
+
+const present = isFallback ? "" : Number(r.present)||0
+const presentMale = isFallback ? 0 : Number(r.present_m)||0
+const presentFemale = isFallback ? 0 : Number(r.present_f)||0
+
+const sick = isFallback ? "" : (r.sick||"")
+const leave = isFallback ? "" : (r.leave||"")
+const absent = isFallback ? "" : (r.absent||"")
+
+levels[level].rows.push({
+  room:r.room,
+  total,male,female,
+  present,presentMale,presentFemale,
+  sick,leave,absent
+})
+
+levels[level].total += total
+levels[level].male += male
+levels[level].female += female
+
+levels[level].present += present
+levels[level].presentMale += presentMale
+levels[level].presentFemale += presentFemale
+levels[level].sick += Number(sick)||0
+levels[level].leave += Number(leave)||0
+levels[level].absent += Number(absent)||0
+
+totalAll += total
+totalMale += male
+totalFemale += female
+
+totalPresent += present
+totalPresentMale += presentMale
+totalPresentFemale += presentFemale
+
+totalSick += Number(sick)||0
+totalLeave += Number(leave)||0
+totalAbsent += Number(absent)||0
+})
+
+let groupSum = {
+  "ป.": {male:0,female:0,total:0,presentMale:0,presentFemale:0,present:0, sick:0, leave:0, absent:0},
+  "ม.": {male:0,female:0,total:0,presentMale:0,presentFemale:0,present:0, sick:0, leave:0, absent:0},
+  "ปวช": {male:0,female:0,total:0,presentMale:0,presentFemale:0,present:0, sick:0, leave:0, absent:0}
+}
+
+const order = ["ป.1","ป.2","ป.3","ป.4","ป.5","ป.6","ม.1","ม.2","ม.3","ม.4","ม.5","ม.6","ปวช.1","ปวช.2","ปวช.3"]
+
+order.forEach(level=>{
+
+let groupKey = ""
+
+if(level.startsWith("ป.")) groupKey = "ป."
+else if(level.startsWith("ม.")) groupKey = "ม."
+else if(level.startsWith("ปวช")) groupKey = "ปวช"
+
+if(groupKey && levels[level]){
+groupSum[groupKey].male += levels[level].male
+groupSum[groupKey].female += levels[level].female
+groupSum[groupKey].total += levels[level].total
+
+groupSum[groupKey].presentMale += levels[level].presentMale
+groupSum[groupKey].presentFemale += levels[level].presentFemale
+groupSum[groupKey].present += levels[level].present
+
+groupSum[groupKey].sick += levels[level].sick
+groupSum[groupKey].leave += levels[level].leave
+groupSum[groupKey].absent += levels[level].absent
+  
+}
+  
+if(!levels[level]) return
+  
+levels[level].rows.sort((a,b)=>{
+
+const numA = a.room.match(/\d+/g)
+const numB = b.room.match(/\d+/g)
+
+if(!numA || !numB) return 0
+
+if(numA[0] != numB[0]){
+  
+return Number(numA[0]) - Number(numB[0])
+  
+}
+
+return (Number(numA[1]||0)) - (Number(numB[1]||0))
+  
+})
+  
+levels[level].rows.forEach(r=>{
+  
+html += `
+<tr>
+<td>${r.room}</td>
+
+<td>${r.male}</td>
+<td>${r.female}</td>
+<td>${r.total}</td>
+
+<td>${r.presentMale}</td>
+<td>${r.presentFemale}</td>
+<td>${r.present}</td>
+
+<td>${r.sick}</td>
+<td>${r.leave}</td>
+<td>${r.absent}</td>
+</tr>
+`
+  
+})
+
+let colorClass = ""
+
+if(level.startsWith("ป.")){
+  colorClass = "primary"
+}else if(level.startsWith("ม.") || level.startsWith("ปวช")){
+  colorClass = "secondary"
+}
+  
+html += `
+<tr class="sum-row ${colorClass}">
+<td>รวม ${level}</td>
+
+<td>${levels[level].male}</td>
+<td>${levels[level].female}</td>
+<td>${levels[level].total}</td>
+
+<td>${levels[level].presentMale}</td>
+<td>${levels[level].presentFemale}</td>
+<td>${levels[level].present}</td>
+
+<td>${levels[level].sick}</td>
+<td>${levels[level].leave}</td>
+<td>${levels[level].absent}</td>
+</tr>
+`
+  
+if(level === "ป.6"){
+html += `
+<tr class="sum-row primary section-break">
+<td>รวมประถมทั้งหมด</td>
+<td>${groupSum["ป."].male}</td>
+<td>${groupSum["ป."].female}</td>
+<td>${groupSum["ป."].total}</td>
+<td>${groupSum["ป."].presentMale}</td>
+<td>${groupSum["ป."].presentFemale}</td>
+<td>${groupSum["ป."].present}</td>
+<td>${groupSum["ป."].sick}</td>
+<td>${groupSum["ป."].leave}</td>
+<td>${groupSum["ป."].absent}</td>
+</tr>
+`
+  
+}
+
+if(level === "ม.6"){
+html += `
+<tr class="sum-row secondary section-break">
+<td>รวมมัธยมทั้งหมด</td>
+<td>${groupSum["ม."].male}</td>
+<td>${groupSum["ม."].female}</td>
+<td>${groupSum["ม."].total}</td>
+<td>${groupSum["ม."].presentMale}</td>
+<td>${groupSum["ม."].presentFemale}</td>
+<td>${groupSum["ม."].present}</td>
+<td>${groupSum["ม."].sick}</td>
+<td>${groupSum["ม."].leave}</td>
+<td>${groupSum["ม."].absent}</td>
+</tr>
+`
+  
+}
+
+if(level === "ปวช.3"){
+html += `
+<tr class="sum-row secondary section-break">
+<td>รวม ปวช ทั้งหมด</td>
+<td>${groupSum["ปวช"].male}</td>
+<td>${groupSum["ปวช"].female}</td>
+<td>${groupSum["ปวช"].total}</td>
+<td>${groupSum["ปวช"].presentMale}</td>
+<td>${groupSum["ปวช"].presentFemale}</td>
+<td>${groupSum["ปวช"].present}</td>
+<td>${groupSum["ปวช"].sick}</td>
+<td>${groupSum["ปวช"].leave}</td>
+<td>${groupSum["ปวช"].absent}</td>
+</tr>
+`
+  
+}
+  
+})
+  
+html += `
+<tr class="sum-row total-all">
+<td>รวมทั้งหมด</td>
+
+<td>${totalMale}</td>
+<td>${totalFemale}</td>
+<td>${totalAll}</td>
+
+<td>${totalPresentMale}</td>
+<td>${totalPresentFemale}</td>
+<td>${totalPresent}</td>
+
+<td>${totalSick}</td>
+<td>${totalLeave}</td>
+<td>${totalAbsent}</td>
+</tr>
+`
+
+document.getElementById("dataBody").innerHTML = html;
+
+const percent = totalAll ? ((totalPresent/totalAll)*100).toFixed(2) : 0
+const malePercent = totalMale ? ((totalPresentMale/totalMale)*100).toFixed(2) : 0
+const femalePercent = totalFemale ? ((totalPresentFemale/totalFemale)*100).toFixed(2) : 0
+
+document.getElementById("summary").innerHTML = `
+จำนวนนักเรียนทั้งหมด&nbsp;&nbsp;&nbsp;${totalAll}&nbsp;&nbsp;&nbsp;คน
+&nbsp;&nbsp;&nbsp;&nbsp;ชาย&nbsp;&nbsp;&nbsp;${totalMale}&nbsp;&nbsp;&nbsp;คน
+&nbsp;&nbsp;&nbsp;&nbsp;หญิง&nbsp;&nbsp;&nbsp;${totalFemale}&nbsp;&nbsp;&nbsp;คน
+<br>
+จำนวนนักเรียนมาเรียนวันนี้&nbsp;&nbsp;&nbsp;${totalPresent}&nbsp;&nbsp;&nbsp;คน
+&nbsp;&nbsp;&nbsp;&nbsp;ชาย&nbsp;&nbsp;&nbsp;${totalPresentMale}&nbsp;&nbsp;&nbsp;คน
+&nbsp;&nbsp;&nbsp;&nbsp;หญิง&nbsp;&nbsp;&nbsp;${totalPresentFemale}&nbsp;&nbsp;&nbsp;คน
+<br>
+ชาย&nbsp;&nbsp;คิดเป็นร้อยละ&nbsp;&nbsp;${malePercent}
+&nbsp;&nbsp;&nbsp;&nbsp;หญิง&nbsp;&nbsp;คิดเป็นร้อยละ&nbsp;&nbsp;${femalePercent}
+<br>
+นักเรียนมาเรียนวันนี้&nbsp;&nbsp;คิดเป็นร้อยละ&nbsp;&nbsp;${percent}
+`
+
+document.getElementById("loading").style.display = "none"
+
+isLoaded = true
+  
+}
+
+function getLevel(room){
+
+if(!room) return "อื่นๆ"
+
+room = room.trim()
+
+let match = room.match(/ป\.?\s*(\d+)/)
+if(match) return "ป." + match[1]
+
+if(room.includes("ประถม")){
+match = room.match(/\d+/)
+if(match) return "ป." + match[0]
+}
+
+match = room.match(/ม\.?\s*(\d+)/)
+if(match) return "ม." + match[1]
+
+if(room.includes("มัธยม")){
+match = room.match(/\d+/)
+if(match) return "ม." + match[0]
+}
+
+match = room.match(/ปวช\.?\s*(\d+)/)
+if(match) return "ปวช." + match[1]
+
+if(room.includes("ชั้นประกาศนียบัตรวิชาชีพ")){
+match = room.match(/\d+/)
+if(match) return "ปวช." + match[0]
+}
+
+return "อื่นๆ"
+  
+}
+
+async function loadSignatureToReport(){
+
+try{
+
+const res = await fetch(API + "?mode=getsigconfig")
+const data = await res.json()
+
+const day = new Date(date).getDay()
+
+let teacher = ""
+
+if(day === 1) teacher = data.mon
+if(day === 2) teacher = data.tue
+if(day === 3) teacher = data.wed
+if(day === 4) teacher = data.thu
+if(day === 5) teacher = data.fri
+
+document.getElementById("teacherName").innerText = `(${teacher || "-"})`
+document.getElementById("assistantName").innerText = `(${data.assistant || "-"})`
+document.getElementById("deputyName").innerText = `(${data.deputy || "-"})`
+document.getElementById("directorName").innerText = `(${data.director || "-"})`
+
+}catch(e){
+  
+console.log("โหลดลายเซ็นไม่สำเร็จ")
+  
+}
+
+}
+  
+loadReport()
+loadSignatureToReport()
+</script>
+</body>
+</html>
