@@ -260,9 +260,12 @@ max-height:260px;
 
 .noData{
 position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
 text-align:center;
-font-size:16px;
-color:#888;
+font-size:15px;
+color:#9ca3af;
 font-weight:500;
 }
   
@@ -821,6 +824,7 @@ font-weight:600;
 <div class="card-header">แผนภูมิสรุปสถิติรายสัปดาห์</div>
 <div class="chartBox">
 <canvas id="weeklyChart"></canvas>
+<div class="noData" id="noWeekly">ยังไม่มีข้อมูลในขณะนี้</div>
 </div>
 </div>
 
@@ -828,6 +832,7 @@ font-weight:600;
 <div class="card-header">แผนภูมิสรุปสถิติรายเดือน</div>
 <div class="chartBox">
 <canvas id="monthlyChart"></canvas>
+<div class="noData" id="noMonthly">ยังไม่มีข้อมูลในขณะนี้</div>
 </div>
 </div>
 
@@ -914,7 +919,7 @@ Export แบบรายงานสถิติ
 </div>
 
 <div class="export-group export-actions">
-<button class="btn-main" onclick="printReport()">
+<button class="btn-main" onclick="printReport(event)">
 Export รายงาน
 </button>
 
@@ -966,7 +971,7 @@ Export รายงาน
 <input type="text" id="director" class="select-modern">
 </div>
 
-<button class="btn-main" onclick="saveSignature()" style="width:100%; padding:12px;">
+<button class="btn-main" onclick="saveSignature(event)" style="width:100%; padding:12px;">
 บันทึกข้อมูลผู้ลงนาม
 </button>
 
@@ -1015,6 +1020,16 @@ location.replace("index.html")
 
 }
 
+function escapeHTML(str){
+  return str.replace(/[&<>"']/g, m => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#039;"
+  }[m]));
+}
+  
 async function loadTerm(){
 
 try{
@@ -1281,6 +1296,7 @@ let monthlyChartInstance = null
 function renderWeeklyChart(data){
 
 const canvas = document.getElementById("weeklyChart")
+const noData = document.getElementById("noWeekly")
 
 if(!data || !data.labels || data.labels.length === 0){
 
@@ -1289,10 +1305,13 @@ weeklyChartInstance.destroy()
 }
 
 canvas.style.display = "none"
+noData.style.display = "block"
+
 return
 }
 
 canvas.style.display = "block"
+noData.style.display = "none"
   
 const ctx = canvas.getContext("2d")
 
@@ -1328,6 +1347,7 @@ legend:{position:"bottom"}
 function renderMonthlyChart(data){
 
 const canvas = document.getElementById("monthlyChart")
+const noData = document.getElementById("noMonthly")
 
 if(!data || !data.labels || data.labels.length === 0){
 
@@ -1336,10 +1356,13 @@ monthlyChartInstance.destroy()
 }
 
 canvas.style.display = "none"
+noData.style.display = "block"
+
 return
 }
 
 canvas.style.display = "block"
+noData.style.display = "none"
   
 const ctx = canvas.getContext("2d")
 
@@ -1421,7 +1444,7 @@ html+=`
 <div class="class-top">
 
 <div>
-${r.room}
+${escapeHTML(r.room)}
 <br>
 <small style="color:#888">
 มีนักเรียนทั้งหมด ${r.total || 0} คน
@@ -1478,7 +1501,7 @@ let newName = prompt("แก้ไขชื่อห้อง", oldRoom)
 
 if(!newName || newName === oldRoom) return
 
-const res = await fetch(API + `?mode=editRoom&old=${encodeURIComponent(oldRoom)}&new=${encodeURIComponent(newName)}`)
+const res = await fetch(API + `?mode=editRoom&old=${encodeURIComponent(oldRoom)}&new=${encodeURIComponent(newName)}&token=${token}`)
 const data = await res.json()
 
 if(data.status === "success"){
@@ -1684,7 +1707,7 @@ animation: 150,
 disabled:true,
 onEnd: function(evt){
 const newOrder = Array.from(el.children).map(c => c.dataset.room);
-fetch(API + "?mode=updateRoomOrder&order=" + encodeURIComponent(JSON.stringify(newOrder)))
+fetch(API + "?mode=updateRoomOrder&order=" + encodeURIComponent(JSON.stringify(newOrder)) + "&token=" + token)
 .then(res => res.json())
 .then(d => {
 if(d.status !== "success"){
@@ -1739,7 +1762,7 @@ if(!name) return
 loadingNow = true
 
 try{
-const res = await fetch(API + "?mode=addRoom&room=" + encodeURIComponent(name))
+const res = await fetch(API + "?mode=addRoom&room=" + encodeURIComponent(name) + "&token=" + token)
 
 if(!res.ok) throw new Error()
 
@@ -1782,7 +1805,7 @@ btn.innerText = "กำลังรีเซ็ต..."
 
 try{
 
-const res = await fetch(API + "?mode=resetRoom&room=" + encodeURIComponent(room))
+const res = await fetch(API + "?mode=resetRoom&room=" + encodeURIComponent(room) + "&token=" + token)
 
 if(!res.ok){
   
@@ -1823,7 +1846,7 @@ loadingNow = true
 
 try{
 
-const res = await fetch(API+"?mode=resetTodayAll")
+const res = await fetch(API + "?mode=resetTodayAll&token=" + token)
 
 if(!res.ok){
   
@@ -1877,7 +1900,7 @@ loadingNow = true
 
 try{
 
-const res = await fetch(API+`?mode=resetRange&start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`)
+const res = await fetch(API+`?mode=resetRange&start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}&token=${token}`)
 
 if(!res.ok){
   
@@ -1919,7 +1942,7 @@ loadingNow = true
 
 try{
 
-const res = await fetch(API+"?mode=resetAll")
+const res = await fetch(API+"?mode=resetAll&token=" + token)
 
 if(!res.ok){
 throw new Error()
@@ -1958,7 +1981,7 @@ return
 
 try{
 
-const res = await fetch(API+`?mode=updateTerm&term=${encodeURIComponent(term)}&year=${encodeURIComponent(year)}`)
+const res = await fetch(API+`?mode=updateTerm&term=${encodeURIComponent(term)}&year=${encodeURIComponent(year)}&token=${token}`)
 
 if(!res.ok) throw new Error()
 
@@ -2024,9 +2047,8 @@ console.log("โหลดชื่อไม่สำเร็จ")
 
 }
   
-async function saveSignature(){
-
-const btn = event.target
+function saveSignature(e){
+const btn = e.target
 btn.disabled = true
 btn.innerText = "กำลังบันทึก..."
 
@@ -2038,7 +2060,8 @@ const url = API + `?mode=updatesigconfig
 &fri=${encodeURIComponent(fri.value)}
 &assistant=${encodeURIComponent(assistant.value)}
 &deputy=${encodeURIComponent(deputy.value)}
-&director=${encodeURIComponent(director.value)}`
+&director=${encodeURIComponent(director.value)}
+&token=${token}`
 
 try{
 
@@ -2093,9 +2116,8 @@ form.style.display = "none"
 
 }
   
-function printReport(){
-
-const btn = event.target
+function printReport(e){
+  const btn = e.target
 const date = document.getElementById("reportDate").value
 
 if(!date){
