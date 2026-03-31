@@ -291,8 +291,24 @@ to{transform:rotate(360deg)}
 
 <p>กรอก Username และ Password เพื่อเข้าสู่ระบบ</p>
 
-<input id="user" class="input" placeholder="Username" required>
+<input id="user" class="input" placeholder="Username" required autofocus>
+<div style="position:relative;">
 <input id="pass" class="input" type="password" placeholder="Password" required>
+
+<i class="bi bi-eye-slash"
+   id="togglePass"
+   onclick="togglePassword()"
+   style="
+   position:absolute;
+   right:12px;
+   top:50%;
+   transform:translateY(-50%);
+   cursor:pointer;
+   font-size:18px;
+   color:#888;
+   ">
+</i>
+</div>
 
 <button id="loginBtn" class="btn btn-admin" onclick="loginAdmin()">
 <i class="bi bi-shield-lock"></i>
@@ -320,22 +336,21 @@ async function loginAdmin(){
 const btn = document.getElementById("loginBtn")
 if(btn.disabled) return
 const btnText = document.getElementById("btnText")
-
-btn.disabled = true
-setTimeout(()=>{
-btn.disabled=false
-btnText.innerHTML="เข้าสู่ระบบ"
-},3000)
   
 const u=document.getElementById("user").value.trim()
 const p=document.getElementById("pass").value.trim()
 
 if(!u || !p){
 alert("กรุณากรอก Username และ Password")
-btn.disabled = true
-btnText.innerHTML = "กำลังเข้าสู่ระบบ..."
+btn.disabled = false
+btnText.innerHTML = "เข้าสู่ระบบ"
 return
 }
+
+btn.disabled = true
+btnText.innerHTML = "กำลังเข้าสู่ระบบ..."
+
+await new Promise(r=>setTimeout(r,300))
   
 try{
 
@@ -345,9 +360,13 @@ formData.append("mode","login")
 formData.append("username",u)
 formData.append("password",p)
 
+const controller = new AbortController()
+setTimeout(()=>controller.abort(),5000)
+
 const res = await fetch(API_URL,{
 method:"POST",
-body:formData
+body:formData,
+signal: controller.signal
 })
 
 if(!res.ok){
@@ -358,15 +377,17 @@ const data = await res.json()
 
 if(data.status==="success"){
 
-localStorage.setItem("adminToken",data.token)
-localStorage.setItem("loginTime",Date.now())
+loginAttempts = 0
+  
+sessionStorage.setItem("adminToken",data.token)
+sessionStorage.setItem("loginTime",Date.now())
 
 location.replace("admin-dashboard.html")
 
 }else{
 
 alert("Username หรือ Password ไม่ถูกต้อง")
-
+  
 document.getElementById("pass").value=""
   
 btn.disabled=false
@@ -375,17 +396,24 @@ btnText.innerHTML="เข้าสู่ระบบ"
 }
 
 }catch(err){
+
+if(err.name === "AbortError"){
+alert("เซิร์ฟเวอร์ตอบสนองช้า กรุณาลองใหม่")
+}else if(!navigator.onLine){
+alert("อินเทอร์เน็ตไม่เสถียร")
+}else{
+alert("เซิร์ฟเวอร์ไม่ตอบสนอง กรุณาลองใหม่")
+}
+
 btn.disabled = false
 btnText.innerHTML = "เข้าสู่ระบบ"
-  
-alert("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาติดต่อผู้ดูแลระบบ")
 
 }
 
 }
 
 document.getElementById("pass").addEventListener("keydown",function(e){
-if(e.key==="Enter"){
+if(e.key==="Enter" && !document.getElementById("loginBtn").disabled){
 loginAdmin()
 }
 })
@@ -459,8 +487,15 @@ setInterval(updateClock,1000)
 
 window.onload=function(){
 
-const token = localStorage.getItem("adminToken")
-const loginTime = localStorage.getItem("loginTime")
+loadTerm()
+
+const token = sessionStorage.getItem("adminToken")
+
+if(token){
+location.replace("admin-dashboard.html")
+}
+  
+const loginTime = sessionStorage.getItem("loginTime")
 
 if(loginTime){
 
@@ -468,13 +503,27 @@ const diff = Date.now() - loginTime
 
 if(diff > 3600000){
 
-localStorage.clear()
+sessionStorage.clear()
 location.href="admin-login.html"
 
 }
 
 }
 
+setInterval(()=>{
+const loginTime = sessionStorage.getItem("loginTime")
+
+if(loginTime){
+const diff = Date.now() - loginTime
+
+if(diff > 3600000){
+sessionStorage.clear()
+alert("Session หมดอายุ กรุณาเข้าสู่ระบบใหม่")
+location.href = "admin-login.html"
+}
+}
+},60000)
+  
 setTimeout(()=>{
 let loading=document.getElementById("loading")
 loading.style.opacity="0"
@@ -484,6 +533,23 @@ loading.style.display="none"
 },200)
 
 },400)
+
+}
+
+function togglePassword(){
+
+const pass = document.getElementById("pass")
+const icon = document.getElementById("togglePass")
+
+if(pass.type === "password"){
+pass.type = "text"
+icon.classList.remove("bi-eye-slash")
+icon.classList.add("bi-eye")
+}else{
+pass.type = "password"
+icon.classList.remove("bi-eye")
+icon.classList.add("bi-eye-slash")
+}
 
 }
   
