@@ -1666,15 +1666,23 @@ document.getElementById("sttREC").className = "status-box err"
 }
   
 function startAutoRefresh(){
-  
+
 load()
-  
+
 if(refreshTimer) clearInterval(refreshTimer)
+
 refreshTimer = setInterval(()=>{
+
+if(sortMode) return
+
 if(!loadingNow && document.visibilityState === "visible"){
+  
 load()
+      
 }
+
 },30000)
+  
 }
 
 startAutoRefresh()
@@ -1779,24 +1787,29 @@ sortableInstance.option("disabled", !sortMode)
 const btn = document.getElementById("sortBtn")
 
 if(sortMode){
+
+clearInterval(refreshTimer)
+
 btn.innerText = "บันทึกลำดับห้อง"
 btn.classList.remove("btn-sub")
 btn.classList.add("btn-main")
-  
-alert("ทำการเข้าโหมดจัดลำดับห้องแล้ว")
-  
+
+alert("โหมดจัดลำดับ : ทำการเลื่อนเพื่อย้ายลำดับห้อง")
+
 }else{
-  
+
+startAutoRefresh()
+
 btn.innerText = "จัดลำดับห้อง"
 btn.classList.remove("btn-main")
 btn.classList.add("btn-sub")
-  
-alert("บันทึกลำดับห้องเรียบร้อยแล้ว")
-  
-load()
-  
-}
 
+alert("บันทึกลำดับห้องเรียบร้อยแล้ว")
+
+load()
+    
+}
+  
 }
 
 async function addRoom(){
