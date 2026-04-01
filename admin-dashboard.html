@@ -1044,13 +1044,17 @@ location.replace("index.html")
 }
 
 function escapeHTML(str){
-  return str.replace(/[&<>"']/g, m => ({
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#039;"
-  }[m]));
+if (typeof str !== "string") {
+str = String(str || "");
+}
+
+return str.replace(/[&<>"']/g, m => ({
+"&":"&amp;",
+"<":"&lt;",
+">":"&gt;",
+'"':"&quot;",
+"'":"&#039;"
+}[m]));
 }
   
 async function loadTerm(){
