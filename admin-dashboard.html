@@ -1109,10 +1109,6 @@ async function load(){
 if(loadingNow) return
 loadingNow = true
 
-if(controller){
-controller.abort()
-}
-
 controller = new AbortController()
 
 try{
@@ -1123,7 +1119,7 @@ API + "?mode=getdashboard&t=" + Date.now(),
 cache: "no-store",
 signal: controller.signal
 },
-10000
+25000
 )
 
 if(!res.ok){
@@ -1145,12 +1141,18 @@ renderMonthlyChart(dash.monthly || {})
 
 console.error(e)
 
-if(!firstLoad){
+if(firstLoad){
+  
 if(e.message === "timeout"){
+  
 alert("เกิดข้อผิดพลาด รีเฟรชใหม่อีกครั้ง")
+  
 }else{
+  
 alert("โหลดข้อมูลไม่สำเร็จ")
+  
 }
+  
 }
 
 console.warn("โหลดข้อมูลไม่สำเร็จ ใช้ข้อมูลเดิมแทน");
@@ -1681,12 +1683,9 @@ load()
       
 }
 
-},30000)
+},45000)
   
 }
-
-startAutoRefresh()
-checkSystemStatusOnce()
 
 function updateClock(){
 
@@ -2209,6 +2208,8 @@ generateYearOptions()
 loadTerm()
   
 window.addEventListener("DOMContentLoaded", () => {
+startAutoRefresh()
+checkSystemStatusOnce()
 loadSignature()
 })
   
