@@ -676,6 +676,23 @@ document.getElementById("sick").value=data.sick ?? ""
 document.getElementById("leave").value=data.leave ?? ""
 document.getElementById("absent").value=data.absent ?? ""
 
+let hasRealData =
+num("all_boys") +
+num("all_girls") +
+num("boys_today") +
+num("girls_today") +
+num("sick") +
+num("leave") +
+num("absent") > 0
+
+if(!hasRealData){
+document.getElementById("sourceInfo").innerText =
+"ที่มาของข้อมูล : ไม่มีข้อมูลในวันนี้"
+  
+hideLoading()
+return
+}
+  
 document.getElementById("sourceInfo").innerText =
 "ที่มาของข้อมูล : " + (data.source || "-")
 
