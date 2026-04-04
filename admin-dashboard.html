@@ -1399,45 +1399,70 @@ canvas.style.display = "none"
 noData.style.display = "block"
 return
 }
-  
+
 if(monthlyChartInstance){
 monthlyChartInstance.destroy()
 }
 
 canvas.style.display = "none"
 noData.style.display = "block"
-
 return
 }
 
 canvas.style.display = "block"
 noData.style.display = "none"
-  
+
 const ctx = canvas.getContext("2d")
 
+const percentPresent = data.present.map((v,i)=>{
+let total = (v || 0) + (data.absent?.[i] || 0)
+return total ? ((v / total) * 100).toFixed(1) : 0
+})
+
+const percentAbsent = data.absent.map((v,i)=>{
+let total = (v || 0) + (data.present?.[i] || 0)
+return total ? ((v / total) * 100).toFixed(1) : 0
+})
+
 if(monthlyChartInstance){
-  monthlyChartInstance.destroy()
+monthlyChartInstance.destroy()
 }
-  
+
 monthlyChartInstance = new Chart(ctx,{
 type:"bar",
 data:{
 labels:data.labels,
 datasets:[
 {
-label:"มาเรียน",
-data:data.present
+label:"% มาเรียน",
+data: percentPresent
 },
 {
-label:"ขาด",
-data:data.absent
+label:"% ขาด",
+data: percentAbsent
 }
 ]
 },
 options:{
 responsive:true,
 plugins:{
-legend:{position:"bottom"}
+legend:{position:"bottom"},
+tooltip:{
+callbacks:{
+label: function(context){
+return context.dataset.label + " " + context.raw + "%"
+}
+}
+}
+},
+scales:{
+y:{
+beginAtZero:true,
+max:100,
+ticks:{
+callback: value => value + "%"
+}
+}
 }
 }
 })
