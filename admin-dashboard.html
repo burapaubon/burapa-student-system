@@ -399,6 +399,11 @@ box-shadow:0 6px 14px rgba(245,158,11,.4);
 background:linear-gradient(135deg,#e63946,#ff6b6b);
 color:white;
 }
+
+.btn-start{
+background: linear-gradient(135deg,#ff6b6b,#ff8fa3);
+color:white;
+}
   
 .btn-sub{background:#e5e7eb; color:#374151;}
 
@@ -1533,27 +1538,26 @@ ${status}
 ${renderUpdateInfo(r)}
 </div>
 
+<div class="buttons">
+<button onclick="editRoom('${encodeURIComponent(r.room)}')" class="btn-edit">
+แก้ไขชื่อห้อง
+</button>
+
+<button onclick="deleteRoom('${encodeURIComponent(r.room)}')" class="btn-reset-danger">
+- ลบห้อง
+</button>
 
 ${r.submitted
 ?`<button class="btn-edit" onclick="location.href='form.html?room=${encodeURIComponent(r.room)}&edit=1&from=admin'">แก้ไขสถิติวันนี้</button>`
-:`<button class="btn-main" onclick="location.href='form.html?room=${encodeURIComponent(r.room)}&from=admin'">เริ่มบันทึกสถิติวันนี้</button>`
+:`<button class="btn-start" onclick="location.href='form.html?room=${encodeURIComponent(r.room)}&from=admin'">เริ่มบันทึกสถิติวันนี้</button>`
 }
 
 <button class="btn-sub" onclick="location.href='form.html?room=${encodeURIComponent(r.room)}&backdate=1&from=admin'">
 แก้ไขสถิติย้อนหลัง
 </button>
 
-<div class="buttons">
-<button onclick="editRoom('${encodeURIComponent(r.room)}')" class="btn-edit">
-แก้ไขชื่อห้อง
-</button>
-
 <button class="btn-reset-soft" onclick="resetRoom(event,'${encodeURIComponent(r.room)}')">
 รีเซ็ตสถิติวันนี้
-</button>
-
-<button onclick="deleteRoom('${encodeURIComponent(r.room)}')" class="btn-reset-danger">
-- ลบห้อง
 </button>
 
 </div>
