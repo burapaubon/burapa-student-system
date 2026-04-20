@@ -1533,14 +1533,6 @@ ${status}
 ${renderUpdateInfo(r)}
 </div>
 
-<div class="buttons">
-<button onclick="editRoom('${encodeURIComponent(r.room)}')" class="btn-edit">
-แก้ไขชื่อห้อง
-</button>
-
-<button onclick="deleteRoom('${encodeURIComponent(r.room)}')" class="btn-reset-danger">
-- ลบห้อง
-</button>
 
 ${r.submitted
 ?`<button class="btn-edit" onclick="location.href='form.html?room=${encodeURIComponent(r.room)}&edit=1&from=admin'">แก้ไขสถิติวันนี้</button>`
@@ -1551,8 +1543,17 @@ ${r.submitted
 แก้ไขสถิติย้อนหลัง
 </button>
 
+<div class="buttons">
+<button onclick="editRoom('${encodeURIComponent(r.room)}')" class="btn-edit">
+แก้ไขชื่อห้อง
+</button>
+
 <button class="btn-reset-soft" onclick="resetRoom(event,'${encodeURIComponent(r.room)}')">
 รีเซ็ตสถิติวันนี้
+</button>
+
+<button onclick="deleteRoom('${encodeURIComponent(r.room)}')" class="btn-reset-danger">
+- ลบห้อง
 </button>
 
 </div>
