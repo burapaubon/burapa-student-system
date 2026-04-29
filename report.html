@@ -276,7 +276,7 @@ align-items:center;
 font-size:20px;
 z-index:9999;
 ">
-กำลังสร้างแบบรายงาน...
+⏳ กำลังสร้างแบบรายงาน...
 </div>
   
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -343,8 +343,8 @@ z-index:9999;
 </div>
 
 <div class="actions">
-<button class="btn primary" onclick="downloadPDF()">ดาวน์โหลด PDF</button>
-<button class="btn secondary" onclick="window.print()">พิมพ์เอกสาร</button>
+<button class="btn primary" onclick="downloadPDF()">📄 ดาวน์โหลด PDF</button>
+<button class="btn secondary" onclick="window.print()">🖨️ พิมพ์เอกสาร</button>
 </div>
 
 <script>
@@ -360,7 +360,7 @@ async function downloadPDF(){
   
 if(!isLoaded){
   
-alert("โปรดรอสักครู่...")
+alert("⏳ โปรดรอสักครู่...")
   
 return
   
@@ -371,7 +371,7 @@ const loadingEl = document.getElementById("loading")
 try{
   
 loadingEl.style.display = "flex"
-loadingEl.innerHTML = "กำลังสร้าง PDF...<br><small>โปรดรอสักครู่</small>"
+loadingEl.innerHTML = "⏳ กำลังสร้าง PDF...<br><small>โปรดรอสักครู่</small>"
 
 const element = document.getElementById("report")
 
@@ -432,7 +432,7 @@ const fileDate = formatFileDate(date)
 pdf.save(`burapa-stu-${fileDate}.pdf`)
 
 }catch(e){
-alert("สร้าง PDF ไม่สำเร็จ")
+alert("❌ สร้าง PDF ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง")
 console.error(e)
 
 } finally {
@@ -484,7 +484,7 @@ return `
 `
 }
 
-document.getElementById("loading").innerText = "กำลังโหลดข้อมูล..."
+document.getElementById("loading").innerText = "⏳ กำลังโหลดข้อมูล..."
   
 async function fetchWithFallback(dateStr){
 
@@ -529,7 +529,7 @@ if(data.length === 0){
   
 document.getElementById("dataBody").innerHTML = `
 
-<tr><td colspan="10">ไม่พบข้อมูล</td></tr>
+<tr><td colspan="10">⚠ ไม่พบข้อมูล</td></tr>
 `
   
 document.getElementById("loading").style.display = "none"
@@ -540,7 +540,7 @@ return
 
 }catch(e){
   
-alert("โหลดข้อมูลไม่สำเร็จ")
+alert("❌ โหลดข้อมูลไม่สำเร็จ กรุณาลองใหม่อีกครั้ง")
   
 document.getElementById("loading").style.display = "none"
   
@@ -550,8 +550,8 @@ return
 
 let html=""
   
-document.getElementById("loading").innerText = "กำลังสร้างรายงาน..."
-document.getElementById("dataBody").innerHTML = `<tr><td colspan="10">กำลังสร้าง Report...</td></tr>`;
+document.getElementById("loading").innerText = "⏳ กำลังสร้างรายงาน..."
+document.getElementById("dataBody").innerHTML = `<tr><td colspan="10">⏳ กำลังสร้าง Report...</td></tr>`;
 
 let levels = {}
 
