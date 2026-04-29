@@ -345,7 +345,7 @@ grid-template-columns:1fr;
   
 <div class="card">
 
-<div class="section">นักเรียนทั้งหมด</div>
+<div class="section">👨‍🎓 นักเรียนทั้งหมด</div>
 
 <div class="field">
 <label>นักเรียนชายทั้งหมด</label>
@@ -358,14 +358,14 @@ grid-template-columns:1fr;
 </div>
 
 <div class="totalbox">
-รวมนักเรียนทั้งหมด : <b id="all_total">0</b>
+✅ รวมนักเรียนทั้งหมด : <b id="all_total">0</b>
 </div>
 
 </div>
   
 <div class="card">
 
-<div class="section">มาเรียนวันนี้</div>
+<div class="section">📅 มาเรียนวันนี้</div>
 
 <div class="field">
 <label>ชายมาเรียน</label>
@@ -378,36 +378,36 @@ grid-template-columns:1fr;
 </div>
 
 <div class="totalbox">
-มาเรียนรวม : <b id="today_total">0</b>
+✅ มาเรียนรวม : <b id="today_total">0</b>
 </div>
 
 </div>
 
 <div class="card">
 
-<div class="section">สถานะอื่นๆ</div>
+<div class="section">📊 สถานะอื่นๆ</div>
 
 <div class="field">
-<label>ป่วย</label>
+<label>🤒ป่วย</label>
 <input type="number" inputmode="numeric" id="sick" min="0" max="100" step="1">
 </div>
 
 <div class="field">
-<label>ลา</label>
+<label>📝ลา</label>
 <input type="number" inputmode="numeric" id="leave" min="0" max="100" step="1">
 </div>
 
 <div class="field">
-<label>ขาด</label>
+<label>❌ ขาด</label>
 <input type="number" inputmode="numeric" id="absent" min="0" max="100" step="1">
 </div>
 
 <div class="msg" id="errorMsg">
-จำนวนที่กรอกไม่สัมพันธ์กับจำนวนนักเรียนทั้งหมด
+⚠ จำนวนที่กรอกไม่สัมพันธ์กับจำนวนนักเรียนทั้งหมด
 </div>
 
 <button id="saveBtn" disabled onclick="save()">
-บันทึกข้อมูลสถิติ
+💾 บันทึกข้อมูลสถิติ
 </button>
 
 </div>
@@ -586,7 +586,7 @@ dateInput.min="2024-01-01"
 dateInput.value=""
 
 document.getElementById("roomName").innerHTML=
-"แบบบันทึกสถิตินักเรียนย้อนหลัง<br>"+room
+"⏳ แบบบันทึกสถิตินักเรียนย้อนหลัง<br>"+room
 
 }else{
 
@@ -596,7 +596,7 @@ dateInput.min=today
 dateInput.max=today
 
 document.getElementById("roomName").innerHTML=
-"แบบบันทึกสถิตินักเรียน<br>"+room
+"📋 แบบบันทึกสถิตินักเรียน<br>"+room
 
 }
 dateInput.addEventListener("change",loadDateData)
@@ -618,7 +618,7 @@ document.getElementById("today_total").innerText="0"
 
 async function loadDateData(){
 
-showLoading("กำลังโหลดข้อมูล...")
+showLoading("↻ กำลังโหลดข้อมูล...")
 clearInputs()
   
 let date=dateInput.value
@@ -711,10 +711,10 @@ window.addEventListener("DOMContentLoaded",()=>{
 inputs = document.querySelectorAll("input[type=number]")
 
 inputs.forEach(i=>{
-  i.addEventListener("input",()=>{
-    isUserTyping = true
-    calculate()
-  })
+i.addEventListener("input",()=>{
+isUserTyping = true
+calculate()
+})
 })
 
 if(!backdate){
@@ -750,7 +750,7 @@ document.getElementById("all_total").innerText = all_total
 if(all_total === 0){
 
 document.getElementById("errorMsg").innerText =
-"กรุณากรอกจำนวนนักเรียนทั้งหมดก่อน"
+"⚠ กรุณากรอกจำนวนนักเรียนทั้งหมดก่อน"
 
 document.getElementById("errorMsg").style.display="block"
 document.getElementById("saveBtn").disabled=true
@@ -774,7 +774,7 @@ document.getElementById("today_total").innerText = today_total
 if(sum > all_total){
 
 document.getElementById("errorMsg").innerText =
-"คุณกรอกจำนวนนักเรียนเกิน " + (sum-all_total) + " คน"
+"⚠ คุณกรอกจำนวนนักเรียนเกิน " + (sum-all_total) + " คน"
 
 document.getElementById("errorMsg").style.display="block"
 document.getElementById("saveBtn").disabled=true
@@ -785,7 +785,7 @@ inputs.forEach(i=>i.classList.add("error"))
 else if(sum < all_total){
 
 document.getElementById("errorMsg").innerText =
-"จำนวนนักเรียนที่ยังไม่ได้กรอกเหลือ " + (all_total-sum) + " คน"
+"ℹ️ จำนวนนักเรียนที่ยังไม่ได้กรอกเหลือ " + (all_total-sum) + " คน"
 
 document.getElementById("errorMsg").style.display="block"
 document.getElementById("saveBtn").disabled=true
@@ -815,17 +815,17 @@ saving=true
 let date=document.getElementById("record_date").value
 
 if(!date){
-alert("กรุณาเลือกวันที่ก่อนบันทึก")
+alert("⚠ กรุณาเลือกวันที่ก่อนบันทึก")
 saving=false
 return
 
 }
 
-showLoading("กำลังบันทึกสถิติ โปรดรอสักครู่...")
+showLoading("↻ กำลังบันทึกสถิติ โปรดรอสักครู่...")
 
 const btn=document.getElementById("saveBtn")
 btn.disabled=true
-btn.innerText="กำลังบันทึกสถิติ..."
+btn.innerText="↻ กำลังบันทึกสถิติ..."
 
 let data={
 mode:"save",
@@ -852,7 +852,7 @@ if(!res.ok){
 throw new Error("save failed")
 }
 
-alert("ระบบทำการบันทึกสถิติเรียบร้อยแล้ว")
+alert("✅ ระบบทำการบันทึกสถิติเรียบร้อยแล้ว")
 
 window.onbeforeunload=null
 if(from === "admin"){
@@ -870,7 +870,7 @@ saving=false
 btn.disabled=false
 btn.innerText="บันทึกข้อมูลสถิติ"
 
-alert("เกิดข้อผิดพลาดในการบันทึก ลองใหม่อีกครั้ง")
+alert("⚠ เกิดข้อผิดพลาดในการบันทึก ลองใหม่อีกครั้ง")
 
 }
 finally{
@@ -881,7 +881,7 @@ hideLoading()
   
 async function loadLatest(){
 
-showLoading("กำลังซิงค์ข้อมูล...")
+showLoading("⏳ กำลังซิงค์ข้อมูล...")
 
 let date=dateInput.value
   
@@ -916,7 +916,7 @@ calculate()
 
 }catch(e){
 console.error(e)
-alert("โหลดข้อมูลไม่สำเร็จ")
+alert("❌ โหลดข้อมูลไม่สำเร็จ")
 }
 finally{
 hideLoading()
@@ -970,7 +970,7 @@ window.onbeforeunload=function(){
 const btn=document.getElementById("saveBtn")
 
 if(!btn.disabled){
-return "ข้อมูลยังไม่ได้ทำการบันทึก"
+return "⚠ ข้อมูลยังไม่ได้ทำการบันทึก"
   
 }
 
