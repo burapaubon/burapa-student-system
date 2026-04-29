@@ -10,7 +10,6 @@
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 <script src="session.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-
 <style>
   
 *{
@@ -807,27 +806,27 @@ font-weight:600;
 <div class="stats">
   
 <div class="stat total">
-<h3>นักเรียนทั้งหมด</h3>
+<h3>👨‍🎓 นักเรียนทั้งหมด</h3>
 <div class="num" id="total">0</div>
 </div>
 
 <div class="stat">
-<h3>มาเรียนวันนี้</h3>
+<h3>✅ มาเรียนวันนี้</h3>
 <div class="num present" id="present">0</div>
 </div>
 
 <div class="stat">
-<h3>ป่วย</h3>
+<h3>🤒 ป่วย</h3>
 <div class="num sick" id="sick">0</div>
 </div>
 
 <div class="stat">
-<h3>ลา</h3>
+<h3>📝 ลา</h3>
 <div class="num leave" id="leave">0</div>
 </div>
 
 <div class="stat">
-<h3>ขาด</h3>
+<h3>❌ ขาด</h3>
 <div class="num absent" id="absent">0</div>
 </div>
 </div>
@@ -835,7 +834,7 @@ font-weight:600;
 <div class="grid">
 
 <div class="card">
-<div class="card-header">แผนภูมิสรุปสถิติวันนี้</div>
+<div class="card-header">📊 แผนภูมิสรุปสถิติวันนี้</div>
 <div class="chartBox">
 <canvas id="chart"></canvas>
 <div id="noData" class="noData"></div>
@@ -843,7 +842,7 @@ font-weight:600;
 </div>
 
 <div class="card">
-<div class="card-header">แผนภูมิสรุปสถิติรายสัปดาห์</div>
+<div class="card-header">📅 แผนภูมิสรุปสถิติรายสัปดาห์</div>
 <div class="chartBox">
 <canvas id="weeklyChart"></canvas>
 <div class="noData" id="noWeekly">ยังไม่มีข้อมูลในขณะนี้</div>
@@ -851,7 +850,7 @@ font-weight:600;
 </div>
 
 <div class="card">
-<div class="card-header">แผนภูมิสรุปสถิติรายเดือน</div>
+<div class="card-header">📆 แผนภูมิสรุปสถิติรายเดือน</div>
 <div class="chartBox">
 <canvas id="monthlyChart"></canvas>
 <div class="noData" id="noMonthly">ยังไม่มีข้อมูลในขณะนี้</div>
@@ -860,7 +859,7 @@ font-weight:600;
 
 <div class="card">
 <div class="card-header" style="justify-content:center; font-weight:700;">
-Export แบบรายงานสถิติ
+📄Export แบบรายงานสถิติ
 </div>
 
 <div class="card-scroll export-section">
@@ -872,16 +871,16 @@ Export แบบรายงานสถิติ
 
 <div class="export-group export-actions">
 <button class="btn-main" onclick="printReport(event)">
-Export รายงาน
+📤 Export รายงาน
 </button>
 
 <button class="btn-sub" onclick="toggleSigForm()">
-แก้ไขรายชื่อผู้ลงนาม
+✏️ แก้ไขรายชื่อผู้ลงนาม
 </button>
 </div>
 
 <div id="sigForm" class="export-group" style="display:none;">
-<div class="export-group-title">ตั้งค่าชื่อผู้ลงนาม</div>
+<div class="export-group-title">🖊 ตั้งค่าชื่อผู้ลงนาม</div>
 
 <div class="field">
 <label>ครูเวรวันจันทร์</label>
@@ -924,7 +923,7 @@ Export รายงาน
 </div>
 
 <button class="btn-main" onclick="saveSignature(event)" style="width:100%; padding:12px;">
-บันทึกข้อมูลผู้ลงนาม
+💾 บันทึกข้อมูลผู้ลงนาม
 </button>
 
 </div>
@@ -933,31 +932,31 @@ Export รายงาน
   
 <div class="card card-rooms">
 <div class="card-header">
-<span>รายการห้องเรียนทั้งหมด <span id="roomCount"></span></span>
+<span>🏫 รายการห้องเรียนทั้งหมด <span id="roomCount"></span></span>
   
 <div class="header-actions">
 <button onclick="addRoom()" class="btn-main">+ เพิ่มห้อง</button>
-<button onclick="toggleSort()" class="btn-sub" id="sortBtn">จัดลำดับห้อง</button>
+<button onclick="toggleSort()" class="btn-sub" id="sortBtn">⇌ จัดลำดับห้อง</button>
 </div>
 </div>
 <div id="classList"></div>
 </div>
 
 <div class="card system-status">
-<h3>สถานะระบบ</h3>
-<div id="sttAPI" class="status-box">API: -</div>
-<div id="sttDB" class="status-box">Database: -</div>
-<div id="sttMSG" class="status-box">Messaging API: -</div>
-<div id="sttREC" class="status-box">Records: -</div>
+<h3>⚙️ สถานะระบบ</h3>
+<div id="sttAPI" class="status-box">🌐 API: -</div>
+<div id="sttDB" class="status-box">🗂️ Database: -</div>
+<div id="sttMSG" class="status-box">💬 Messaging API: -</div>
+<div id="sttREC" class="status-box">💾 Records: -</div>
 </div>
 
 <div class="card reset-card">
-<h3>จัดการข้อมูลสถิติ</h3>
+<h3>‼ จัดการข้อมูลสถิติ</h3>
 
 <div class="control-section">
 <div class="control-title">รีเซ็ตข้อมูลวันนี้</div>
 <button class="btn-control warn" onclick="resetTodayAll(event)">
-รีเซ็ตข้อมูลวันนี้ทั้งหมด
+🔄 รีเซ็ตข้อมูลวันนี้ทั้งหมด
 </button>
 </div>
 
@@ -968,20 +967,20 @@ Export รายงาน
 <input type="date" id="endDate">
 </div>
 <button class="btn-control warn" onclick="resetRange()">
-รีเซ็ตตามช่วงเวลา
+📅 รีเซ็ตตามช่วงเวลา
 </button>
 </div>
 
 <div class="control-section danger-box">
 <div class="control-title">ล้างข้อมูลทั้งหมด</div>
 <button class="btn-control danger" onclick="resetAll()">
-ล้างข้อมูลทั้งระบบ
+🚨 ล้างข้อมูลทั้งระบบ
 </button>
 </div>
 </div>
 
 <div class="card">
-<h3>ตั้งค่าภาคเรียน / ปีการศึกษา</h3>
+<h3>🎓 ตั้งค่าภาคเรียน / ปีการศึกษา</h3>
 
 <div class="field">
 <label>ภาคเรียน</label>
@@ -998,7 +997,7 @@ Export รายงาน
 </div>
 
 <button class="btn-main" onclick="changeTermYear(event)" style="width:100%; padding:12px;">
-บันทึกการตั้งค่า
+💾 บันทึกการตั้งค่า
 </button>
 </div>
 
@@ -1035,7 +1034,7 @@ const API="https://script.google.com/macros/s/AKfycbyV4PNjlFskTfF0Ol6xrZdWpSCJm5
   
 function logout(){
 
-if(!confirm("คุณต้องการออกจากระบบหรือไม่")) return
+if(!confirm("ⓘ คุณต้องการออกจากระบบหรือไม่")) return
 
 sessionStorage.removeItem("adminToken")
 sessionStorage.removeItem("loginTime")
@@ -1510,7 +1509,7 @@ alertBar.style.display="none"
 rooms.forEach(r=>{
 
 let status = r.submitted
-?'<span class="status-badge ok">✔ บันทึกสถิติแล้ว</span>'
+?'<span class="status-badge ok">✅ บันทึกสถิติแล้ว</span>'
 :'<span class="status-badge pending">⚠ ยังไม่ได้บันทึกสถิติ</span>'
 
 html+=`
@@ -1537,29 +1536,29 @@ ${renderUpdateInfo(r)}
 <div class="buttons">
 ${r.submitted
 ? `<button class="btn-edit" onclick="location.href='form.html?room=${encodeURIComponent(r.room)}&edit=1&from=admin'">
-แก้ไขสถิติวันนี้
+✏️ แก้ไขสถิติวันนี้
 </button>`
 : `<button class="btn-start" onclick="location.href='form.html?room=${encodeURIComponent(r.room)}&from=admin'">
-เริ่มบันทึกสถิติวันนี้
+📌 เริ่มบันทึกสถิติวันนี้
 </button>`
 }
 
 <button class="btn-sub" onclick="location.href='form.html?room=${encodeURIComponent(r.room)}&backdate=1&from=admin'">
-แก้ไขย้อนหลัง
+📅 แก้ไขย้อนหลัง
 </button>
 </div>
 
 <div class="buttons" style="margin-top:6px;">
 <button onclick="editRoom('${encodeURIComponent(r.room)}')" class="btn-edit">
-แก้ไขชื่อห้อง
+📝 แก้ไขชื่อห้อง
 </button>
 
 <button onclick="deleteRoom('${encodeURIComponent(r.room)}')" class="btn-reset-danger">
-ลบห้อง
+🗑 ลบห้อง
 </button>
 
 <button class="btn-reset-soft" onclick="resetRoom(event,'${encodeURIComponent(r.room)}')">
-รีเซ็ตวันนี้
+🔄 รีเซ็ตวันนี้
 </button>
 </div>
 
@@ -1585,10 +1584,10 @@ const res = await fetch(API + `?mode=editRoom&old=${encodeURIComponent(oldRoom)}
 const data = await res.json()
 
 if(data.status === "success"){
-alert("แก้ไขชื่อห้องสำเร็จ กรุณาทำการรีเฟรช")
+alert("✅ แก้ไขชื่อห้องสำเร็จ กรุณาทำการรีเฟรช")
 load()
 }else{
-alert("แก้ไขชื่อห้องไม่สำเร็จ ลองใหม่อีกครั้ง")
+alert("❌ แก้ไขชื่อห้องไม่สำเร็จ ลองใหม่อีกครั้ง")
 }
 
 }
@@ -1597,7 +1596,7 @@ async function deleteRoom(room){
 
 room = decodeURIComponent(room)
 
-if(!confirm("ต้องการลบ "+room+" ใช่หรือไม่?")) return
+if(!confirm("⚠ ต้องการลบ "+room+" ใช่หรือไม่?")) return
 
 try{
 
@@ -1609,18 +1608,18 @@ const data = await res.json()
 
 if(data.status === "success"){
   
-alert("ลบห้องเรียบร้อยแล้ว กรุณาทำการรีเฟรช")
+alert("✅ ลบห้องเรียบร้อยแล้ว กรุณาทำการรีเฟรช")
   
 load()
   
 }else{
   
-alert("ทำการลบห้องไม่สำเร็จ ลองใหม่อีกครั้ง")
+alert("❌ ทำการลบห้องไม่สำเร็จ ลองใหม่อีกครั้ง")
 }
 
 }catch(e){
   
-alert("เกิดข้อผิดพลาด ลองใหม่อีกครั้ง")
+alert("⚠ เกิดข้อผิดพลาด ลองใหม่อีกครั้ง")
   
 }
 
@@ -1797,11 +1796,11 @@ fetch(API + "?mode=updateRoomOrder&order=" + encodeURIComponent(JSON.stringify(n
 .then(res => res.json())
 .then(d => {
 if(d.status !== "success"){
-alert("บันทึกลำดับไม่สำเร็จ กรุณาลองใหม่")
+alert("❌ บันทึกลำดับไม่สำเร็จ กรุณาลองใหม่")
 }
 })
 .catch(()=>{
-alert("ระบบจัดเรียงห้องไม่ได้ ลองใหม่อีกครั้ง")
+alert("⚠ ระบบจัดเรียงห้องไม่ได้ ลองใหม่อีกครั้ง")
 })
 }
 });
@@ -1820,21 +1819,21 @@ if(sortMode){
 
 clearInterval(refreshTimer)
 
-btn.innerText = "บันทึกลำดับห้อง"
+btn.innerText = "💾 บันทึกลำดับห้อง"
 btn.classList.remove("btn-sub")
 btn.classList.add("btn-main")
 
-alert("โหมดจัดลำดับ : ทำการเลื่อนเพื่อย้ายลำดับห้อง จากนั้นกดบันทึกลำดับห้อง")
+alert("🛠️ โหมดจัดลำดับ : ทำการเลื่อนเพื่อย้ายลำดับห้อง จากนั้นกดบันทึกลำดับห้อง")
 
 }else{
 
 startAutoRefresh()
 
-btn.innerText = "จัดลำดับห้อง"
+btn.innerText = "⇌ จัดลำดับห้อง"
 btn.classList.remove("btn-main")
 btn.classList.add("btn-sub")
 
-alert("บันทึกลำดับห้องเรียบร้อยแล้ว")
+alert("✅ บันทึกลำดับห้องเรียบร้อยแล้ว")
 
 load()
     
@@ -1846,7 +1845,7 @@ async function addRoom(){
 
 if(loadingNow) return
 
-let name = prompt("พิมพ์ชื่อห้อง เช่น ชั้นประถมศึกษาปีที่ 1")
+let name = prompt("📍 พิมพ์ชื่อห้อง เช่น ชั้นประถมศึกษาปีที่ 1")
   
 if(!name) return
 
@@ -1861,19 +1860,19 @@ const data = await res.json()
 
 if(data.status === "success"){
   
-alert("ระบบเพิ่มห้องสำเร็จ กรุณาทำการรีเฟรช")
+alert("✅ ระบบเพิ่มห้องสำเร็จ กรุณาทำการรีเฟรช")
   
 load()
   
 }else{
   
-alert("ทำการเพิ่มห้องไม่สำเร็จ ลองใหม่อีกครั้ง")
+alert("❌ ทำการเพิ่มห้องไม่สำเร็จ ลองใหม่อีกครั้ง")
   
 }
 
 }catch(e){
   
-alert("เกิดข้อผิดพลาด ลองใหม่อีกครั้ง")
+alert("⚠ เกิดข้อผิดพลาด ลองใหม่อีกครั้ง")
   
 }
 
@@ -1885,14 +1884,14 @@ async function resetRoom(e, room){
 
 room = decodeURIComponent(room)
 
-if(!confirm("คุณต้องการรีเซ็ตสถิตวันนี้ของ "+room+" ใช่ไหม?")) return
+if(!confirm("⚠ คุณต้องการรีเซ็ตสถิตวันนี้ของ "+room+" ใช่ไหม?")) return
 
 if(loadingNow) return
 loadingNow = true
 
 const btn = e.currentTarget
 btn.disabled = true
-btn.innerText = "กำลังรีเซ็ต..."
+btn.innerText = "↻ กำลังรีเซ็ต..."
 
 try{
 
@@ -1904,13 +1903,13 @@ throw new Error()
   
 }
 
-alert("ทำการรีเซ็ตสถิติ "+room+" วันนี้สำเร็จ กรุณารีเฟรชหน้าเพจ")
+alert("✅ ทำการรีเซ็ตสถิติ "+room+" วันนี้สำเร็จ กรุณารีเฟรชหน้าเพจ")
   
 load()
 
 } catch(e){
   
-alert("รีเซ็ตไม่สำเร็จ กรุณาลองใหม่อีกครั้ง")
+alert("❌ รีเซ็ตไม่สำเร็จ กรุณาลองใหม่อีกครั้ง")
   
 }
 
@@ -1928,10 +1927,10 @@ if(loadingNow) return
 const btn = e.currentTarget
 if(btn.disabled) return
 
-if(!confirm("คุณต้องการรีเซ็ตสถิติทุกห้องในวันนี้ใช่ไหม?")) return
+if(!confirm("⚠ คุณต้องการรีเซ็ตสถิติทุกห้องในวันนี้ใช่ไหม?")) return
 
 btn.disabled = true
-btn.innerText = "กำลังรีเซ็ต..."
+btn.innerText = "↻ กำลังรีเซ็ต..."
 
 loadingNow = true
 
@@ -1945,13 +1944,13 @@ throw new Error()
   
 }
 
-alert("ทำการรีเซ็ตสถิติทุกห้องในวันนี้สำเร็จ กรุณารีเฟรชหน้าเพจ")
+alert("✅ ทำการรีเซ็ตสถิติทุกห้องในวันนี้สำเร็จ กรุณารีเฟรชหน้าเพจ")
   
 load()
 
 }catch(e){
   
-alert("เกิดข้อผิดพลาด ลองใหม่อีกครั้ง")
+alert("⚠ เกิดข้อผิดพลาด ลองใหม่อีกครั้ง")
   
 }
 
@@ -1977,11 +1976,11 @@ return
   
 }
 
-if(!confirm("รีเซ็ตข้อมูลช่วง "+start+" ถึง "+end+" ใช่หรือไม่")) return
+if(!confirm("⚠ รีเซ็ตข้อมูลช่วง "+start+" ถึง "+end+" ใช่หรือไม่")) return
 
 if(new Date(start) > new Date(end)){
   
-alert("วันที่เริ่มต้องไม่มากกว่าวันที่สิ้นสุด")
+alert("⚠ วันที่เริ่มต้องไม่มากกว่าวันที่สิ้นสุด")
   
 return
   
@@ -1999,13 +1998,13 @@ throw new Error()
   
 }
 
-alert("รีเซ็ตสถิติแบบเลือกช่วงวันสำเร็จ กรุณารีเฟรชหน้าเพจ")
+alert("✅ รีเซ็ตสถิติแบบเลือกช่วงวันสำเร็จ กรุณารีเฟรชหน้าเพจ")
   
 load()
 
 }catch(e){
   
-alert("เกิดข้อผิดพลาด ลองใหม่อีกครั้ง")
+alert("⚠ เกิดข้อผิดพลาด ลองใหม่อีกครั้ง")
   
 }
 
@@ -2023,7 +2022,7 @@ let confirmText = prompt("พิมพ์ 'RESET' เพื่อยืนยั
 
 if(confirmText !== "RESET"){
   
-alert("ยกเลิกการล้างข้อมูล")
+alert("⚠ ยกเลิกการล้างข้อมูล")
   
 return
   
@@ -2039,11 +2038,11 @@ if(!res.ok){
 throw new Error()
 }
 
-alert("ล้างข้อมูลสถิติในระบบทั้งหมดแล้ว")
+alert("✅ ล้างข้อมูลสถิติในระบบทั้งหมดแล้ว")
 load()
 
 }catch(e){
-alert("เกิดข้อผิดพลาด ลองใหม่อีกครั้ง")
+alert("⚠ เกิดข้อผิดพลาด ลองใหม่อีกครั้ง")
 }
 
 loadingNow = false
@@ -2054,14 +2053,14 @@ async function changeTermYear(e){
 const btn = e.target
   
 btn.disabled = true
-btn.innerText = "กำลังบันทึก..."
+btn.innerText = "↻ กำลังบันทึก..."
 
 const term = document.getElementById("termInput").value
 const year = document.getElementById("yearInput").value
 
 if(!term || !year){
   
-alert("กรุณาเลือกให้ครบ")
+alert("⚠ กรุณาเลือกให้ครบ")
   
 btn.disabled = false
 btn.innerText = "บันทึกการตั้งค่า"
@@ -2084,13 +2083,13 @@ throw new Error()
   
 }
 
-alert("เปลี่ยนภาคเรียน / ปีการศึกษาเรียบร้อยแล้ว")
+alert("✅ เปลี่ยนภาคเรียน / ปีการศึกษาเรียบร้อยแล้ว")
 
 loadTerm()
 
 }catch(e){
 
-alert("เกิดข้อผิดพลาดในการบันทึก กรุณาลองใหม่อีกครั้ง")
+alert("⚠ เกิดข้อผิดพลาดในการบันทึก กรุณาลองใหม่อีกครั้ง")
 
 }
 
@@ -2135,7 +2134,7 @@ document.getElementById("director").value = data.director || ""
 
 }catch(e){
 
-console.error("โหลดรายชื่อไม่สำเร็จ", e)
+console.error("⚠ โหลดรายชื่อไม่สำเร็จ", e)
 
 }
 }
@@ -2144,7 +2143,7 @@ async function saveSignature(e){
 
 const btn = e.target
 btn.disabled = true
-btn.innerText = "กำลังบันทึก..."
+btn.innerText = "↻ กำลังบันทึก..."
 
 try{
 
@@ -2166,20 +2165,20 @@ if(!res.ok) throw new Error()
 const data = await res.json()
 
 if(data.status === "success"){
-alert("บันทึกเรียบร้อย")
+alert("✅ บันทึกเรียบร้อย")
 loadSignature()
 document.getElementById("sigForm").style.display = "none"
 }else{
-alert("บันทึกไม่สำเร็จ")
+alert("❌ บันทึกไม่สำเร็จ")
 }
 
 }catch(e){
 console.error(e)
-alert("เกิดข้อผิดพลาด")
+alert("⚠ เกิดข้อผิดพลาด")
 }
 
 btn.disabled = false
-btn.innerText = "บันทึกข้อมูลผู้ลงนาม"
+btn.innerText = "💾 บันทึกข้อมูลผู้ลงนาม"
 }
 
 function toggleSigForm(){
@@ -2211,14 +2210,14 @@ const date = document.getElementById("reportDate").value
 
 if(!date){
   
-alert("กรุณาเลือกวันที่ต้องการทำแบบรายงาน")
+alert("⚠ กรุณาเลือกวันที่ต้องการทำแบบรายงาน")
   
 return
   
 }
 
 btn.disabled = true
-btn.innerText = "กำลังสร้างรายงาน..."
+btn.innerText = "↻ กำลังสร้างรายงาน..."
 
 window.open(
 "report.html?date=" + date,
@@ -2228,7 +2227,7 @@ window.open(
 setTimeout(()=>{
   
 btn.disabled = false
-btn.innerText = "Export รายงาน"
+btn.innerText = "📤 Export รายงาน"
   
 },1500)
 
