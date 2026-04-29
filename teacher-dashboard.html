@@ -488,27 +488,27 @@ width:100%;
 <div class="stats">
 
 <div class="stat">
-<h3>นักเรียนทั้งหมด</h3>
+<h3>👨‍🎓 นักเรียนทั้งหมด</h3>
 <div class="num" id="total">0</div>
 </div>
 
 <div class="stat">
-<h3>มาเรียนวันนี้</h3>
+<h3>✅ มาเรียนวันนี้</h3>
 <div class="num present" id="present">0</div>
 </div>
 
 <div class="stat">
-<h3>ป่วย</h3>
+<h3>🤒 ป่วย</h3>
 <div class="num sick" id="sick">0</div>
 </div>
 
 <div class="stat">
-<h3>ลา</h3>
+<h3>📝 ลา</h3>
 <div class="num leave" id="leave">0</div>
 </div>
 
 <div class="stat">
-<h3>ขาด</h3>
+<h3>❌ ขาด</h3>
 <div class="num absent" id="absent">0</div>
 </div>
 </div>
@@ -517,7 +517,7 @@ width:100%;
 
 <div class="card">
 
-<div class="card-header">แผนภูมิสรุปสถิติวันนี้</div>
+<div class="card-header">📊 แผนภูมิสรุปสถิติวันนี้</div>
 
 <div class="chartBox">
 
@@ -534,7 +534,7 @@ width:100%;
 <div class="card">
 
 <div class="card-header">
-<span>รายการห้องเรียนทั้งหมด</span>
+<span>🏫 รายการห้องเรียนทั้งหมด</span>
 <span id="roomCount"></span>
 </div>
 
@@ -617,7 +617,7 @@ throw new Error("no data")
 
 }catch(e){
 
-console.warn("โหลดเทอมไม่ได้ → ใช้ backup")
+console.warn("โหลดเทอมไม่ได้ ใช้ข้อมูลสำรอง")
 
 let term = localStorage.getItem("term")
 let year = localStorage.getItem("year")
@@ -899,7 +899,7 @@ return
 rooms.forEach(r=>{
 
 let status = r.submitted
-?'<span class="status-badge ok">✔ บันทึกสถิติแล้ว</span>'
+?'<span class="status-badge ok">✅ บันทึกสถิติแล้ว</span>'
 :'<span class="status-badge pending">⚠ ยังไม่ได้บันทึกสถิติ</span>'
 
 html+=`
@@ -921,14 +921,14 @@ ${status}
 
 ${r.submitted
 ?`<button class="btn-edit" onclick="if(this.dataset.clicked)return;
-this.dataset.clicked=1; this.disabled = true; location.href='form.html?room=${encodeURIComponent(r.room)}&edit=1&from=teacher'">แก้ไขสถิติวันนี้</button>`
+this.dataset.clicked=1; this.disabled = true; location.href='form.html?room=${encodeURIComponent(r.room)}&edit=1&from=teacher'">✏️ แก้ไขสถิติวันนี้</button>`
 :`<button class="btn-main" onclick="if(this.dataset.clicked)return;
-this.dataset.clicked=1; this.disabled = true; location.href='form.html?room=${encodeURIComponent(r.room)}&from=teacher'">เริ่มบันทึกสถิติวันนี้</button>`
+this.dataset.clicked=1; this.disabled = true; location.href='form.html?room=${encodeURIComponent(r.room)}&from=teacher'">📌 เริ่มบันทึกสถิติวันนี้</button>`
 }
 
 <button class="btn-sub" onclick="if(this.dataset.clicked)return;
 this.dataset.clicked=1; this.disabled = true; location.href='form.html?room=${encodeURIComponent(r.room)}&backdate=1&from=teacher'">
-แก้ไขสถิติย้อนหลัง
+📅 แก้ไขสถิติย้อนหลัง
 </button>
 
 </div>
