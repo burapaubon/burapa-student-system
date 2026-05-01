@@ -295,6 +295,78 @@ grid-template-columns:1fr;
 
 }
   
+#toastOverlay{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.2);
+backdrop-filter: blur(2px);
+opacity:0;
+pointer-events:none;
+transition:.3s ease;
+z-index:9998;
+}
+
+#toastOverlay.show{
+opacity:1;
+}
+
+#toast{
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%, -50%) scale(.8);
+padding:28px 36px;
+border-radius:22px;
+font-size:18px;
+font-weight:600;
+text-align:center;
+color:#fff;
+opacity:0;
+pointer-events:none;
+z-index:9999;
+min-width:260px;
+max-width:90%;
+box-shadow:
+0 30px 80px rgba(0,0,0,.35),
+0 10px 25px rgba(0,0,0,.2);
+transition: all .4s cubic-bezier(.22,1,.36,1);
+}
+
+#toast.show{
+opacity:1;
+transform:translate(-50%, -50%) scale(1);
+}
+
+#toast.success{
+background:linear-gradient(135deg,#4ade80,#22c55e);
+}
+
+#toast.error{
+background:linear-gradient(135deg,#ff6b6b,#ef4444);
+}
+
+#toast.info{
+background:linear-gradient(135deg,#60a5fa,#3b82f6);
+}
+
+#toast::after{
+content:"";
+position:absolute;
+left:0;
+bottom:0;
+height:4px;
+width:100%;
+background:rgba(255,255,255,.5);
+transform-origin:left;
+transform:scaleX(1);
+transition: transform linear var(--duration, 6s);
+border-radius:0 0 20px 20px;
+}
+
+#toast.hide::after{
+transform:scaleX(0);
+}
+
 </style>
 </head>
 
@@ -422,6 +494,9 @@ grid-template-columns:1fr;
 สำนักการศึกษา เทศบาลนครอุบลราชธานี
 </footer>
   
+<div id="toast"></div>
+<div id="toastOverlay"></div>
+
 <script>
   
 const API="https://script.google.com/macros/s/AKfycbyV4PNjlFskTfF0Ol6xrZdWpSCJm54bi33l0M66QpluNo8X6B7Js8LZRtuY7T05KsShoQ/exec"
@@ -461,7 +536,7 @@ let el = document.getElementById("termDisplay")
 
 try{
 
-const res = await fetch(API + "?mode=getterm&t=" + Date.now())
+const res = await fetchWithTimeout(API + "?mode=getterm&t=" + Date.now())
 const data = await res.json()
 
 if(data.term != null && data.year != null){
@@ -616,9 +691,18 @@ document.getElementById("today_total").innerText="0"
 
 }
 
+async function fetchWithTimeout(url, options={}, timeout=8000){
+return Promise.race([
+fetch(url, options),
+new Promise((_, reject)=>
+setTimeout(()=>reject(new Error("timeout")), timeout)
+)
+])
+}
+
 async function loadDateData(){
 
-showLoading("↻ กำลังโหลดข้อมูล...")
+showLoading("กำลังซิงค์ข้อมูล...")
 clearInputs()
   
 let date=dateInput.value
@@ -630,7 +714,7 @@ return
 
 try{
 
-const res=await fetch(
+const res = await fetchWithTimeout(
 API+"?mode=getbydate&room="+encodeURIComponent(room)+"&date="+date+"&t="+Date.now()
 )
 
@@ -693,9 +777,11 @@ document.getElementById("saveBtn").disabled=true
 return
 }
 
-}catch(e){
+} catch(e){
 console.error(e)
+showToast("โหลดข้อมูลไม่สำเร็จ กรุณาลองใหม่","error",5000)
 }
+
 finally{
 hideLoading()
 }
@@ -724,7 +810,7 @@ loadLastRoomData()
 })
 
 function num(id){
-let v = parseInt(document.getElementById(id).value) || 0
+let v = Number(document.getElementById(id).value) || 0
 return v < 0 ? 0 : v
 }
 
@@ -738,8 +824,9 @@ if(Number(i.value) < 0) i.value = 0
 
 i.value = Math.floor(i.value)
 
-if(i.max && Number(i.value) > Number(i.max)){
-i.value = i.max
+const max = Number(i.max)
+if(i.max && Number(i.value) > max){
+i.value = max
 }
 
 })
@@ -815,17 +902,17 @@ saving=true
 let date=document.getElementById("record_date").value
 
 if(!date){
-alert("⚠ กรุณาเลือกวันที่ก่อนบันทึก")
+showToast("⚠ กรุณาเลือกวันที่ก่อนบันทึก","error",4000)
 saving=false
 return
 
 }
 
-showLoading("↻ กำลังบันทึกสถิติ โปรดรอสักครู่...")
+showLoading("กำลังบันทึกสถิติ โปรดรอสักครู่...")
 
 const btn=document.getElementById("saveBtn")
 btn.disabled=true
-btn.innerText="↻ กำลังบันทึกสถิติ..."
+btn.innerText="กำลังบันทึกสถิติ..."
 
 let data={
 mode:"save",
@@ -852,14 +939,16 @@ if(!res.ok){
 throw new Error("save failed")
 }
 
-alert("✅ ระบบทำการบันทึกสถิติเรียบร้อยแล้ว")
+showToast("บันทึกข้อมูลเรียบร้อยแล้ว","success",2000)
 
+setTimeout(()=>{
 window.onbeforeunload=null
 if(from === "admin"){
-  location.href = "admin-dashboard.html"
+location.href = "admin-dashboard.html"
 } else {
-  location.href = "teacher-dashboard.html"
+location.href = "teacher-dashboard.html"
 }
+},1500)
 
 }catch(e){
 
@@ -870,7 +959,7 @@ saving=false
 btn.disabled=false
 btn.innerText="บันทึกข้อมูลสถิติ"
 
-alert("⚠ เกิดข้อผิดพลาดในการบันทึก ลองใหม่อีกครั้ง")
+showToast("เกิดข้อผิดพลาด ลองใหม่อีกครั้ง","error",5000)
 
 }
 finally{
@@ -881,13 +970,13 @@ hideLoading()
   
 async function loadLatest(){
 
-showLoading("⏳ กำลังซิงค์ข้อมูล...")
+showLoading("กำลังซิงค์ข้อมูล...")
 
 let date=dateInput.value
   
 try{
 
-const res = await fetch(
+const res = await fetchWithTimeout(
 API+"?mode=getbydate&room="+encodeURIComponent(room)+"&date="+date+"&t="+Date.now()
 )
 
@@ -916,7 +1005,7 @@ calculate()
 
 }catch(e){
 console.error(e)
-alert("❌ โหลดข้อมูลไม่สำเร็จ")
+showToast("❌ โหลดข้อมูลไม่สำเร็จ","error",5000)
 }
 finally{
 hideLoading()
@@ -929,9 +1018,11 @@ async function loadLastRoomData(){
 if(hasLoadedOnce) return
 hasLoadedOnce = true
   
+showLoading("รอสักครู่...")
+
 try{
 
-const res = await fetch(
+const res = await fetchWithTimeout(
 API+"?mode=getlatestroom&room="+encodeURIComponent(room)+"&t="+Date.now()
 )
 
@@ -939,11 +1030,11 @@ let data = {}
 
 try{
   
-  data = await res.json()
+data = await res.json()
   
 }catch{
   
-  data = {}
+data = {}
   
 }
 
@@ -955,16 +1046,16 @@ document.getElementById("all_boys").value = data.all_boys ?? ""
 document.getElementById("all_girls").value = data.all_girls ?? ""
 
 calculate()
-document.getElementById("saveBtn").disabled=false
-
 }catch(e){
   
 console.error(e)
   
-}
-
+} finally {
+hideLoading()
 }
   
+}
+
 window.onbeforeunload=function(){
 
 const btn=document.getElementById("saveBtn")
@@ -979,10 +1070,50 @@ return "⚠ ข้อมูลยังไม่ได้ทำการบั�
 document.addEventListener("DOMContentLoaded",function(){
 
 loadTerm()
-updateClock()
 
 })
   
+let toastTimeout
+
+function showToast(message, type="info", duration=5000){
+
+const toast = document.getElementById("toast")
+const overlay = document.getElementById("toastOverlay")
+
+let icon = "ℹ️"
+if(type==="success") icon="✅"
+if(type==="error") icon="❌"
+
+toast.innerHTML = `
+<div style="font-size:30px;margin-bottom:8px">${icon}</div>
+<div>${message}</div>
+`
+
+toast.className = ""
+toast.classList.add(type)
+
+toast.classList.remove("hide")
+
+void toast.offsetWidth
+
+toast.style.setProperty("--duration", duration + "ms")
+
+overlay.classList.add("show")
+toast.classList.add("show")
+
+setTimeout(()=>{
+  toast.classList.add("hide")
+}, 50)
+
+clearTimeout(toastTimeout)
+
+toastTimeout = setTimeout(()=>{
+  toast.classList.remove("show")
+  overlay.classList.remove("show")
+}, duration)
+
+}
+
 </script>
 </body>
 </html>
