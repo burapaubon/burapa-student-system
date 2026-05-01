@@ -762,6 +762,59 @@ transform:translateY(-1px);
 margin:6px 0;
 font-size:15px;
 }
+
+#toastContainer{
+position:fixed;
+top:20px;
+right:20px;
+z-index:99999;
+display:flex;
+flex-direction:column;
+gap:12px;
+}
+
+.toast{
+min-width:280px;
+max-width:420px;
+background:#fff;
+border-radius:14px;
+padding:14px 16px;
+box-shadow:0 12px 30px rgba(0,0,0,.12);
+border-left:5px solid #22c55e;
+animation:toastSlide .35s ease;
+}
+
+.toast.success{border-left-color:#22c55e;}
+.toast.error{border-left-color:#ef4444;}
+.toast.warn{border-left-color:#f59e0b;}
+
+.toast-title{
+font-size:14px;
+font-weight:700;
+}
+
+.toast-text{
+font-size:13px;
+margin-top:4px;
+color:#555;
+}
+
+.toast.hide{
+opacity:0;
+transform:translateX(40px);
+transition:.35s;
+}
+
+@keyframes toastSlide{
+from{
+opacity:0;
+transform:translateX(40px);
+}
+to{
+opacity:1;
+transform:translateX(0);
+}
+}
 </style>
 </head>
   
@@ -775,6 +828,8 @@ font-size:15px;
 กำลังเปิดหน้าบริหารจัดการระบบ...
 </div>
 </div>
+
+<div id="toastContainer"></div>
 
 <header>
 
@@ -1031,7 +1086,39 @@ setTimeout(() => reject(new Error("timeout")), timeout)
 }
   
 const API="https://script.google.com/macros/s/AKfycbyV4PNjlFskTfF0Ol6xrZdWpSCJm54bi33l0M66QpluNo8X6B7Js8LZRtuY7T05KsShoQ/exec"
-  
+
+function showToast(type, title, message, autoReload = false) {
+const container = document.getElementById("toastContainer");
+
+if (!container) {
+console.warn("toastContainer not found");
+return;
+}
+
+const toast = document.createElement("div");
+toast.className = `toast ${type}`;
+
+toast.innerHTML = `
+<div class="toast-title">${title}</div>
+<div class="toast-text">${message}</div>
+`;
+
+container.appendChild(toast);
+
+setTimeout(() => {
+toast.classList.add("hide");
+
+setTimeout(async () => {
+toast.remove();
+
+if (autoReload) {
+await load();
+}
+}, 400);
+
+}, 2500);
+}
+
 function logout(){
 
 if(!confirm("ⓘ คุณต้องการออกจากระบบหรือไม่")) return
@@ -1145,17 +1232,17 @@ if(firstLoad){
   
 if(e.message === "timeout"){
   
-alert("เกิดข้อผิดพลาด รีเฟรชใหม่อีกครั้ง")
+showToast("error","เกิดข้อผิดพลาด","กรุณารีเฟรชใหม่อีกครั้ง")
   
 }else{
   
-alert("โหลดข้อมูลไม่สำเร็จ")
+showToast("error","โหลดข้อมูลไม่สำเร็จ","กรุณาลองใหม่อีกครั้ง")
   
 }
   
 }
 
-console.warn("โหลดข้อมูลไม่สำเร็จ ใช้ข้อมูลเดิมแทน");
+console.warn("โหลดข้อมูลไม่สำเร็จ ลองรีเฟรชอีกครั้ง");
 
 }finally{
 
@@ -1215,69 +1302,78 @@ requestAnimationFrame(step)
 }
 
 function renderDash(d){
-  
+
 let total = d.total || 0
 let present = d.present || 0
 let sick = d.sick || 0
 let leave = d.leave || 0
 let absent = d.absent || 0
+
 let used = present + sick + leave + absent
 let unknown = Math.max(0, total - used)
-if(unknown < 0) unknown = 0
 
 let sum = present + sick + leave + absent + unknown
 
-let noData=document.getElementById("noData")
-let canvas=document.getElementById("chart")
+let noData = document.getElementById("noData")
+let canvas = document.getElementById("chart")
 
-if(sum===0){
-canvas.style.display="none"
-noData.style.display="block"
-}else{
-canvas.style.display="block"
-noData.style.display="none"
+if(total === 0){
+
+canvas.style.display = "none"
+noData.style.display = "block"
+noData.innerHTML = `
+ยังไม่มีข้อมูลในขณะนี้
+`
+
+return
 }
 
-animateNumber("total",total)
-animateNumber("present",present)
-animateNumber("sick",sick)
-animateNumber("leave",leave)
-animateNumber("absent",absent)
+canvas.style.display = "block"
+noData.style.display = "none"
+
+animateNumber("total", total)
+animateNumber("present", present)
+animateNumber("sick", sick)
+animateNumber("leave", leave)
+animateNumber("absent", absent)
 
 let labels
 let colors
 let data
 
-if(sum===0){
+if(sum === 0){
 
-labels=["ยังไม่บันทึกสถิติในวันนี้"]
-colors=["#d9d9d9"]
-data=[1]
+labels = ["ยังไม่บันทึกสถิติในวันนี้"]
+colors = ["#d9d9d9"]
+data = [1]
 
 }else{
 
-labels=["มาเรียน","ป่วย","ลา","ขาด","ยังไม่มีข้อมูล"]
-colors=["#22c55e","#ff8fab","#ffd166","#f87171","#9ca3af"]
-data=[present,sick,leave,absent,unknown]
+labels = ["มาเรียน","ป่วย","ลา","ขาด","ยังไม่มีข้อมูล"]
+colors = ["#22c55e","#ff8fab","#ffd166","#f87171","#9ca3af"]
+data = [present, sick, leave, absent, unknown]
 }
 
-if(!canvas) return
-let ctx=canvas.getContext("2d")
+let ctx = canvas.getContext("2d")
 
 if(chartInstance){
+
 chartInstance.data.labels = labels
 chartInstance.data.datasets[0].data = data
+chartInstance.data.datasets[0].backgroundColor = colors
 chartInstance.update()
+
 }else{
+
 chartInstance = new Chart(ctx,{
 type:"pie",
 data:{
-labels:labels,
+labels: labels,
 datasets:[{
-data:data,
-backgroundColor:colors,
-borderWidth:2,
-borderColor:"#fff"
+data: data,
+backgroundColor: colors,
+borderWidth: 2,
+borderColor: "#fff"
 }]
 },
 plugins:[ChartDataLabels],
@@ -1302,18 +1398,18 @@ datalabels:{
 color:"#fff",
 font:{weight:"bold"},
 formatter:(v,ctx)=>{
-let sum=ctx.chart.data.datasets[0].data.reduce((a,b)=>a+(b||0),0)
+let sum = ctx.chart.data.datasets[0].data.reduce((a,b)=>a+(b||0),0)
 
-if(sum===0) return ""
-if(ctx.chart.data.labels.length===1) return ""
+if(sum === 0) return ""
+if(ctx.chart.data.labels.length === 1) return ""
 
-let percent=(v/sum*100).toFixed(1)
+let percent = (v/sum*100).toFixed(1)
 
-if(percent<0.1 && v>0){
+if(percent < 0.1 && v > 0){
 return "<0.1%"
 }
 
-return percent+"%"
+return percent + "%"
 }
 }
 }
@@ -1549,7 +1645,8 @@ ${r.submitted
 </div>
 
 <div class="buttons" style="margin-top:6px;">
-<button onclick="editRoom('${encodeURIComponent(r.room)}')" class="btn-edit">
+<button onclick="editRoom(this.dataset.room)"
+data-room="${escapeHTML(r.room)}" class="btn-edit">
 📝 แก้ไขชื่อห้อง
 </button>
 
@@ -1584,10 +1681,15 @@ const res = await fetch(API + `?mode=editRoom&old=${encodeURIComponent(oldRoom)}
 const data = await res.json()
 
 if(data.status === "success"){
-alert("✅ แก้ไขชื่อห้องสำเร็จ กรุณาทำการรีเฟรช")
-load()
+
+showToast(
+"success",
+"แก้ไขชื่อห้องสำเร็จ",
+"ระบบจะอัพเดทชื่อห้องในไม่ช้า",
+true
+)
 }else{
-alert("❌ แก้ไขชื่อห้องไม่สำเร็จ ลองใหม่อีกครั้ง")
+showToast("error","แก้ไขชื่อห้องไม่สำเร็จ"," ลองใหม่อีกครั้ง")
 }
 
 }
@@ -1608,18 +1710,21 @@ const data = await res.json()
 
 if(data.status === "success"){
   
-alert("✅ ลบห้องเรียบร้อยแล้ว กรุณาทำการรีเฟรช")
-  
-load()
+showToast(
+"success",
+"ลบห้องสำเร็จ",
+"ระบบจะนำห้องออกในไม่ช้า",
+true
+)
   
 }else{
   
-alert("❌ ทำการลบห้องไม่สำเร็จ ลองใหม่อีกครั้ง")
+showToast("error","ทำการลบห้องไม่สำเร็จ"," ลองใหม่อีกครั้ง")
 }
 
 }catch(e){
   
-alert("⚠ เกิดข้อผิดพลาด ลองใหม่อีกครั้ง")
+showToast("error","เกิดข้อผิดพลาด","กรุณาลองใหม่อีกครั้ง")
   
 }
 
@@ -1796,11 +1901,11 @@ fetch(API + "?mode=updateRoomOrder&order=" + encodeURIComponent(JSON.stringify(n
 .then(res => res.json())
 .then(d => {
 if(d.status !== "success"){
-alert("❌ บันทึกลำดับไม่สำเร็จ กรุณาลองใหม่")
+showToast("error","บันทึกลำดับไม่สำเร็จ","กรุณาลองใหม่")
 }
 })
 .catch(()=>{
-alert("⚠ ระบบจัดเรียงห้องไม่ได้ ลองใหม่อีกครั้ง")
+showToast("warn","ระบบจัดเรียงห้องไม่ได้"," ลองใหม่อีกครั้ง")
 })
 }
 });
@@ -1811,7 +1916,9 @@ function toggleSort(){
 
 sortMode = !sortMode
 
+if(sortableInstance){
 sortableInstance.option("disabled", !sortMode)
+}
 
 const btn = document.getElementById("sortBtn")
 
@@ -1819,11 +1926,11 @@ if(sortMode){
 
 clearInterval(refreshTimer)
 
-btn.innerText = "💾 บันทึกลำดับห้อง"
+btn.innerText = "💾 เสร็จสิ้นการจัดลำดับ"
 btn.classList.remove("btn-sub")
 btn.classList.add("btn-main")
 
-alert("🛠️ โหมดจัดลำดับ : ทำการเลื่อนเพื่อย้ายลำดับห้อง จากนั้นกดบันทึกลำดับห้อง")
+alert("🛠️ โหมดจัดลำดับ : ทำการเลื่อนเพื่อย้ายลำดับห้อง จากนั้นกดเสร็จสิ้นการจัดลำดับ")
 
 }else{
 
@@ -1833,9 +1940,12 @@ btn.innerText = "⇌ จัดลำดับห้อง"
 btn.classList.remove("btn-main")
 btn.classList.add("btn-sub")
 
-alert("✅ บันทึกลำดับห้องเรียบร้อยแล้ว")
-
-load()
+showToast(
+"success",
+"เสร็จสิ้นการจัดลำดับห้อง",
+"หากต้องการแก้ไข ให้ทำการจัดลำดับห้องใหม่",
+true
+)
     
 }
   
@@ -1845,9 +1955,41 @@ async function addRoom(){
 
 if(loadingNow) return
 
-let name = prompt("📍 พิมพ์ชื่อห้อง เช่น ชั้นประถมศึกษาปีที่ 1")
+let name = prompt("📍 พิมพ์ชื่อห้อง เช่น ชั้นประถมศึกษาปีที่ 1 , ชั้นมัธยมศึกษาปีที่ 1/2")
   
-if(!name) return
+if (!name || !name.trim()) return;
+
+name = name.trim();
+
+const validRoomPattern = /^[ก-๙a-zA-Z0-9\s./()-]+$/;
+
+const blockedNames = [
+"0",
+"null",
+"undefined",
+"admin",
+"test",
+"default",
+"system",
+"none"
+];
+
+if (
+!name ||
+!name.trim() ||
+!validRoomPattern.test(name) ||
+/^\d+$/.test(name) ||
+!/[ก-๙a-zA-Z]/.test(name) ||
+name.length > 50 ||
+blockedNames.includes(name.toLowerCase())
+) {
+showToast(
+"warn",
+"รูปแบบชื่อห้องไม่ถูกต้อง",
+"กรุณาตั้งชื่อห้อง เช่น ชั้นประถมศึกษาปีที่ 1 หรือ มัธยมศึกษาปีที่ 1/2"
+);
+return;
+}
 
 loadingNow = true
 
@@ -1860,19 +2002,26 @@ const data = await res.json()
 
 if(data.status === "success"){
   
-alert("✅ ระบบเพิ่มห้องสำเร็จ กรุณาทำการรีเฟรช")
-  
-load()
+showToast(
+"success",
+"เพิ่มห้องสำเร็จ",
+"ระบบจะเพิ่มห้องในไม่ช้า (ด้านล่างสุด)",
+true
+)
   
 }else{
   
-alert("❌ ทำการเพิ่มห้องไม่สำเร็จ ลองใหม่อีกครั้ง")
+showToast(
+"error",
+"เพิ่มห้องไม่สำเร็จ",
+"กรุณาลองใหม่อีกครั้ง"
+)
   
 }
 
 }catch(e){
   
-alert("⚠ เกิดข้อผิดพลาด ลองใหม่อีกครั้ง")
+showToast("error","เกิดข้อผิดพลาด"," ลองใหม่อีกครั้ง")
   
 }
 
@@ -1884,14 +2033,14 @@ async function resetRoom(e, room){
 
 room = decodeURIComponent(room)
 
-if(!confirm("⚠ คุณต้องการรีเซ็ตสถิตวันนี้ของ "+room+" ใช่ไหม?")) return
+if(!confirm("⚠ คุณต้องการรีเซ็ตสถิติวันนี้ของ "+room+" ใช่ไหม?")) return
 
 if(loadingNow) return
 loadingNow = true
 
 const btn = e.currentTarget
 btn.disabled = true
-btn.innerText = "↻ กำลังรีเซ็ต..."
+btn.innerText = "กำลังรีเซ็ต..."
 
 try{
 
@@ -1903,17 +2052,20 @@ throw new Error()
   
 }
 
-alert("✅ ทำการรีเซ็ตสถิติ "+room+" วันนี้สำเร็จ กรุณารีเฟรชหน้าเพจ")
-  
-load()
+showToast(
+"success",
+"รีเซ็ตสถิติ "+room+" วันนี้สำเร็จ",
+"ระบบจะอัพเดทการเปลี่ยนแปลงในไม่ช้า",
+true
+)
 
 } catch(e){
   
-alert("❌ รีเซ็ตไม่สำเร็จ กรุณาลองใหม่อีกครั้ง")
+showToast("error","รีเซ็ตไม่สำเร็จ","กรุณาลองใหม่อีกครั้ง")
   
 }
 
-btn.innerText = "รีเซ็ตสถิติวันนี้"
+btn.innerText = "🔄 รีเซ็ตสถิติวันนี้"
 btn.disabled = false
 
 loadingNow = false
@@ -1930,7 +2082,7 @@ if(btn.disabled) return
 if(!confirm("⚠ คุณต้องการรีเซ็ตสถิติทุกห้องในวันนี้ใช่ไหม?")) return
 
 btn.disabled = true
-btn.innerText = "↻ กำลังรีเซ็ต..."
+btn.innerText = "กำลังรีเซ็ต..."
 
 loadingNow = true
 
@@ -1944,13 +2096,16 @@ throw new Error()
   
 }
 
-alert("✅ ทำการรีเซ็ตสถิติทุกห้องในวันนี้สำเร็จ กรุณารีเฟรชหน้าเพจ")
-  
-load()
+showToast(
+"success",
+"รีเซ็ตสถิติวันนี้สำเร็จ",
+"ระบบจะอัพเดทการเปลี่ยนแปลงในไม่ช้า",
+true
+)
 
 }catch(e){
   
-alert("⚠ เกิดข้อผิดพลาด ลองใหม่อีกครั้ง")
+showToast("error","เกิดข้อผิดพลาด" ,"ลองใหม่อีกครั้ง")
   
 }
 
@@ -1970,7 +2125,7 @@ let end=document.getElementById("endDate").value
 
 if(!start || !end){
   
-alert("กรุณาเลือกวันที่")
+showToast("error","กรุณาเลือกวันที่ก่อน","โปรดเลือกวันที่เริ่มต้นและสิ้นสุด")
   
 return
   
@@ -1980,7 +2135,7 @@ if(!confirm("⚠ รีเซ็ตข้อมูลช่วง "+start+" ถ�
 
 if(new Date(start) > new Date(end)){
   
-alert("⚠ วันที่เริ่มต้องไม่มากกว่าวันที่สิ้นสุด")
+showToast("warn","วันที่ไม่ถูกต้อง","วันที่เริ่มต้องไม่มากกว่าวันที่สิ้นสุด")
   
 return
   
@@ -1998,13 +2153,16 @@ throw new Error()
   
 }
 
-alert("✅ รีเซ็ตสถิติแบบเลือกช่วงวันสำเร็จ กรุณารีเฟรชหน้าเพจ")
-  
-load()
+showToast(
+"success",
+"รีเซ็ตสถิติแบบเลือกช่วงวันสำเร็จ",
+"ระบบจะอัพเดทการเปลี่ยนแปลงในไม่ช้า",
+true
+)
 
 }catch(e){
   
-alert("⚠ เกิดข้อผิดพลาด ลองใหม่อีกครั้ง")
+showToast("error","เกิดข้อผิดพลาด","ลองใหม่อีกครั้ง")
   
 }
 
@@ -2022,7 +2180,7 @@ let confirmText = prompt("พิมพ์ 'RESET' เพื่อยืนยั
 
 if(confirmText !== "RESET"){
   
-alert("⚠ ยกเลิกการล้างข้อมูล")
+alert("❌ ล้างข้อมูลไม่สำเร็จ")
   
 return
   
@@ -2038,11 +2196,15 @@ if(!res.ok){
 throw new Error()
 }
 
-alert("✅ ล้างข้อมูลสถิติในระบบทั้งหมดแล้ว")
-load()
+showToast(
+"success",
+"ล้างข้อมูลสถิติทั้งหมดสำเร็จ",
+"ระบบจะอัพเดทการเปลี่ยนแปลงในไม่ช้า",
+true
+)
 
 }catch(e){
-alert("⚠ เกิดข้อผิดพลาด ลองใหม่อีกครั้ง")
+showToast("error","เกิดข้อผิดพลาด","ลองใหม่อีกครั้ง")
 }
 
 loadingNow = false
@@ -2053,14 +2215,14 @@ async function changeTermYear(e){
 const btn = e.target
   
 btn.disabled = true
-btn.innerText = "↻ กำลังบันทึก..."
+btn.innerText = "กำลังบันทึก..."
 
 const term = document.getElementById("termInput").value
 const year = document.getElementById("yearInput").value
 
 if(!term || !year){
   
-alert("⚠ กรุณาเลือกให้ครบ")
+showToast("warn","เลือกข้อมูลไม่ครบ","กรุณาเลือกให้ครบถ้วน")
   
 btn.disabled = false
 btn.innerText = "บันทึกการตั้งค่า"
@@ -2083,13 +2245,18 @@ throw new Error()
   
 }
 
-alert("✅ เปลี่ยนภาคเรียน / ปีการศึกษาเรียบร้อยแล้ว")
+showToast(
+"success",
+"บันทึกภาคเรียนสำเร็จ",
+"ระบบจะอัพเดทภาคเรียนในไม่ช้า",
+true
+)
 
 loadTerm()
 
 }catch(e){
 
-alert("⚠ เกิดข้อผิดพลาดในการบันทึก กรุณาลองใหม่อีกครั้ง")
+showToast("error","เกิดข้อผิดพลาดในการบันทึก","กรุณาลองใหม่อีกครั้ง")
 
 }
 
@@ -2143,11 +2310,12 @@ async function saveSignature(e){
 
 const btn = e.target
 btn.disabled = true
-btn.innerText = "↻ กำลังบันทึก..."
+btn.innerText = "กำลังบันทึก..."
 
 try{
 
-const url = API + `?mode=updatesigconfig
+const url = API +
+`?mode=updatesigconfig
 &mon=${encodeURIComponent(document.getElementById("mon").value)}
 &tue=${encodeURIComponent(document.getElementById("tue").value)}
 &wed=${encodeURIComponent(document.getElementById("wed").value)}
@@ -2165,16 +2333,25 @@ if(!res.ok) throw new Error()
 const data = await res.json()
 
 if(data.status === "success"){
-alert("✅ บันทึกเรียบร้อย")
+showToast(
+"success",
+"บันทึกรายชื่อสำเร็จ",
+"ระบบจะอัพเดทรายชื่อในไม่ช้า",
+true
+)
 loadSignature()
 document.getElementById("sigForm").style.display = "none"
 }else{
-alert("❌ บันทึกไม่สำเร็จ")
+showToast("error","บันทึกไม่สำเร็จ","กรุณาลองใหม่อีกครั้ง")
 }
 
 }catch(e){
 console.error(e)
-alert("⚠ เกิดข้อผิดพลาด")
+showToast(
+"error",
+"เกิดข้อผิดพลาด",
+"กรุณาลองใหม่อีกครั้ง"
+)
 }
 
 btn.disabled = false
@@ -2210,14 +2387,18 @@ const date = document.getElementById("reportDate").value
 
 if(!date){
   
-alert("⚠ กรุณาเลือกวันที่ต้องการทำแบบรายงาน")
+showToast(
+"warn",
+"ยังไม่ได้เลือกวันที่",
+"โปรดเลือกวันที่ต้องการทำรายงาน"
+)
   
 return
   
 }
 
 btn.disabled = true
-btn.innerText = "↻ กำลังสร้างรายงาน..."
+btn.innerText = "กำลังสร้างรายงาน..."
 
 window.open(
 "report.html?date=" + date,
