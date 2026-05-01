@@ -356,14 +356,48 @@ location.href="admin-login.html"
 
 }
 
+async function fetchWithTimeout(url, timeout = 5000){
+const controller = new AbortController()
+const id = setTimeout(() => controller.abort(), timeout)
+
+try{
+const res = await fetch(url, { signal: controller.signal })
+clearTimeout(id)
+return res
+}catch(err){
+clearTimeout(id)
+throw err
+}
+}
+
+async function fetchRetry(url, retries = 3){
+for(let i=0;i<retries;i++){
+try{
+return await fetchWithTimeout(url)
+}catch(e){
+if(i === retries-1) throw e
+}
+}
+}
+
 async function loadTermFromAPI(){
 
 let el = document.getElementById("termDisplay")
 
 try{
 
-const res = await fetch(API + "?mode=getterm&t=" + Date.now())
-const data = await res.json()
+const res = await fetchRetry(API + "?mode=getterm&t=" + Date.now())
+
+if(!res.ok) throw new Error("HTTP error")
+
+const text = await res.text()
+
+let data
+try{
+data = JSON.parse(text)
+}catch{
+throw new Error("Invalid JSON")
+}
 
 if(data.term && data.year){
 
@@ -375,15 +409,13 @@ el.style.display = "block"
 localStorage.setItem("term", data.term)
 localStorage.setItem("year", data.year)
 
-return
-
 }else{
 throw new Error("no data")
 }
 
 }catch(e){
 
-console.warn("API ล้ม → ใช้ข้อมูลสำรอง")
+console.warn("API ล้ม → ใช้ cache", e)
 
 let term = localStorage.getItem("term")
 let year = localStorage.getItem("year")
@@ -397,12 +429,12 @@ el.style.display = "block"
 
 }else{
 
-el.style.display = "none"
+el.innerHTML = "ไม่สามารถโหลดข้อมูลภาคเรียนได้"
+el.style.display = "block"
 
 }
 
 }
-
 }
   
 function updateClock(){
