@@ -7,8 +7,11 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"
+onerror="console.warn('Chart.js โหลดไม่สำเร็จ')"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"
+onerror="console.warn('ChartDataLabels โหลดไม่สำเร็จ')"></script>
 
 <style>
 
@@ -483,6 +486,17 @@ width:100%;
 
 </header>
 
+<div id="alertBar" style="
+background:#fff3cd;
+color:#856404;
+padding:10px;
+text-align:center;
+font-size:14px;
+display:none;
+font-weight:600;
+">
+</div>
+
 <main>
 
 <div class="stats">
@@ -648,23 +662,18 @@ let firstLoad = true
 async function load(){
 
 if(loadingNow)return
-if(!firstLoad && document.hidden) return
 
 loadingNow = true
 
-if(firstLoad){
-showLoading()
-}
-
 let slowTimer = setTimeout(()=>{
-if(loadingNow){
-showError("⏳ ระบบกำลังซิงค์ข้อมูล")
+if(loadingNow && !chartInstance){
+showError("ระบบกำลังซิงค์ข้อมูล")
 }
 },8000)
 
 try{
 
-const dash = await fetchWithRetry(
+let dash = await fetchWithRetry(
 API+"?mode=getdashboard&t="+Date.now(),
 { cache:"no-store" },
 3
@@ -673,7 +682,14 @@ API+"?mode=getdashboard&t="+Date.now(),
 clearTimeout(slowTimer)
 
 if(!dash || typeof dash !== "object"){
-throw new Error("invalid data")
+dash = {
+total: 0,
+present: 0,
+sick: 0,
+leave: 0,
+absent: 0,
+rooms: []
+}
 }
 
 renderDash(dash)
@@ -682,20 +698,32 @@ renderRooms(rooms)
 
 hideLoading()
 
-}catch(e){
+} catch(e){
 
 console.error(e)
 
 showError("❌ โหลดข้อมูลไม่สำเร็จ\nลองรีเฟรชใหม่อีกครั้ง")
 
-setTimeout(() => {
-if(!document.hidden) load()
-}, 5000)
+let retryDelay = 5000
+
+let retryTimer
+
+const retry = () => {
+clearTimeout(retryTimer)
+retryTimer = setTimeout(()=>{
+if(!document.hidden){
+load()
+retryDelay = Math.min(retryDelay * 1.5, 30000)
+}
+}, retryDelay)
+}
+
+retry()
 
 } finally {
 
 clearTimeout(slowTimer)
-  
+
 loadingNow = false
 firstLoad = false
 
@@ -703,14 +731,19 @@ firstLoad = false
 
 }
 
+if(firstLoad){
+showLoading()
+}
+
 function showLoading(){
+
 let noData = document.getElementById("noData")
 let canvas = document.getElementById("chart")
 
 canvas.style.display = "none"
 noData.style.display = "block"
 noData.innerText = "⏳ กำลังอัพเดทข้อมูล..."
-  
+
 }
   
 function showError(msg){
@@ -789,11 +822,16 @@ let noData=document.getElementById("noData")
 let canvas=document.getElementById("chart")
 
 if(sum===0){
-canvas.style.display="none"
-noData.style.display="block"
+canvas.style.display = "none"
+noData.style.display = "block"
+noData.innerHTML = `
+<div style="line-height:1.8">
+ยังไม่มีข้อมูลสถิติในระบบ<br>
+</div>
+`
 }else{
-canvas.style.display="block"
-noData.style.display="none"
+canvas.style.display = "block"
+noData.style.display = "none"
 }
 
 animateNumber("total",total)
@@ -828,23 +866,30 @@ if (!(canvas instanceof HTMLCanvasElement)) return;
 const ctx = canvas.getContext("2d");
   
 if (!ctx) return;
-  
+
+if (typeof Chart === "undefined"){
+
+showError("⚠ ไม่สามารถโหลดกราฟได้")
+
+return
+
+}
+
 if(chartInstance){
 
-try{
-  
-chartInstance.destroy()
-  
-}catch(e){}
-  
-chartInstance = null
-  
-}
+chartInstance.data.labels = labels
+chartInstance.data.datasets[0].data = data
+chartInstance.update()
 
-if (typeof ChartDataLabels !== "undefined") {
+}else{
+
+if (
+typeof ChartDataLabels !== "undefined" &&
+!Chart.registry.plugins.get('datalabels')
+){
 Chart.register(ChartDataLabels)
 }
-  
+
 chartInstance = new Chart(ctx,{
 type:"pie",
 data:{
@@ -882,6 +927,8 @@ return percent<0.1 && v>0 ? "<0.1%" : percent+"%"
 
 }
 
+}
+
 function renderRooms(rooms){
 
 document.getElementById("roomCount").innerText="("+rooms.length+" ห้อง)"
@@ -893,10 +940,34 @@ if(rooms.length===0){
 document.getElementById("classList").innerHTML=
 "<div style='text-align:center;padding:30px;color:#999'>ไม่พบข้อมูลห้องเรียน</div>"
 
+document.getElementById("alertBar").style.display = "none"
+
 return
 }
   
+let done = rooms.filter(r => r.submitted).length
+
+let pending = rooms.filter(r => !r.submitted).length
+let alertBar = document.getElementById("alertBar")
+
+if(done === 0){
+
+alertBar.style.display="block"
+alertBar.innerHTML="⚠ ยังไม่มีการบันทึกสถิติในวันนี้"
+
+}else if(pending > 0){
+
+alertBar.style.display="block"
+alertBar.innerHTML="⚠ เหลือ "+pending+" ห้องที่ยังไม่ได้บันทึกสถิติในวันนี้"
+
+}else{
+
+alertBar.style.display="none"
+
+}
+
 rooms.forEach(r=>{
+if(!r || !r.room) return
 
 let status = r.submitted
 ?'<span class="status-badge ok">✅ บันทึกสถิติแล้ว</span>'
@@ -964,7 +1035,6 @@ clearInterval(refreshTimer)
 
 }else{
 
-firstLoad = true
 startAutoRefresh()
 load()
 
