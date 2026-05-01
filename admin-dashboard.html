@@ -1991,6 +1991,22 @@ showToast(
 return;
 }
 
+const existingRooms = Array.from(
+document.querySelectorAll("#classList .class")
+).map(el => {
+const roomName = el.dataset.room || "";
+return roomName.trim().toLowerCase();
+});
+
+if (existingRooms.includes(name.toLowerCase())) {
+showToast(
+"warn",
+"ชื่อห้องที่ตั้งซ้ำกับชื่อห้องที่มีอยู่",
+"ห้องนี้มีอยู่ในระบบแล้ว"
+);
+return;
+}
+
 loadingNow = true
 
 try{
