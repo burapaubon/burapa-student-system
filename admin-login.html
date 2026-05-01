@@ -331,6 +331,8 @@ to{transform:rotate(360deg)}
   
 const API_URL = "https://script.google.com/macros/s/AKfycbyV4PNjlFskTfF0Ol6xrZdWpSCJm54bi33l0M66QpluNo8X6B7Js8LZRtuY7T05KsShoQ/exec"
   
+fetch(API_URL + "?ping=1").catch(()=>{})
+
 async function loginAdmin(){
 
 const btn = document.getElementById("loginBtn")
