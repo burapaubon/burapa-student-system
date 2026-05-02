@@ -1675,7 +1675,22 @@ oldRoom = decodeURIComponent(oldRoom)
 
 let newName = prompt("แก้ไขชื่อห้อง", oldRoom)
 
-if(!newName || newName === oldRoom) return
+if(!newName || newName.trim() === "" || newName === oldRoom) return
+
+newName = newName.trim()
+
+const existingRooms = Array.from(
+document.querySelectorAll("#classList .class")
+).map(el => (el.dataset.room || "").trim().toLowerCase())
+
+if(existingRooms.includes(newName.toLowerCase()) && newName.toLowerCase() !== oldRoom.toLowerCase()){
+showToast(
+"warn",
+"ชื่อห้องซ้ำกับที่มีในระบบ",
+"มีห้องที่ใช้ชื่อนี้อยู่แล้ว กรุณาใช้ชื่ออื่น"
+)
+return
+}
 
 const res = await fetch(API + `?mode=editRoom&old=${encodeURIComponent(oldRoom)}&new=${encodeURIComponent(newName)}&token=${token}`)
 const data = await res.json()
@@ -1688,10 +1703,12 @@ showToast(
 "ระบบจะอัพเดทชื่อห้องในไม่ช้า",
 true
 )
-}else{
-showToast("error","แก้ไขชื่อห้องไม่สำเร็จ"," ลองใหม่อีกครั้ง")
-}
 
+}else{
+
+showToast("error","แก้ไขชื่อห้องไม่สำเร็จ","ลองใหม่อีกครั้ง")
+
+}
 }
 
 async function deleteRoom(room){
