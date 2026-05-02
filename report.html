@@ -415,7 +415,7 @@ const pageCtx = pageCanvas.getContext("2d")
 
 pageCanvas.width = canvas.width
 const safePadding = 10
-pageCanvas.height = pageHeightPx - safePadding
+pageCanvas.height = Math.floor(pageHeightPx - safePadding)
 
 pageCtx.fillStyle = "#ffffff"
 pageCtx.fillRect(0, 0, pageCanvas.width, pageCanvas.height)
@@ -423,16 +423,26 @@ pageCtx.fillRect(0, 0, pageCanvas.width, pageCanvas.height)
 pageCtx.drawImage(
 canvas,
 0, renderedHeight,
-canvas.width, pageHeightPx,
+canvas.width, pageCanvas.height,
 0, 0,
-canvas.width, pageHeightPx
+canvas.width, pageCanvas.height
 )
 
 const imgDataPage = pageCanvas.toDataURL("image/png")
 
 if (renderedHeight > 0) pdf.addPage()
 
-pdf.addImage(imgDataPage, "PNG", margin, margin, imgWidth, pageHeight - (margin * 2) - 2)
+const pageImgHeight =
+  (pageCanvas.height * imgWidth) / pageCanvas.width
+
+pdf.addImage(
+  imgDataPage,
+  "PNG",
+  margin,
+  margin,
+  imgWidth,
+  pageImgHeight
+)
 
 renderedHeight += pageCanvas.height
   
@@ -602,7 +612,7 @@ const total = Number(r.total)||0
 const male = Number(r.male)||0
 const female = Number(r.female)||0
 
-const present = isFallback ? "" : Number(r.present)||0
+const present = isFallback ? 0 : Number(r.present)||0
 const presentMale = isFallback ? 0 : Number(r.present_m)||0
 const presentFemale = isFallback ? 0 : Number(r.present_f)||0
 
@@ -692,12 +702,9 @@ if(Number(numA[0]) !== Number(numB[0])){
 }
 
 return (Number(numA[1]||0)) - (Number(numB[1]||0))
+
 })
 
-return (Number(numA[1]||0)) - (Number(numB[1]||0))
-  
-})
-  
 levels[level].rows.forEach(r=>{
   
 html += `
@@ -827,6 +834,8 @@ html += `
 <td>${totalSick}</td>
 <td>${totalLeave}</td>
 <td>${totalAbsent}</td>
+
+<td colspan="6"></td>
 </tr>
 `
 
