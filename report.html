@@ -561,6 +561,12 @@ d.setDate(d.getDate()-1)
 return { data:[], fallbackDate:null }
   
 }
+
+function showValue(v){
+  return (v === null || v === undefined || v === "" || v === 0)
+    ? "ว่าง"
+    : v
+}
   
 async function loadReport(){
 
@@ -717,13 +723,13 @@ totalSick += Number(sick)||0
 totalLeave += Number(leave)||0
 totalAbsent += Number(absent)||0
 
-levels[level].in_m += inM
-levels[level].in_f += inF
-levels[level].in_total += inTotal
+levels[level].in_m += (inM ?? 0)
+levels[level].in_f += (inF ?? 0)
+levels[level].in_total += (inTotal ?? 0)
 
-levels[level].out_m += outM
-levels[level].out_f += outF
-levels[level].out_total += outTotal
+levels[level].out_m += (outM ?? 0)
+levels[level].out_f += (outF ?? 0)
+levels[level].out_total += (outTotal ?? 0)
 
 totalOutMale += outM
 totalOutFemale += outF
@@ -829,13 +835,13 @@ html += `
 <td>${r.leave}</td>
 <td>${r.absent}</td>
 
-<td>${r.in_m ?? ""}</td>
-<td>${r.in_f ?? ""}</td>
-<td>${r.in_total ?? ""}</td>
+<td>${showValue(r.in_m)}</td>
+<td>${showValue(r.in_f)}</td>
+<td>${showValue(r.in_total)}</td>
 
-<td>${r.out_m === null ? "" : r.out_m}</td>
-<td>${r.out_f === null ? "" : r.out_f}</td>
-<td>${r.out_total === null ? "" : r.out_total}</td>
+<td>${showValue(r.out_m)}</td>
+<td>${showValue(r.out_f)}</td>
+<td>${showValue(r.out_total)}</td>
 </tr>
 `
   
