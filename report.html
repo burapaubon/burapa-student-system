@@ -500,7 +500,7 @@ async function fetchWithFallback(dateStr){
 
 let d = new Date(dateStr)
 
-for(let i=0;i<60;i++){
+for(let i=0;i<30;i++){
     
 const tryDate = d.toISOString().split("T")[0]
 
@@ -687,13 +687,12 @@ levels[level].rows.sort((a,b)=>{
 const numA = (a.room.match(/\d+/g) || ["0"])
 const numB = (b.room.match(/\d+/g) || ["0"])
 
-if(!numA || !numB) return 0
-
-if(numA[0] != numB[0]){
-  
-return Number(numA[0]) - Number(numB[0])
-  
+if(Number(numA[0]) !== Number(numB[0])){
+  return Number(numA[0]) - Number(numB[0])
 }
+
+return (Number(numA[1]||0)) - (Number(numB[1]||0))
+})
 
 return (Number(numA[1]||0)) - (Number(numB[1]||0))
   
