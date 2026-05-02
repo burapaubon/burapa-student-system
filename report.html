@@ -163,7 +163,7 @@ page-break-inside: avoid;
 }
 
 .footer{
-margin-top:50px;
+margin-top:70px;
 display:grid;
 grid-template-columns: repeat(2, 1fr);
 gap:50px 60px;
@@ -586,6 +586,14 @@ let totalPresentFemale = 0
 let totalSick = 0
 let totalLeave = 0
 let totalAbsent = 0
+
+let totalInMale = 0
+let totalInFemale = 0
+let totalInAll = 0
+
+let totalOutMale = 0
+let totalOutFemale = 0
+let totalOutAll = 0
   
 data.forEach(r=>{
 
@@ -602,10 +610,16 @@ presentMale:0,
 presentFemale:0,
 sick:0,
 leave:0,
-absent:0
-  
+absent:0,
+
+in_m:0,
+in_f:0,
+in_total:0,
+
+out_m:0,
+out_f:0,
+out_total:0
 }
-  
 }
 
 const total = Number(r.total)||0
@@ -657,12 +671,59 @@ totalPresentFemale += presentFemale
 totalSick += Number(sick)||0
 totalLeave += Number(leave)||0
 totalAbsent += Number(absent)||0
+
+const inM = Number(r.in_m) || 0
+const inF = Number(r.in_f) || 0
+const inTotal = Number(r.in_total) || 0
+
+const outM = Number(r.out_m) || 0
+const outF = Number(r.out_f) || 0
+const outTotal = Number(r.out_total) || 0
+
+levels[level].in_m += inM
+levels[level].in_f += inF
+levels[level].in_total += inTotal
+
+levels[level].out_m += outM
+levels[level].out_f += outF
+levels[level].out_total += outTotal
+
+totalInMale += inM
+totalInFemale += inF
+totalInAll += inTotal
+
+totalOutMale += outM
+totalOutFemale += outF
+totalOutAll += outTotal
 })
 
 let groupSum = {
-  "ป.": {male:0,female:0,total:0,presentMale:0,presentFemale:0,present:0, sick:0, leave:0, absent:0},
-  "ม.": {male:0,female:0,total:0,presentMale:0,presentFemale:0,present:0, sick:0, leave:0, absent:0},
-  "ปวช": {male:0,female:0,total:0,presentMale:0,presentFemale:0,present:0, sick:0, leave:0, absent:0}
+  "ป.": {
+    male:0,female:0,total:0,
+    presentMale:0,presentFemale:0,present:0,
+    sick:0, leave:0, absent:0,
+
+    in_m:0, in_f:0, in_total:0,
+    out_m:0, out_f:0, out_total:0
+  },
+
+  "ม.": {
+    male:0,female:0,total:0,
+    presentMale:0,presentFemale:0,present:0,
+    sick:0, leave:0, absent:0,
+
+    in_m:0, in_f:0, in_total:0,
+    out_m:0, out_f:0, out_total:0
+  },
+
+  "ปวช": {
+    male:0,female:0,total:0,
+    presentMale:0,presentFemale:0,present:0,
+    sick:0, leave:0, absent:0,
+
+    in_m:0, in_f:0, in_total:0,
+    out_m:0, out_f:0, out_total:0
+  }
 }
 
 const order = ["ป.1","ป.2","ป.3","ป.4","ป.5","ป.6","ม.1","ม.2","ม.3","ม.4","ม.5","ม.6","ปวช.1","ปวช.2","ปวช.3"]
@@ -687,6 +748,14 @@ groupSum[groupKey].present += levels[level].present
 groupSum[groupKey].sick += levels[level].sick
 groupSum[groupKey].leave += levels[level].leave
 groupSum[groupKey].absent += levels[level].absent
+
+groupSum[groupKey].in_m += levels[level].in_m
+groupSum[groupKey].in_f += levels[level].in_f
+groupSum[groupKey].in_total += levels[level].in_total
+
+groupSum[groupKey].out_m += levels[level].out_m
+groupSum[groupKey].out_f += levels[level].out_f
+groupSum[groupKey].out_total += levels[level].out_total
   
 }
   
@@ -759,7 +828,13 @@ html += `
 <td>${levels[level].leave}</td>
 <td>${levels[level].absent}</td>
 
-<td colspan="6"></td>
+<td>${levels[level].in_m}</td>
+<td>${levels[level].in_f}</td>
+<td>${levels[level].in_total}</td>
+
+<td>${levels[level].out_m}</td>
+<td>${levels[level].out_f}</td>
+<td>${levels[level].out_total}</td>
 </tr>
 `
   
@@ -776,6 +851,14 @@ html += `
 <td>${groupSum["ป."].sick}</td>
 <td>${groupSum["ป."].leave}</td>
 <td>${groupSum["ป."].absent}</td>
+
+<td>${groupSum["ป."].in_m}</td>
+<td>${groupSum["ป."].in_f}</td>
+<td>${groupSum["ป."].in_total}</td>
+
+<td>${groupSum["ป."].out_m}</td>
+<td>${groupSum["ป."].out_f}</td>
+<td>${groupSum["ป."].out_total}</td>
 </tr>
 `
   
@@ -794,6 +877,14 @@ html += `
 <td>${groupSum["ม."].sick}</td>
 <td>${groupSum["ม."].leave}</td>
 <td>${groupSum["ม."].absent}</td>
+
+<td>${groupSum["ม."].in_m}</td>
+<td>${groupSum["ม."].in_f}</td>
+<td>${groupSum["ม."].in_total}</td>
+
+<td>${groupSum["ม."].out_m}</td>
+<td>${groupSum["ม."].out_f}</td>
+<td>${groupSum["ม."].out_total}</td>
 </tr>
 `
   
@@ -812,6 +903,14 @@ html += `
 <td>${groupSum["ปวช"].sick}</td>
 <td>${groupSum["ปวช"].leave}</td>
 <td>${groupSum["ปวช"].absent}</td>
+
+<td>${groupSum["ปวช"].in_m}</td>
+<td>${groupSum["ปวช"].in_f}</td>
+<td>${groupSum["ปวช"].in_total}</td>
+
+<td>${groupSum["ปวช"].out_m}</td>
+<td>${groupSum["ปวช"].out_f}</td>
+<td>${groupSum["ปวช"].out_total}</td>
 </tr>
 `
   
@@ -835,7 +934,13 @@ html += `
 <td>${totalLeave}</td>
 <td>${totalAbsent}</td>
 
-<td colspan="6"></td>
+<td>${totalInMale}</td>
+<td>${totalInFemale}</td>
+<td>${totalInAll}</td>
+
+<td>${totalOutMale}</td>
+<td>${totalOutFemale}</td>
+<td>${totalOutAll}</td>
 </tr>
 `
 
@@ -916,6 +1021,8 @@ if(day === 2) teacher = data.tue
 if(day === 3) teacher = data.wed
 if(day === 4) teacher = data.thu
 if(day === 5) teacher = data.fri
+if(day === 6) teacher = data.sat || "Sat"
+if(day === 0) teacher = data.sun || "Sun"
 
 document.getElementById("teacherName").innerText = `(${teacher || "-"})`
 document.getElementById("assistantName").innerText = `(${data.assistant || "-"})`
