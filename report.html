@@ -572,7 +572,7 @@ const res = await fetch(API + "?mode=report&date=" + date)
 data = await res.json()
 
 const hasTodayData = data && data.length > 0
-const isFallback = !hasTodayData
+isFallback = !hasTodayData
 
 if (!hasTodayData) {
 const result = await fetchWithFallback(date)
