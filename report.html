@@ -24,6 +24,7 @@ box-sizing:border-box;
 box-shadow:none !important;
 page-break-inside:auto;
 font-family:'Sarabun',Tahoma,sans-serif;
+page-break-inside:auto;
 }
 
 h2{
@@ -46,22 +47,15 @@ h2, .date{
   page-break-inside:auto;
   margin-top:10px;
   page-break-before: auto;
-  overflow-x:auto;
 }
   
 table{
-  width:100%;
+  width:99%;
   border-collapse:collapse;
-  font-size:12px;
+  font-size:13.5px;
   page-break-before:auto;
   page-break-inside:auto;
   table-layout: fixed;
-}
-
-@media (max-width: 768px){
-  table{
-    font-size: 11px;
-  }
 }
   
 td, th{
@@ -73,8 +67,13 @@ td, th{
   page-break-inside: auto;
 }
 
-tr, .sum-row, .footer {
-  break-inside: avoid;
+table, thead, tbody, tr, td, th{
+  break-inside: avoid !important;
+}
+
+tr, td, th{
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
 }
   
 td:first-child{
@@ -107,7 +106,7 @@ thead th{
 } 
 
 th:first-child, td:first-child{
-  width:160px;
+  width:200px;
 }
 
 .total{
@@ -163,7 +162,7 @@ page-break-inside: avoid;
 }
 
 .footer{
-margin-top:70px;
+margin-top:50px;
 display:grid;
 grid-template-columns: repeat(2, 1fr);
 gap:50px 60px;
@@ -250,18 +249,6 @@ page-break-before: avoid;
 overflow:hidden;
 }
 
-table, tr, td, th {
-page-break-inside: avoid !important;
-break-inside: avoid !important;
-}
-
-.footer,
-.summary,
-.sum-row {
-page-break-inside: avoid !important;
-break-inside: avoid !important;
-}
-  
 .actions, button{
 display:none !important;
 }
@@ -310,17 +297,8 @@ z-index:9999;
 <th rowspan="2">ป่วย</th>
 <th rowspan="2">ลา</th>
 <th rowspan="2">ขาด</th>
-<th colspan="3">เข้าใหม่</th>
-<th colspan="3">จำหน่าย</th>
 </tr>
 <tr>
-<th>ชาย</th>
-<th>หญิง</th>
-<th>รวม</th>
-<th>ชาย</th>
-<th>หญิง</th>
-<th>รวม</th>
-
 <th>ชาย</th>
 <th>หญิง</th>
 <th>รวม</th>
@@ -379,117 +357,92 @@ const params = new URLSearchParams(location.search)
 const date = params.get("date") || new Date().toISOString().split("T")[0]
   
 async function downloadPDF(){
-
+  
 if(!isLoaded){
+  
 alert("⏳ โปรดรอสักครู่...")
+  
 return
+  
 }
 
 const loadingEl = document.getElementById("loading")
 
 try{
-
+  
 loadingEl.style.display = "flex"
 loadingEl.innerHTML = "⏳ กำลังสร้าง PDF...<br><small>โปรดรอสักครู่</small>"
 
 const element = document.getElementById("report")
 
 await document.fonts.ready
-await new Promise(r => setTimeout(r, 300))
+await new Promise(r => setTimeout(r, 200))
+element.style.width = "210mm"
 
-const canvas = await html2canvas(element,{
-scale:2,
-useCORS:true,
-backgroundColor:"#ffffff",
-letterRendering:true
+const canvas = await html2canvas(element, {
+scale: 2,
+useCORS: true,
+letterRendering: true,
+backgroundColor: "#ffffff"
 })
 
 const { jsPDF } = window.jspdf
-const pdf = new jsPDF("p","mm","a4")
+const pdf = new jsPDF("p", "mm", "a4")
 
-const margin = 10
-const pageWidth = 210
+const margin = 12
+const imgWidth = 210 - (margin * 2)
 const pageHeight = 297
-
-const usableWidth = pageWidth - (margin * 2)
-const usableHeight = pageHeight - (margin * 2)
-
-const imgWidth = usableWidth
 const imgHeight = canvas.height * imgWidth / canvas.width
 
-const pageHeightPx = Math.floor(
-(canvas.width * usableHeight) / usableWidth
-)
+const pageHeightPx = canvas.height * (pageHeight / imgHeight)
 
 let renderedHeight = 0
 
-while(renderedHeight < canvas.height){
+while (renderedHeight < canvas.height) {
 
 const pageCanvas = document.createElement("canvas")
 const pageCtx = pageCanvas.getContext("2d")
 
 pageCanvas.width = canvas.width
-pageCanvas.height = Math.min(
-pageHeightPx,
-canvas.height - renderedHeight
-)
+const safePadding = 10
+pageCanvas.height = pageHeightPx - safePadding
 
 pageCtx.fillStyle = "#ffffff"
-pageCtx.fillRect(
-0,
-0,
-pageCanvas.width,
-pageCanvas.height
-)
+pageCtx.fillRect(0, 0, pageCanvas.width, pageCanvas.height)
 
 pageCtx.drawImage(
 canvas,
-0,
-renderedHeight,
-canvas.width,
-pageCanvas.height,
-0,
-0,
-canvas.width,
-pageCanvas.height
+0, renderedHeight,
+canvas.width, pageHeightPx,
+0, 0,
+canvas.width, pageHeightPx
 )
 
-const imgData = pageCanvas.toDataURL("image/png")
+const imgDataPage = pageCanvas.toDataURL("image/png")
 
-if(renderedHeight > 0){
-pdf.addPage()
-}
+if (renderedHeight > 0) pdf.addPage()
 
-const currentPageHeight =
-(pageCanvas.height * imgWidth) / pageCanvas.width
-
-pdf.addImage(
-imgData,
-"PNG",
-margin,
-margin,
-imgWidth,
-currentPageHeight
-)
+pdf.addImage(imgDataPage, "PNG", margin, margin, imgWidth, pageHeight - (margin * 2) - 2)
 
 renderedHeight += pageCanvas.height
+  
 }
 
 const fileDate = formatFileDate(date)
-pdf.save(`รายงานสถิติ-${fileDate}.pdf`)
+pdf.save(`burapa-stu-${fileDate}.pdf`)
 
 }catch(e){
-
+alert("❌ สร้าง PDF ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง")
 console.error(e)
-alert("❌ สร้าง PDF ไม่สำเร็จ")
 
-}finally{
-
+} finally {
+  
 loadingEl.style.display = "none"
-
+  
+}
+  
 }
 
-}
 if(!date){
   
 document.getElementById("dateText").innerText = "-"
@@ -537,7 +490,7 @@ async function fetchWithFallback(dateStr){
 
 let d = new Date(dateStr)
 
-for(let i=0;i<30;i++){
+for(let i=0;i<365;i++){
     
 const tryDate = d.toISOString().split("T")[0]
 
@@ -561,12 +514,6 @@ d.setDate(d.getDate()-1)
 return { data:[], fallbackDate:null }
   
 }
-
-function showValue(v){
-  return (v === null || v === undefined || v === "")
-    ? "-"
-    : v
-}
   
 async function loadReport(){
 
@@ -574,25 +521,15 @@ let data = []
 let isFallback = false
 
 try{
-const res = await fetch(API + "?mode=report&date=" + date)
-data = await res.json()
-
-const hasTodayData = data && data.length > 0
-isFallback = !hasTodayData
-
-let fallbackDate = null
-
-if (!hasTodayData) {
 const result = await fetchWithFallback(date)
 data = result.data
-fallbackDate = result.fallbackDate
-}
+isFallback = result.fallbackDate !== date
 
 if(data.length === 0){
   
 document.getElementById("dataBody").innerHTML = `
 
-<tr><td colspan="16">⚠ ไม่พบข้อมูล</td></tr>
+<tr><td colspan="10">⚠ ไม่พบข้อมูล</td></tr>
 `
   
 document.getElementById("loading").style.display = "none"
@@ -614,7 +551,7 @@ return
 let html=""
   
 document.getElementById("loading").innerText = "⏳ กำลังสร้างรายงาน..."
-document.getElementById("dataBody").innerHTML = `<tr><td colspan="16">⏳ กำลังสร้าง Report...</td></tr>`;
+document.getElementById("dataBody").innerHTML = `<tr><td colspan="10">⏳ กำลังสร้าง Report...</td></tr>`;
 
 let levels = {}
 
@@ -629,14 +566,6 @@ let totalPresentFemale = 0
 let totalSick = 0
 let totalLeave = 0
 let totalAbsent = 0
-
-let totalInMale = 0
-let totalInFemale = 0
-let totalInAll = 0
-
-let totalOutMale = 0
-let totalOutFemale = 0
-let totalOutAll = 0
   
 data.forEach(r=>{
 
@@ -653,64 +582,42 @@ presentMale:0,
 presentFemale:0,
 sick:0,
 leave:0,
-absent:0,
-
-in_m:0,
-in_f:0,
-in_total:0,
-
-out_m:0,
-out_f:0,
-out_total:0
+absent:0
+  
 }
+  
 }
 
 const total = Number(r.total)||0
 const male = Number(r.male)||0
 const female = Number(r.female)||0
 
-const present = Number(r.present) || 0
+const present = isFallback ? "" : Number(r.present)||0
 const presentMale = isFallback ? 0 : Number(r.present_m)||0
 const presentFemale = isFallback ? 0 : Number(r.present_f)||0
 
-const sick = isFallback ? 0 : Number(r.sick || 0)
-const leave = isFallback ? 0 : Number(r.leave || 0)
-const absent = isFallback ? 0 : Number(r.absent || 0)
+const sick = isFallback ? "" : (r.sick||"")
+const leave = isFallback ? "" : (r.leave||"")
+const absent = isFallback ? "" : (r.absent||"")
 
-const inM = isFallback ? 0 : Number(r.in_m || 0)
-const inF = isFallback ? 0 : Number(r.in_f || 0)
-const inTotal = inM + inF
-
-const outM = isFallback ? 0 : Number(r.out_m || 0)
-const outF = isFallback ? 0 : Number(r.out_f || 0)
-const outTotal = outM + outF
-  
 levels[level].rows.push({
-room:r.room,
-total,male,female,
-present,presentMale,presentFemale,
-sick,leave,absent,
-
-in_m: isFallback ? "" : inM,
-in_f: isFallback ? "" : inF,
-in_total: isFallback ? "" : inTotal,
-
-out_m: isFallback ? null : (r.out_m ?? 0),
-out_f: isFallback ? null : (r.out_f ?? 0),
-out_total: isFallback ? null : (outM + outF)
-});
+  room:r.room,
+  total,male,female,
+  present,presentMale,presentFemale,
+  sick,leave,absent
+})
 
 levels[level].total += total
 levels[level].male += male
 levels[level].female += female
 
-levels[level].present += Number(present) || 0
+levels[level].present += present
 levels[level].presentMale += presentMale
 levels[level].presentFemale += presentFemale
 levels[level].sick += Number(sick)||0
 levels[level].leave += Number(leave)||0
 levels[level].absent += Number(absent)||0
-  
+
 totalAll += total
 totalMale += male
 totalFemale += female
@@ -722,51 +629,12 @@ totalPresentFemale += presentFemale
 totalSick += Number(sick)||0
 totalLeave += Number(leave)||0
 totalAbsent += Number(absent)||0
-
-levels[level].in_m += (inM ?? 0)
-levels[level].in_f += (inF ?? 0)
-levels[level].in_total += (inTotal ?? 0)
-
-levels[level].out_m += (outM ?? 0)
-levels[level].out_f += (outF ?? 0)
-levels[level].out_total += (outTotal ?? 0)
-
-totalOutMale += outM
-totalOutFemale += outF
-totalOutAll += outTotal
-  
-totalInMale += inM
-totalInFemale += inF
-totalInAll += inTotal
 })
 
 let groupSum = {
-  "ป.": {
-    male:0,female:0,total:0,
-    presentMale:0,presentFemale:0,present:0,
-    sick:0, leave:0, absent:0,
-
-    in_m:0, in_f:0, in_total:0,
-    out_m:0, out_f:0, out_total:0
-  },
-
-  "ม.": {
-    male:0,female:0,total:0,
-    presentMale:0,presentFemale:0,present:0,
-    sick:0, leave:0, absent:0,
-
-    in_m:0, in_f:0, in_total:0,
-    out_m:0, out_f:0, out_total:0
-  },
-
-  "ปวช": {
-    male:0,female:0,total:0,
-    presentMale:0,presentFemale:0,present:0,
-    sick:0, leave:0, absent:0,
-
-    in_m:0, in_f:0, in_total:0,
-    out_m:0, out_f:0, out_total:0
-  }
+  "ป.": {male:0,female:0,total:0,presentMale:0,presentFemale:0,present:0, sick:0, leave:0, absent:0},
+  "ม.": {male:0,female:0,total:0,presentMale:0,presentFemale:0,present:0, sick:0, leave:0, absent:0},
+  "ปวช": {male:0,female:0,total:0,presentMale:0,presentFemale:0,present:0, sick:0, leave:0, absent:0}
 }
 
 const order = ["ป.1","ป.2","ป.3","ป.4","ป.5","ป.6","ม.1","ม.2","ม.3","ม.4","ม.5","ม.6","ปวช.1","ปวช.2","ปวช.3"]
@@ -775,9 +643,9 @@ order.forEach(level=>{
 
 let groupKey = ""
 
-if(level.startsWith("ปวช.")) groupKey = "ปวช"
-else if(level.startsWith("ป.")) groupKey = "ป."
+if(level.startsWith("ป.")) groupKey = "ป."
 else if(level.startsWith("ม.")) groupKey = "ม."
+else if(level.startsWith("ปวช")) groupKey = "ปวช"
 
 if(groupKey && levels[level]){
 groupSum[groupKey].male += levels[level].male
@@ -791,14 +659,6 @@ groupSum[groupKey].present += levels[level].present
 groupSum[groupKey].sick += levels[level].sick
 groupSum[groupKey].leave += levels[level].leave
 groupSum[groupKey].absent += levels[level].absent
-
-groupSum[groupKey].in_m += levels[level].in_m
-groupSum[groupKey].in_f += levels[level].in_f
-groupSum[groupKey].in_total += levels[level].in_total
-
-groupSum[groupKey].out_m += levels[level].out_m
-groupSum[groupKey].out_f += levels[level].out_f
-groupSum[groupKey].out_total += levels[level].out_total
   
 }
   
@@ -806,17 +666,21 @@ if(!levels[level]) return
   
 levels[level].rows.sort((a,b)=>{
 
-const numA = (a.room.match(/\d+/g) || ["0"])
-const numB = (b.room.match(/\d+/g) || ["0"])
+const numA = a.room.match(/\d+/g)
+const numB = b.room.match(/\d+/g)
 
-if(Number(numA[0]) !== Number(numB[0])){
-  return Number(numA[0]) - Number(numB[0])
+if(!numA || !numB) return 0
+
+if(numA[0] != numB[0]){
+  
+return Number(numA[0]) - Number(numB[0])
+  
 }
 
 return (Number(numA[1]||0)) - (Number(numB[1]||0))
-
+  
 })
-
+  
 levels[level].rows.forEach(r=>{
   
 html += `
@@ -834,14 +698,6 @@ html += `
 <td>${r.sick}</td>
 <td>${r.leave}</td>
 <td>${r.absent}</td>
-
-<td>${showValue(r.in_m)}</td>
-<td>${showValue(r.in_f)}</td>
-<td>${showValue(r.in_total)}</td>
-
-<td>${showValue(r.out_m)}</td>
-<td>${showValue(r.out_f)}</td>
-<td>${showValue(r.out_total)}</td>
 </tr>
 `
   
@@ -870,14 +726,6 @@ html += `
 <td>${levels[level].sick}</td>
 <td>${levels[level].leave}</td>
 <td>${levels[level].absent}</td>
-
-<td>${levels[level].in_m}</td>
-<td>${levels[level].in_f}</td>
-<td>${levels[level].in_total}</td>
-
-<td>${levels[level].out_m}</td>
-<td>${levels[level].out_f}</td>
-<td>${levels[level].out_total}</td>
 </tr>
 `
   
@@ -894,14 +742,6 @@ html += `
 <td>${groupSum["ป."].sick}</td>
 <td>${groupSum["ป."].leave}</td>
 <td>${groupSum["ป."].absent}</td>
-
-<td>${groupSum["ป."].in_m}</td>
-<td>${groupSum["ป."].in_f}</td>
-<td>${groupSum["ป."].in_total}</td>
-
-<td>${groupSum["ป."].out_m}</td>
-<td>${groupSum["ป."].out_f}</td>
-<td>${groupSum["ป."].out_total}</td>
 </tr>
 `
   
@@ -920,14 +760,6 @@ html += `
 <td>${groupSum["ม."].sick}</td>
 <td>${groupSum["ม."].leave}</td>
 <td>${groupSum["ม."].absent}</td>
-
-<td>${groupSum["ม."].in_m}</td>
-<td>${groupSum["ม."].in_f}</td>
-<td>${groupSum["ม."].in_total}</td>
-
-<td>${groupSum["ม."].out_m}</td>
-<td>${groupSum["ม."].out_f}</td>
-<td>${groupSum["ม."].out_total}</td>
 </tr>
 `
   
@@ -946,14 +778,6 @@ html += `
 <td>${groupSum["ปวช"].sick}</td>
 <td>${groupSum["ปวช"].leave}</td>
 <td>${groupSum["ปวช"].absent}</td>
-
-<td>${groupSum["ปวช"].in_m}</td>
-<td>${groupSum["ปวช"].in_f}</td>
-<td>${groupSum["ปวช"].in_total}</td>
-
-<td>${groupSum["ปวช"].out_m}</td>
-<td>${groupSum["ปวช"].out_f}</td>
-<td>${groupSum["ปวช"].out_total}</td>
 </tr>
 `
   
@@ -976,14 +800,6 @@ html += `
 <td>${totalSick}</td>
 <td>${totalLeave}</td>
 <td>${totalAbsent}</td>
-
-<td>${totalInMale}</td>
-<td>${totalInFemale}</td>
-<td>${totalInAll}</td>
-
-<td>${totalOutMale}</td>
-<td>${totalOutFemale}</td>
-<td>${totalOutAll}</td>
 </tr>
 `
 
@@ -1020,15 +836,7 @@ if(!room) return "อื่นๆ"
 
 room = room.trim()
 
-let match = room.match(/ปวช\.?\s*(\d+)/)
-if(match) return "ปวช." + match[1]
-
-if(room.includes("ชั้นประกาศนียบัตรวิชาชีพ")){
-match = room.match(/\d+/)
-if(match) return "ปวช." + match[0]
-}
-
-match = room.match(/ป\.?\s*(\d+)/)
+let match = room.match(/ป\.?\s*(\d+)/)
 if(match) return "ป." + match[1]
 
 if(room.includes("ประถม")){
@@ -1044,8 +852,16 @@ match = room.match(/\d+/)
 if(match) return "ม." + match[0]
 }
 
-return "อื่นๆ"
+match = room.match(/ปวช\.?\s*(\d+)/)
+if(match) return "ปวช." + match[1]
 
+if(room.includes("ชั้นประกาศนียบัตรวิชาชีพ")){
+match = room.match(/\d+/)
+if(match) return "ปวช." + match[0]
+}
+
+return "อื่นๆ"
+  
 }
 
 async function loadSignatureToReport(){
@@ -1064,8 +880,6 @@ if(day === 2) teacher = data.tue
 if(day === 3) teacher = data.wed
 if(day === 4) teacher = data.thu
 if(day === 5) teacher = data.fri
-if(day === 6) teacher = data.sat || "Sat"
-if(day === 0) teacher = data.sun || "Sun"
 
 document.getElementById("teacherName").innerText = `(${teacher || "-"})`
 document.getElementById("assistantName").innerText = `(${data.assistant || "-"})`
