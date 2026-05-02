@@ -297,8 +297,17 @@ z-index:9999;
 <th rowspan="2">ป่วย</th>
 <th rowspan="2">ลา</th>
 <th rowspan="2">ขาด</th>
+<th colspan="3">เข้าใหม่</th>
+<th colspan="3">จำหน่าย</th>
 </tr>
 <tr>
+<th>ชาย</th>
+<th>หญิง</th>
+<th>รวม</th>
+<th>ชาย</th>
+<th>หญิง</th>
+<th>รวม</th>
+
 <th>ชาย</th>
 <th>หญิง</th>
 <th>รวม</th>
@@ -529,7 +538,7 @@ if(data.length === 0){
   
 document.getElementById("dataBody").innerHTML = `
 
-<tr><td colspan="10">⚠ ไม่พบข้อมูล</td></tr>
+<tr><td colspan="16">⚠ ไม่พบข้อมูล</td></tr>
 `
   
 document.getElementById("loading").style.display = "none"
@@ -551,7 +560,7 @@ return
 let html=""
   
 document.getElementById("loading").innerText = "⏳ กำลังสร้างรายงาน..."
-document.getElementById("dataBody").innerHTML = `<tr><td colspan="10">⏳ กำลังสร้าง Report...</td></tr>`;
+document.getElementById("dataBody").innerHTML = `<tr><td colspan="16">⏳ กำลังสร้าง Report...</td></tr>`;
 
 let levels = {}
 
@@ -604,7 +613,15 @@ levels[level].rows.push({
   room:r.room,
   total,male,female,
   present,presentMale,presentFemale,
-  sick,leave,absent
+  sick,leave,absent,
+
+  in_m: r.in_m,
+  in_f: r.in_f,
+  in_total: r.in_total,
+
+  out_m: r.out_m,
+  out_f: r.out_f,
+  out_total: r.out_total
 })
 
 levels[level].total += total
@@ -698,6 +715,14 @@ html += `
 <td>${r.sick}</td>
 <td>${r.leave}</td>
 <td>${r.absent}</td>
+
+<td>${r.in_m || ""}</td>
+<td>${r.in_f || ""}</td>
+<td>${r.in_total || ""}</td>
+
+<td>${r.out_m || ""}</td>
+<td>${r.out_f || ""}</td>
+<td>${r.out_total || ""}</td>
 </tr>
 `
   
