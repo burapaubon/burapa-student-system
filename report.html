@@ -723,17 +723,17 @@ levels[level].in_m += inM
 levels[level].in_f += inF
 levels[level].in_total += inTotal
 
-levels[level].out_m += Number(outM) || 0
-levels[level].out_f += Number(outF) || 0
-levels[level].out_total += Number(outTotal) || 0
+if(outM !== "") levels[level].out_m += Number(outM)
+if(outF !== "") levels[level].out_f += Number(outF)
+if(outTotal !== "") levels[level].out_total += Number(outTotal)
 
+if(outM !== "") totalOutMale += Number(outM)
+if(outF !== "") totalOutFemale += Number(outF)
+if(outTotal !== "") totalOutAll += Number(outTotal)
+  
 totalInMale += inM
 totalInFemale += inF
 totalInAll += inTotal
-
-totalOutMale += Number(outM) || 0
-totalOutFemale += Number(outF) || 0
-totalOutAll += Number(outTotal) || 0
 })
 
 let groupSum = {
