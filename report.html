@@ -574,9 +574,12 @@ data = await res.json()
 const hasTodayData = data && data.length > 0
 isFallback = !hasTodayData
 
+let fallbackDate = null
+
 if (!hasTodayData) {
 const result = await fetchWithFallback(date)
 data = result.data
+fallbackDate = result.fallbackDate
 }
 
 if(data.length === 0){
@@ -667,6 +670,16 @@ const presentFemale = isFallback ? 0 : Number(r.present_f)||0
 const sick = isFallback ? 0 : Number(r.sick || 0)
 const leave = isFallback ? 0 : Number(r.leave || 0)
 const absent = isFallback ? 0 : Number(r.absent || 0)
+
+const inM = isFallback ? 0 : Number(r.in_m || 0)
+const inF = isFallback ? 0 : Number(r.in_f || 0)
+const inTotal = inM + inF
+
+const outM = isFallback ? "" : Number(r.out_m || 0)
+const outF = isFallback ? "" : Number(r.out_f || 0)
+const outTotal = isFallback ? "" : (
+(Number(r.out_m || 0) + Number(r.out_f || 0))
+)
   
 levels[level].rows.push({
 room:r.room,
@@ -674,17 +687,13 @@ total,male,female,
 present,presentMale,presentFemale,
 sick,leave,absent,
 
-in_m: isFallback ? "" : (r.in_m === "" || r.in_m == null ? "" : Number(r.in_m)),
-in_f: isFallback ? "" : (r.in_f === "" || r.in_f == null ? "" : Number(r.in_f)),
-in_total: isFallback ? "" : (
-(Number(r.in_m) || 0) + (Number(r.in_f) || 0)
-),
+in_m: isFallback ? "" : inM,
+in_f: isFallback ? "" : inF,
+in_total: isFallback ? "" : inTotal,
 
-out_m: isFallback ? 0 : Number(r.out_m || 0),
-out_f: isFallback ? 0 : Number(r.out_f || 0),
-out_total: isFallback ? 0 : (
-Number(r.out_m || 0) + Number(r.out_f || 0)
-)
+out_m: isFallback ? "" : outM,
+out_f: isFallback ? "" : outF,
+out_total: isFallback ? "" : outTotal
 });
 
 levels[level].total += total
@@ -710,39 +719,21 @@ totalSick += Number(sick)||0
 totalLeave += Number(leave)||0
 totalAbsent += Number(absent)||0
 
-let inM = 0
-let inF = 0
-let inTotal = 0
-
-let outM = 0
-let outF = 0
-let outTotal = 0
-
-if (!isFallback) {
-  inM = Number(r.in_m) || 0
-  inF = Number(r.in_f) || 0
-  inTotal = inM + inF
-
-  outM = Number(r.out_m) || 0
-  outF = Number(r.out_f) || 0
-  outTotal = outM + outF
-}
-
 levels[level].in_m += inM
 levels[level].in_f += inF
 levels[level].in_total += inTotal
 
-levels[level].out_m += outM
-levels[level].out_f += outF
-levels[level].out_total += outTotal
+levels[level].out_m += Number(outM) || 0
+levels[level].out_f += Number(outF) || 0
+levels[level].out_total += Number(outTotal) || 0
 
 totalInMale += inM
 totalInFemale += inF
 totalInAll += inTotal
 
-totalOutMale += outM
-totalOutFemale += outF
-totalOutAll += outTotal
+totalOutMale += Number(outM) || 0
+totalOutFemale += Number(outF) || 0
+totalOutAll += Number(outTotal) || 0
 })
 
 let groupSum = {
@@ -1020,38 +1011,6 @@ isLoaded = true
 }
 
 function getLevel(room){
-
-if(!room) return "อื่นๆ"
-
-room = room.trim()
-
-let match = room.match(/ป\.?\s*(\d+)/)
-if(match) return "ป." + match[1]
-
-if(room.includes("ประถม")){
-match = room.match(/\d+/)
-if(match) return "ป." + match[0]
-}
-
-match = room.match(/ม\.?\s*(\d+)/)
-if(match) return "ม." + match[1]
-
-if(room.includes("มัธยม")){
-match = room.match(/\d+/)
-if(match) return "ม." + match[0]
-}
-
-match = room.match(/ปวช\.?\s*(\d+)/)
-if(match) return "ปวช." + match[1]
-
-if(room.includes("ชั้นประกาศนียบัตรวิชาชีพ")){
-match = room.match(/\d+/)
-if(match) return "ปวช." + match[0]
-}
-
-return "อื่นๆ"
-  
-}function getLevel(room){
 
 if(!room) return "อื่นๆ"
 
