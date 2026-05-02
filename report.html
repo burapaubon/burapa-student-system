@@ -47,15 +47,22 @@ h2, .date{
   page-break-inside:auto;
   margin-top:10px;
   page-break-before: auto;
+  overflow-x:auto;
 }
   
 table{
-  width:99%;
+  width:100%;
   border-collapse:collapse;
-  font-size:13.5px;
+  font-size:12px;
   page-break-before:auto;
   page-break-inside:auto;
   table-layout: fixed;
+}
+
+@media (max-width: 768px){
+  table{
+    font-size: 11px;
+  }
 }
   
 td, th{
@@ -67,13 +74,8 @@ td, th{
   page-break-inside: auto;
 }
 
-table, thead, tbody, tr, td, th{
-  break-inside: avoid !important;
-}
-
-tr, td, th{
-  page-break-inside: avoid !important;
-  break-inside: avoid !important;
+tr, .sum-row, .footer {
+  break-inside: avoid;
 }
   
 td:first-child{
@@ -106,7 +108,7 @@ thead th{
 } 
 
 th:first-child, td:first-child{
-  width:200px;
+  width:160px;
 }
 
 .total{
@@ -438,7 +440,7 @@ renderedHeight += pageCanvas.height
 }
 
 const fileDate = formatFileDate(date)
-pdf.save(`burapa-stu-${fileDate}.pdf`)
+pdf.save(`burapa-student-${fileDate}.pdf`)
 
 }catch(e){
 alert("❌ สร้าง PDF ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง")
@@ -751,6 +753,8 @@ html += `
 <td>${levels[level].sick}</td>
 <td>${levels[level].leave}</td>
 <td>${levels[level].absent}</td>
+
+<td colspan="6"></td>
 </tr>
 `
   
