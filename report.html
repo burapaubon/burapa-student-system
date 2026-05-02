@@ -675,11 +675,9 @@ const inM = isFallback ? 0 : Number(r.in_m || 0)
 const inF = isFallback ? 0 : Number(r.in_f || 0)
 const inTotal = inM + inF
 
-const outM = isFallback ? "" : Number(r.out_m || 0)
-const outF = isFallback ? "" : Number(r.out_f || 0)
-const outTotal = isFallback ? "" : (
-(Number(r.out_m || 0) + Number(r.out_f || 0))
-)
+const outM = isFallback ? 0 : Number(r.out_m || 0)
+const outF = isFallback ? 0 : Number(r.out_f || 0)
+const outTotal = outM + outF
   
 levels[level].rows.push({
 room:r.room,
@@ -723,13 +721,13 @@ levels[level].in_m += inM
 levels[level].in_f += inF
 levels[level].in_total += inTotal
 
-if(outM !== "") levels[level].out_m += Number(outM)
-if(outF !== "") levels[level].out_f += Number(outF)
-if(outTotal !== "") levels[level].out_total += Number(outTotal)
+if(outM !== "") levels[level].out_m += outM
+if(outF !== "") levels[level].out_f += outF
+if(outTotal !== "") levels[level].out_total += outTotal
 
-if(outM !== "") totalOutMale += Number(outM)
-if(outF !== "") totalOutFemale += Number(outF)
-if(outTotal !== "") totalOutAll += Number(outTotal)
+if(outM !== "") totalOutMale += outM
+if(outF !== "") totalOutFemale += outF
+if(outTotal !== "") totalOutAll += outTotal
   
 totalInMale += inM
 totalInFemale += inF
