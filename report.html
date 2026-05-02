@@ -568,9 +568,16 @@ let data = []
 let isFallback = false
 
 try{
+const res = await fetch(API + "?mode=report&date=" + date)
+data = await res.json()
+
+const hasTodayData = data && data.length > 0
+const isFallback = !hasTodayData
+
+if (!hasTodayData) {
 const result = await fetchWithFallback(date)
 data = result.data
-isFallback = result.fallbackDate !== date
+}
 
 if(data.length === 0){
   
@@ -657,9 +664,9 @@ const present = isFallback ? 0 : Number(r.present)||0
 const presentMale = isFallback ? 0 : Number(r.present_m)||0
 const presentFemale = isFallback ? 0 : Number(r.present_f)||0
 
-const sick = isFallback ? "" : (r.sick||"")
-const leave = isFallback ? "" : (r.leave||"")
-const absent = isFallback ? "" : (r.absent||"")
+const sick = isFallback ? 0 : Number(r.sick || 0)
+const leave = isFallback ? 0 : Number(r.leave || 0)
+const absent = isFallback ? 0 : Number(r.absent || 0)
   
 levels[level].rows.push({
 room:r.room,
@@ -673,10 +680,10 @@ in_total: isFallback ? 0 : (
   (Number(r.in_m) || 0) + (Number(r.in_f) || 0)
 ),
 
-out_m: isFallback ? "" : (r.out_m === "" || r.out_m == null ? "" : Number(r.out_m)),
-out_f: isFallback ? "" : (r.out_f === "" || r.out_f == null ? "" : Number(r.out_f)),
+out_m: isFallback ? 0 : Number(r.out_m || 0),
+out_f: isFallback ? 0 : Number(r.out_f || 0),
 out_total: isFallback ? 0 : (
-  (Number(r.out_m) || 0) + (Number(r.out_f) || 0)
+Number(r.out_m || 0) + Number(r.out_f || 0)
 )
 });
 
