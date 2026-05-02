@@ -476,7 +476,7 @@ renderedHeight += pageCanvas.height
 }
 
 const fileDate = formatFileDate(date)
-pdf.save(`burapa-student-${fileDate}.pdf`)
+pdf.save(`รายงานสถิติ-${fileDate}.pdf`)
 
 }catch(e){
 
@@ -563,8 +563,8 @@ return { data:[], fallbackDate:null }
 }
 
 function showValue(v){
-  return (v === null || v === undefined || v === "" || v === 0)
-    ? "ว่าง"
+  return (v === null || v === undefined || v === "")
+    ? "-"
     : v
 }
   
@@ -669,7 +669,7 @@ const total = Number(r.total)||0
 const male = Number(r.male)||0
 const female = Number(r.female)||0
 
-const present = isFallback ? 0 : Number(r.present)||0
+const present = Number(r.present) || 0
 const presentMale = isFallback ? 0 : Number(r.present_m)||0
 const presentFemale = isFallback ? 0 : Number(r.present_f)||0
 
@@ -697,7 +697,7 @@ in_total: isFallback ? "" : inTotal,
 
 out_m: isFallback ? null : (r.out_m ?? 0),
 out_f: isFallback ? null : (r.out_f ?? 0),
-out_total: isFallback ? null : ((r.out_m ?? 0) + (r.out_f ?? 0))
+out_total: isFallback ? null : (outM + outF)
 });
 
 levels[level].total += total
