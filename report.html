@@ -669,12 +669,16 @@ sick,leave,absent,
 
 in_m: isFallback ? "" : (r.in_m === "" || r.in_m == null ? "" : Number(r.in_m)),
 in_f: isFallback ? "" : (r.in_f === "" || r.in_f == null ? "" : Number(r.in_f)),
-in_total: isFallback ? 0 : (Number(r.in_total) || 0),
+in_total: isFallback ? 0 : (
+  (Number(r.in_m) || 0) + (Number(r.in_f) || 0)
+),
 
 out_m: isFallback ? "" : (r.out_m === "" || r.out_m == null ? "" : Number(r.out_m)),
 out_f: isFallback ? "" : (r.out_f === "" || r.out_f == null ? "" : Number(r.out_f)),
-out_total: isFallback ? 0 : (Number(r.out_total) || 0),
-})
+out_total: isFallback ? 0 : (
+  (Number(r.out_m) || 0) + (Number(r.out_f) || 0)
+)
+});
 
 levels[level].total += total
 levels[level].male += male
@@ -699,13 +703,13 @@ totalSick += Number(sick)||0
 totalLeave += Number(leave)||0
 totalAbsent += Number(absent)||0
 
-const inM = Number(r.in_m) || 0
-const inF = Number(r.in_f) || 0
-const inTotal = Number(r.in_total) || 0
+const inM = isFallback ? 0 : (Number(r.in_m) || 0)
+const inF = isFallback ? 0 : (Number(r.in_f) || 0)
+const inTotal = inM + inF
 
-const outM = Number(r.out_m) || 0
-const outF = Number(r.out_f) || 0
-const outTotal = Number(r.out_total) || 0
+const outM = isFallback ? 0 : (Number(r.out_m) || 0)
+const outF = isFallback ? 0 : (Number(r.out_f) || 0)
+const outTotal = outM + outF
 
 levels[level].in_m += inM
 levels[level].in_f += inF
