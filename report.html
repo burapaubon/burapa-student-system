@@ -611,19 +611,27 @@ const sick = isFallback ? "" : (r.sick||"")
 const leave = isFallback ? "" : (r.leave||"")
 const absent = isFallback ? "" : (r.absent||"")
 
+const in_m = r.in_m ?? ""
+const in_f = r.in_f ?? ""
+const in_total = (r.in_total !== undefined && r.in_total !== null) ? Number(r.in_total) : 0
+
+const out_m = r.out_m ?? ""
+const out_f = r.out_f ?? ""
+const out_total = (r.out_total !== undefined && r.out_total !== null) ? Number(r.out_total) : 0
+  
 levels[level].rows.push({
   room:r.room,
   total,male,female,
   present,presentMale,presentFemale,
   sick,leave,absent,
 
-  in_m: r.in_m,
-  in_f: r.in_f,
-  in_total: r.in_total,
+in_m: isFallback ? "" : (Number(r.in_m) || 0),
+in_f: isFallback ? "" : (Number(r.in_f) || 0),
+in_total: isFallback ? 0 : (Number(r.in_total) || 0),
 
-  out_m: r.out_m,
-  out_f: r.out_f,
-  out_total: r.out_total
+out_m: isFallback ? "" : (Number(r.out_m) || 0),
+out_f: isFallback ? "" : (Number(r.out_f) || 0),
+out_total: isFallback ? 0 : (Number(r.out_total) || 0),
 })
 
 levels[level].total += total
@@ -636,7 +644,7 @@ levels[level].presentFemale += presentFemale
 levels[level].sick += Number(sick)||0
 levels[level].leave += Number(leave)||0
 levels[level].absent += Number(absent)||0
-
+  
 totalAll += total
 totalMale += male
 totalFemale += female
@@ -718,13 +726,13 @@ html += `
 <td>${r.leave}</td>
 <td>${r.absent}</td>
 
-<td>${r.in_m || ""}</td>
-<td>${r.in_f || ""}</td>
-<td>${r.in_total || ""}</td>
+<td>${r.in_m}</td>
+<td>${r.in_f}</td>
+<td>${r.in_total}</td>
 
-<td>${r.out_m || ""}</td>
-<td>${r.out_f || ""}</td>
-<td>${r.out_total || ""}</td>
+<td>${r.out_m}</td>
+<td>${r.out_f}</td>
+<td>${r.out_total}</td>
 </tr>
 `
   
