@@ -698,7 +698,7 @@ levels[level].total += total
 levels[level].male += male
 levels[level].female += female
 
-levels[level].present += present
+levels[level].present += Number(present) || 0
 levels[level].presentMale += presentMale
 levels[level].presentFemale += presentFemale
 levels[level].sick += Number(sick)||0
@@ -721,13 +721,13 @@ levels[level].in_m += inM
 levels[level].in_f += inF
 levels[level].in_total += inTotal
 
-if(r.out_m != null) levels[level].out_m += Number(r.out_m)
-if(r.out_f != null) levels[level].out_f += Number(r.out_f)
-if(r.out_total != null) levels[level].out_total += Number(r.out_total)
+levels[level].out_m += outM
+levels[level].out_f += outF
+levels[level].out_total += outTotal
 
-if(r.out_m != null) totalOutMale += Number(r.out_m)
-if(r.out_f != null) totalOutFemale += Number(r.out_f)
-if(r.out_total != null) totalOutAll += Number(r.out_total)
+totalOutMale += outM
+totalOutFemale += outF
+totalOutAll += outTotal
   
 totalInMale += inM
 totalInFemale += inF
