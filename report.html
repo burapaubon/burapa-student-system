@@ -250,6 +250,18 @@ page-break-before: avoid;
 overflow:hidden;
 }
 
+table, tr, td, th {
+page-break-inside: avoid !important;
+break-inside: avoid !important;
+}
+
+.footer,
+.summary,
+.sum-row {
+page-break-inside: avoid !important;
+break-inside: avoid !important;
+}
+  
 .actions, button{
 display:none !important;
 }
@@ -367,102 +379,117 @@ const params = new URLSearchParams(location.search)
 const date = params.get("date") || new Date().toISOString().split("T")[0]
   
 async function downloadPDF(){
-  
+
 if(!isLoaded){
-  
 alert("⏳ โปรดรอสักครู่...")
-  
 return
-  
 }
 
 const loadingEl = document.getElementById("loading")
 
 try{
-  
+
 loadingEl.style.display = "flex"
 loadingEl.innerHTML = "⏳ กำลังสร้าง PDF...<br><small>โปรดรอสักครู่</small>"
 
 const element = document.getElementById("report")
 
 await document.fonts.ready
-await new Promise(r => setTimeout(r, 200))
-element.style.width = "210mm"
+await new Promise(r => setTimeout(r, 300))
 
-const canvas = await html2canvas(element, {
-scale: 2,
-useCORS: true,
-letterRendering: true,
-backgroundColor: "#ffffff"
+const canvas = await html2canvas(element,{
+scale:2,
+useCORS:true,
+backgroundColor:"#ffffff",
+letterRendering:true
 })
 
 const { jsPDF } = window.jspdf
-const pdf = new jsPDF("p", "mm", "a4")
+const pdf = new jsPDF("p","mm","a4")
 
-const margin = 12
-const imgWidth = 210 - (margin * 2)
+const margin = 10
+const pageWidth = 210
 const pageHeight = 297
+
+const usableWidth = pageWidth - (margin * 2)
+const usableHeight = pageHeight - (margin * 2)
+
+const imgWidth = usableWidth
 const imgHeight = canvas.height * imgWidth / canvas.width
 
-const pageHeightPx = canvas.height * (pageHeight / imgHeight)
+const pageHeightPx = Math.floor(
+(canvas.width * usableHeight) / usableWidth
+)
 
 let renderedHeight = 0
 
-while (renderedHeight < canvas.height) {
+while(renderedHeight < canvas.height){
 
 const pageCanvas = document.createElement("canvas")
 const pageCtx = pageCanvas.getContext("2d")
 
 pageCanvas.width = canvas.width
-const safePadding = 10
-pageCanvas.height = Math.floor(pageHeightPx - safePadding)
+pageCanvas.height = Math.min(
+pageHeightPx,
+canvas.height - renderedHeight
+)
 
 pageCtx.fillStyle = "#ffffff"
-pageCtx.fillRect(0, 0, pageCanvas.width, pageCanvas.height)
+pageCtx.fillRect(
+0,
+0,
+pageCanvas.width,
+pageCanvas.height
+)
 
 pageCtx.drawImage(
 canvas,
-0, renderedHeight,
-canvas.width, pageCanvas.height,
-0, 0,
-canvas.width, pageCanvas.height
+0,
+renderedHeight,
+canvas.width,
+pageCanvas.height,
+0,
+0,
+canvas.width,
+pageCanvas.height
 )
 
-const imgDataPage = pageCanvas.toDataURL("image/png")
+const imgData = pageCanvas.toDataURL("image/png")
 
-if (renderedHeight > 0) pdf.addPage()
+if(renderedHeight > 0){
+pdf.addPage()
+}
 
-const pageImgHeight =
-  (pageCanvas.height * imgWidth) / pageCanvas.width
+const currentPageHeight =
+(pageCanvas.height * imgWidth) / pageCanvas.width
 
 pdf.addImage(
-  imgDataPage,
-  "PNG",
-  margin,
-  margin,
-  imgWidth,
-  pageImgHeight
+imgData,
+"PNG",
+margin,
+margin,
+imgWidth,
+currentPageHeight
 )
 
 renderedHeight += pageCanvas.height
-  
 }
 
 const fileDate = formatFileDate(date)
 pdf.save(`burapa-student-${fileDate}.pdf`)
 
 }catch(e){
-alert("❌ สร้าง PDF ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง")
+
 console.error(e)
+alert("❌ สร้าง PDF ไม่สำเร็จ")
 
-} finally {
-  
+}finally{
+
 loadingEl.style.display = "none"
-  
-}
-  
+
 }
 
+}
 if(!date){
   
 document.getElementById("dateText").innerText = "-"
@@ -640,12 +667,12 @@ total,male,female,
 present,presentMale,presentFemale,
 sick,leave,absent,
 
-in_m: isFallback ? "" : (Number(r.in_m) || 0),
-in_f: isFallback ? "" : (Number(r.in_f) || 0),
+in_m: isFallback ? "" : (r.in_m === "" || r.in_m == null ? "" : Number(r.in_m)),
+in_f: isFallback ? "" : (r.in_f === "" || r.in_f == null ? "" : Number(r.in_f)),
 in_total: isFallback ? 0 : (Number(r.in_total) || 0),
 
-out_m: isFallback ? "" : (Number(r.out_m) || 0),
-out_f: isFallback ? "" : (Number(r.out_f) || 0),
+out_m: isFallback ? "" : (r.out_m === "" || r.out_m == null ? "" : Number(r.out_m)),
+out_f: isFallback ? "" : (r.out_f === "" || r.out_f == null ? "" : Number(r.out_f)),
 out_total: isFallback ? 0 : (Number(r.out_total) || 0),
 })
 
