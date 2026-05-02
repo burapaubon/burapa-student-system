@@ -676,8 +676,8 @@ sick,leave,absent,
 
 in_m: isFallback ? "" : (r.in_m === "" || r.in_m == null ? "" : Number(r.in_m)),
 in_f: isFallback ? "" : (r.in_f === "" || r.in_f == null ? "" : Number(r.in_f)),
-in_total: isFallback ? 0 : (
-  (Number(r.in_m) || 0) + (Number(r.in_f) || 0)
+in_total: isFallback ? "" : (
+(Number(r.in_m) || 0) + (Number(r.in_f) || 0)
 ),
 
 out_m: isFallback ? 0 : Number(r.out_m || 0),
@@ -710,13 +710,23 @@ totalSick += Number(sick)||0
 totalLeave += Number(leave)||0
 totalAbsent += Number(absent)||0
 
-const inM = isFallback ? 0 : (Number(r.in_m) || 0)
-const inF = isFallback ? 0 : (Number(r.in_f) || 0)
-const inTotal = inM + inF
+let inM = 0
+let inF = 0
+let inTotal = 0
 
-const outM = isFallback ? 0 : (Number(r.out_m) || 0)
-const outF = isFallback ? 0 : (Number(r.out_f) || 0)
-const outTotal = outM + outF
+let outM = 0
+let outF = 0
+let outTotal = 0
+
+if (!isFallback) {
+  inM = Number(r.in_m) || 0
+  inF = Number(r.in_f) || 0
+  inTotal = inM + inF
+
+  outM = Number(r.out_m) || 0
+  outF = Number(r.out_f) || 0
+  outTotal = outM + outF
+}
 
 levels[level].in_m += inM
 levels[level].in_f += inF
@@ -770,9 +780,9 @@ order.forEach(level=>{
 
 let groupKey = ""
 
-if(level.startsWith("ป.")) groupKey = "ป."
+if(level.startsWith("ปวช.")) groupKey = "ปวช"
+else if(level.startsWith("ป.")) groupKey = "ป."
 else if(level.startsWith("ม.")) groupKey = "ม."
-else if(level.startsWith("ปวช.")) groupKey = "ปวช"
 
 if(groupKey && levels[level]){
 groupSum[groupKey].male += levels[level].male
@@ -1041,6 +1051,38 @@ if(match) return "ปวช." + match[0]
 
 return "อื่นๆ"
   
+}function getLevel(room){
+
+if(!room) return "อื่นๆ"
+
+room = room.trim()
+
+let match = room.match(/ปวช\.?\s*(\d+)/)
+if(match) return "ปวช." + match[1]
+
+if(room.includes("ชั้นประกาศนียบัตรวิชาชีพ")){
+match = room.match(/\d+/)
+if(match) return "ปวช." + match[0]
+}
+
+match = room.match(/ป\.?\s*(\d+)/)
+if(match) return "ป." + match[1]
+
+if(room.includes("ประถม")){
+match = room.match(/\d+/)
+if(match) return "ป." + match[0]
+}
+
+match = room.match(/ม\.?\s*(\d+)/)
+if(match) return "ม." + match[1]
+
+if(room.includes("มัธยม")){
+match = room.match(/\d+/)
+if(match) return "ม." + match[0]
+}
+
+return "อื่นๆ"
+
 }
 
 async function loadSignatureToReport(){
