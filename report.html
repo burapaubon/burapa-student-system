@@ -24,7 +24,6 @@ box-sizing:border-box;
 box-shadow:none !important;
 page-break-inside:auto;
 font-family:'Sarabun',Tahoma,sans-serif;
-page-break-inside:auto;
 }
 
 h2{
@@ -501,7 +500,7 @@ async function fetchWithFallback(dateStr){
 
 let d = new Date(dateStr)
 
-for(let i=0;i<365;i++){
+for(let i=0;i<60;i++){
     
 const tryDate = d.toISOString().split("T")[0]
 
@@ -610,20 +609,12 @@ const presentFemale = isFallback ? 0 : Number(r.present_f)||0
 const sick = isFallback ? "" : (r.sick||"")
 const leave = isFallback ? "" : (r.leave||"")
 const absent = isFallback ? "" : (r.absent||"")
-
-const in_m = r.in_m ?? ""
-const in_f = r.in_f ?? ""
-const in_total = (r.in_total !== undefined && r.in_total !== null) ? Number(r.in_total) : 0
-
-const out_m = r.out_m ?? ""
-const out_f = r.out_f ?? ""
-const out_total = (r.out_total !== undefined && r.out_total !== null) ? Number(r.out_total) : 0
   
 levels[level].rows.push({
-  room:r.room,
-  total,male,female,
-  present,presentMale,presentFemale,
-  sick,leave,absent,
+room:r.room,
+total,male,female,
+present,presentMale,presentFemale,
+sick,leave,absent,
 
 in_m: isFallback ? "" : (Number(r.in_m) || 0),
 in_f: isFallback ? "" : (Number(r.in_f) || 0),
@@ -672,7 +663,7 @@ let groupKey = ""
 
 if(level.startsWith("ป.")) groupKey = "ป."
 else if(level.startsWith("ม.")) groupKey = "ม."
-else if(level.startsWith("ปวช")) groupKey = "ปวช"
+else if(level.startsWith("ปวช.")) groupKey = "ปวช"
 
 if(groupKey && levels[level]){
 groupSum[groupKey].male += levels[level].male
@@ -693,8 +684,8 @@ if(!levels[level]) return
   
 levels[level].rows.sort((a,b)=>{
 
-const numA = a.room.match(/\d+/g)
-const numB = b.room.match(/\d+/g)
+const numA = (a.room.match(/\d+/g) || ["0"])
+const numB = (b.room.match(/\d+/g) || ["0"])
 
 if(!numA || !numB) return 0
 
@@ -726,13 +717,13 @@ html += `
 <td>${r.leave}</td>
 <td>${r.absent}</td>
 
-<td>${r.in_m}</td>
-<td>${r.in_f}</td>
-<td>${r.in_total}</td>
+<td>${r.in_m ?? ""}</td>
+<td>${r.in_f ?? ""}</td>
+<td>${r.in_total ?? ""}</td>
 
-<td>${r.out_m}</td>
-<td>${r.out_f}</td>
-<td>${r.out_total}</td>
+<td>${r.out_m ?? ""}</td>
+<td>${r.out_f ?? ""}</td>
+<td>${r.out_total ?? ""}</td>
 </tr>
 `
   
