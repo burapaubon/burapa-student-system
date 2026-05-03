@@ -420,45 +420,39 @@ const pdf = new jsPDF("p", "mm", "a4")
 const margin = 12
 const imgWidth = 210 - (margin * 2)
 const pageHeight = 297 - (margin * 2)
-
 const scale = imgWidth / canvas.width
-const pageHeightPx = pageHeight / scale
+const pageHeightPx = Math.floor(pageHeight / scale)
 
 let renderedHeight = 0
 
 while (renderedHeight < canvas.height) {
 
-const pageCanvas = document.createElement("canvas")
-const pageCtx = pageCanvas.getContext("2d")
+  const pageCanvas = document.createElement("canvas")
+  const pageCtx = pageCanvas.getContext("2d")
 
-pageCanvas.width = canvas.width
-pageCanvas.height = pageHeightPx
+  pageCanvas.width = canvas.width
+  pageCanvas.height = Math.min(pageHeightPx, canvas.height - renderedHeight)
 
-pageCtx.fillStyle = "#fff"
-pageCtx.fillRect(0, 0, pageCanvas.width, pageCanvas.height)
+  pageCtx.fillStyle = "#fff"
+  pageCtx.fillRect(0, 0, pageCanvas.width, pageCanvas.height)
 
-pageCtx.drawImage(
-canvas,
-0, renderedHeight,
-canvas.width, pageHeightPx,
-0, 0,
-canvas.width, pageHeightPx
-)
+  pageCtx.drawImage(
+    canvas,
+    0, renderedHeight,
+    canvas.width, pageCanvas.height,
+    0, 0,
+    canvas.width, pageCanvas.height
+  )
 
-const imgData = pageCanvas.toDataURL("image/png")
+  const imgData = pageCanvas.toDataURL("image/png")
 
-if (renderedHeight > 0) pdf.addPage()
+  if (renderedHeight > 0) pdf.addPage()
 
-pdf.addImage(
-imgData,
-"PNG",
-margin,
-margin,
-imgWidth,
-pageHeight
-)
+  const imgHeight = pageCanvas.height * scale
 
-renderedHeight += pageHeightPx
+  pdf.addImage(imgData, "PNG", margin, margin, imgWidth, imgHeight)
+
+  renderedHeight += pageCanvas.height
 }
 
 const fileDate = formatFileDate(date)
@@ -677,8 +671,8 @@ const prev = prevResults[i] || {}
 const prevMale = Number(prev.all_boys) || 0
 const prevFemale = Number(prev.all_girls) || 0
 
-let currMale = Number(r.male) || 0
-let currFemale = Number(r.female) || 0
+let currMale = Number(r.male ?? r.all_boys ?? prevMale) || 0
+let currFemale = Number(r.female ?? r.all_girls ?? prevFemale) || 0
 
 if(!hasPresentData || isFallback){
 currMale = prevMale
