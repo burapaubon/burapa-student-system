@@ -528,7 +528,7 @@ async function getPreviousData(room, date){
 
 let d = new Date(date)
 
-for(let i=0;i<90;i++){
+for(let i=0;i<30;i++){
 
   d.setDate(d.getDate() - 1)
   const prevDate = d.toISOString().split("T")[0]
@@ -548,6 +548,35 @@ for(let i=0;i<90;i++){
 
 return {}
 }
+
+const prevCache = {}
+
+async function getPreviousDataFast(room, date){
+
+if (prevCache[room] && Object.keys(prevCache[room]).length > 0) {
+  return prevCache[room]
+}
+
+let d = new Date(date)
+
+for(let i=0;i<30;i++){
+  d.setDate(d.getDate() - 1)
+  const prevDate = d.toISOString().split("T")[0]
+
+  try{
+    const res = await fetch(API + `?mode=getbydate&room=${room}&date=${prevDate}`)
+    const data = await res.json()
+
+    if(data && (data.all_boys !== undefined || data.all_girls !== undefined)){
+      prevCache[room] = data
+      return data
+    }
+  }catch(e){}
+}
+
+prevCache[room] = {}
+return {}
+}
   
 async function loadReport(){
 
@@ -563,7 +592,7 @@ if(data.length === 0){
   
 document.getElementById("dataBody").innerHTML = `
 
-<tr><td colspan="10">⚠ ไม่พบข้อมูล</td></tr>
+<tr><td colspan="17">⚠ ไม่พบข้อมูล</td></tr>
 `
   
 document.getElementById("loading").style.display = "none"
@@ -585,7 +614,7 @@ return
 let html=""
   
 document.getElementById("loading").innerText = "⏳ กำลังสร้างรายงาน..."
-document.getElementById("dataBody").innerHTML = `<tr><td colspan="10">⏳ กำลังสร้าง Report...</td></tr>`;
+document.getElementById("dataBody").innerHTML = `<tr><td colspan="17">⏳ กำลังสร้าง Report...</td></tr>`;
 
 let levels = {}
 
@@ -602,7 +631,7 @@ let totalLeave = 0
 let totalAbsent = 0
   
 const prevResults = await Promise.all(
-  data.map(r => getPreviousData(r.room, date))
+  data.map(r => getPreviousDataFast(r.room, date))
 )
 
 data.forEach((r, i) => {
@@ -622,7 +651,7 @@ data.forEach((r, i) => {
   let inTotal = 0
   let outTotal = 0
 
-  if (prev.all_boys !== undefined) {
+  if (prev && (prev.all_boys != null || prev.all_girls != null)) {
 
   if (currMale > prevMale) {
     inMale = currMale - prevMale
@@ -655,7 +684,14 @@ data.forEach((r, i) => {
       presentFemale:0,
       sick:0,
       leave:0,
-      absent:0
+      absent:0,
+      inMale:0,
+      inFemale:0, 
+      inTotal:0,
+      
+      outMale:0, 
+      outFemale:0, 
+      outTotal:0,
     }
   }
 
@@ -702,12 +738,25 @@ data.forEach((r, i) => {
   levels[level].leave += leave
   levels[level].absent += absent
 
+  levels[level].inMale += inMale
+  levels[level].inFemale += inFemale
+  levels[level].inTotal += inTotal
+
+  levels[level].outMale += outMale
+  levels[level].outFemale += outFemale
+  levels[level].outTotal += outTotal
 })
 
 let groupSum = {
-  "ป.": {male:0,female:0,total:0,presentMale:0,presentFemale:0,present:0, sick:0, leave:0, absent:0},
-  "ม.": {male:0,female:0,total:0,presentMale:0,presentFemale:0,present:0, sick:0, leave:0, absent:0},
-  "ปวช": {male:0,female:0,total:0,presentMale:0,presentFemale:0,present:0, sick:0, leave:0, absent:0}
+  "ป.": {male:0,female:0,total:0,presentMale:0,presentFemale:0,present:0, sick:0, leave:0, absent:0,
+  inMale:0,inFemale:0,inTotal:0,
+  outMale:0,outFemale:0,outTotal:0},
+  "ม.": {male:0,female:0,total:0,presentMale:0,presentFemale:0,present:0, sick:0, leave:0, absent:0,
+  inMale:0,inFemale:0,inTotal:0,
+  outMale:0,outFemale:0,outTotal:0},
+  "ปวช": {male:0,female:0,total:0,presentMale:0,presentFemale:0,present:0, sick:0, leave:0, absent:0,
+  inMale:0,inFemale:0,inTotal:0,
+  outMale:0,outFemale:0,outTotal:0}
 }
 
 const order = ["ป.1","ป.2","ป.3","ป.4","ป.5","ป.6","ม.1","ม.2","ม.3","ม.4","ม.5","ม.6","ปวช.1","ปวช.2","ปวช.3"]
@@ -739,8 +788,8 @@ if(!levels[lv]) return
   
 levels[lv].rows.sort((a,b)=>{
 
-const numA = (a.room.match(/\d+/g) || ["0","0"])
-const numB = (b.room.match(/\d+/g) || ["0","0"])
+const numA = a.room.match(/\d+/g) || [0,0]
+const numB = b.room.match(/\d+/g) || [0,0]
 
 if(!numA || !numB) return 0
 
@@ -807,6 +856,14 @@ html += `
 <td>${levels[lv].sick}</td>
 <td>${levels[lv].leave}</td>
 <td>${levels[lv].absent}</td>
+
+<td>${levels[lv].inMale}</td>
+<td>${levels[lv].inFemale}</td>
+<td>${levels[lv].inTotal}</td>
+
+<td>${levels[lv].outMale}</td>
+<td>${levels[lv].outFemale}</td>
+<td>${levels[lv].outTotal}</td>
 </tr>
 `
   
