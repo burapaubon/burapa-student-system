@@ -524,6 +524,8 @@ const result = await fetchWithFallback(date)
 data = result.data
 isFallback = result.fallbackDate !== date
 
+const useDate = result.fallbackDate || date
+
 if(data.length === 0){
   
 document.getElementById("dataBody").innerHTML = `
@@ -577,7 +579,7 @@ let totalOutFemale = 0
 let totalOutTotal = 0
   
 const prevResults = await Promise.all(
-  data.map(r => getPreviousDataFast(roomCache, r.room, date))
+data.map(r => getPreviousDataFast(roomCache, r.room, useDate))
 )
 
 data.forEach((r, i) => {
@@ -606,10 +608,8 @@ const total = currMale + currFemale
   let inTotal = 0
   let outTotal = 0
 
-const hasTodayData = !isFallback
-
 if (
-  !isFallback &&
+  (useDate === date) &&
   Object.keys(prev).length > 0 &&
   (currMale + currFemale) > 0
 ) {
@@ -667,7 +667,7 @@ totalOutTotal += outTotal
 const hasTodayInput = (
   r.present_m !== undefined &&
   r.present_f !== undefined &&
-  !isFallback
+  (useDate === date)
 )
 
 const presentMale = hasTodayInput ? Number(r.present_m) : 0
