@@ -102,7 +102,7 @@ thead th{
 } 
 
 th:first-child, td:first-child{
-  width:25%;
+  width:27%;
 }
 
 .total{
@@ -290,7 +290,7 @@ z-index:9999;
 <tr>
 
 <colgroup>
-  <col style="width:25%">
+  <col style="width:27%">
 
   <col style="width:4.5%">
   <col style="width:4.5%">
@@ -675,6 +675,8 @@ const prevResults = await Promise.all(
 
 data.forEach((r, i) => {
 
+  const hasPresentData = r.present_m !== undefined && r.present_f !== undefined
+  
   const prev = prevResults[i] || {}
 
   const prevMale = Number(prev.all_boys) || 0
@@ -752,9 +754,9 @@ totalOutTotal += outTotal
   const male = Number(r.male)||0
   const female = Number(r.female)||0
 
-  const present = isFallback ? 0 : Number(r.present) || 0
-  const presentMale = isFallback ? 0 : Number(r.present_m) || 0
-  const presentFemale = isFallback ? 0 : Number(r.present_f) || 0
+  const present = (!hasPresentData || isFallback) ? "" : Number(r.present) || 0
+  const presentMale = (!hasPresentData || isFallback) ? "" : Number(r.present_m) || 0
+  const presentFemale = (!hasPresentData || isFallback) ? "" : Number(r.present_f) || 0
 
   const sick = Number(r.sick) || 0
   const leave = Number(r.leave) || 0
