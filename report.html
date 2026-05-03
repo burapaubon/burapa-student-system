@@ -66,11 +66,6 @@ th, td{
   white-space: nowrap;
   page-break-inside: auto;
 }
-
-tr, td, th{
-  page-break-inside: avoid !important;
-  break-inside: avoid !important;
-}
   
 td:first-child{
   white-space:normal;
@@ -292,25 +287,25 @@ z-index:9999;
 <colgroup>
   <col style="width:27%">
 
-  <col style="width:4.5%">
-  <col style="width:4.5%">
-  <col style="width:4.5%">
+  <col style="width:4.6%">
+  <col style="width:4.6%">
+  <col style="width:4.6%">
 
-  <col style="width:4.5%">
-  <col style="width:4.5%">
-  <col style="width:4.5%">
+  <col style="width:4.6%">
+  <col style="width:4.6%">
+  <col style="width:4.6%">
 
-  <col style="width:4.5%">
-  <col style="width:4.5%">
-  <col style="width:4.5%">
+  <col style="width:4.6%">
+  <col style="width:4.6%">
+  <col style="width:4.6%">
 
-  <col style="width:4.5%">
-  <col style="width:4.5%">
-  <col style="width:4.5%">
+  <col style="width:4.6%">
+  <col style="width:4.6%">
+  <col style="width:4.6%">
 
-  <col style="width:4.5%">
-  <col style="width:4.5%">
-  <col style="width:4.5%">
+  <col style="width:4.6%">
+  <col style="width:4.6%">
+  <col style="width:4.6%">
 </colgroup>
   
 <th rowspan="2">ชั้น</th>
@@ -424,10 +419,10 @@ const pdf = new jsPDF("p", "mm", "a4")
 
 const margin = 12
 const imgWidth = 210 - (margin * 2)
-const pageHeight = 297
+const pageHeight = 297 - (margin * 2)
 
-const imgHeight = canvas.height * imgWidth / canvas.width
-const pageHeightPx = canvas.height * (pageHeight / imgHeight)
+const scale = imgWidth / canvas.width
+const pageHeightPx = pageHeight / scale
 
 let renderedHeight = 0
 
@@ -437,10 +432,9 @@ const pageCanvas = document.createElement("canvas")
 const pageCtx = pageCanvas.getContext("2d")
 
 pageCanvas.width = canvas.width
-const safePadding = 20
-pageCanvas.height = pageHeightPx - safePadding
+pageCanvas.height = pageHeightPx
 
-pageCtx.fillStyle = "#ffffff"
+pageCtx.fillStyle = "#fff"
 pageCtx.fillRect(0, 0, pageCanvas.width, pageCanvas.height)
 
 pageCtx.drawImage(
@@ -451,17 +445,20 @@ canvas.width, pageHeightPx,
 canvas.width, pageHeightPx
 )
 
-const imgDataPage = pageCanvas.toDataURL("image/png")
+const imgData = pageCanvas.toDataURL("image/png")
 
 if (renderedHeight > 0) pdf.addPage()
 
-const ratio = imgWidth / canvas.width
-const imgHeightScaled = pageCanvas.height * (imgWidth / pageCanvas.width)
+pdf.addImage(
+imgData,
+"PNG",
+margin,
+margin,
+imgWidth,
+pageHeight
+)
 
-pdf.addImage(imgDataPage, "PNG", margin, margin, imgWidth, imgHeightScaled)
-
-renderedHeight += pageCanvas.height
-  
+renderedHeight += pageHeightPx
 }
 
 const fileDate = formatFileDate(date)
@@ -580,17 +577,15 @@ for(let i=0;i<30;i++){
 return {}
 }
 
-const prevCache = {}
+const roomCache = {}
 
-async function getPreviousDataFast(room, date){
+async function getPreviousDataFast(cache, room, date){
 
-if (prevCache[room] && Object.keys(prevCache[room]).length > 0) {
-  return prevCache[room]
-}
+if(cache[room]) return cache[room]
 
 let d = new Date(date)
 
-for(let i=0;i<30;i++){
+for(let i=0;i<7;i++){
   d.setDate(d.getDate() - 1)
   const prevDate = d.toISOString().split("T")[0]
 
@@ -599,13 +594,13 @@ for(let i=0;i<30;i++){
     const data = await res.json()
 
     if(data && (data.all_boys !== undefined || data.all_girls !== undefined)){
-      prevCache[room] = data
+      cache[room] = data
       return data
     }
   }catch(e){}
 }
 
-prevCache[room] = {}
+cache[room] = {}
 return {}
 }
   
@@ -670,21 +665,28 @@ let totalOutFemale = 0
 let totalOutTotal = 0
   
 const prevResults = await Promise.all(
-  data.map(r => getPreviousDataFast(r.room, date))
+  data.map(r => getPreviousDataFast(roomCache, r.room, date))
 )
 
 data.forEach((r, i) => {
 
-  const hasPresentData = r.present_m !== undefined && r.present_f !== undefined
+const hasPresentData = r.present_m !== undefined && r.present_f !== undefined
   
-  const prev = prevResults[i] || {}
+const prev = prevResults[i] || {}
 
-  const prevMale = Number(prev.all_boys) || 0
-  const prevFemale = Number(prev.all_girls) || 0
+const prevMale = Number(prev.all_boys) || 0
+const prevFemale = Number(prev.all_girls) || 0
 
-  const currMale = Number(r.male) || 0
-  const currFemale = Number(r.female) || 0
+let currMale = Number(r.male) || 0
+let currFemale = Number(r.female) || 0
 
+if(!hasPresentData || isFallback){
+currMale = prevMale
+currFemale = prevFemale
+}
+
+const total = currMale + currFemale
+  
   let inMale = 0
   let inFemale = 0
   let outMale = 0
@@ -750,10 +752,6 @@ totalOutTotal += outTotal
     }
   }
 
-  const total = Number(r.total)||0
-  const male = Number(r.male)||0
-  const female = Number(r.female)||0
-
   const present = (!hasPresentData || isFallback) ? "" : Number(r.present) || 0
   const presentMale = (!hasPresentData || isFallback) ? "" : Number(r.present_m) || 0
   const presentFemale = (!hasPresentData || isFallback) ? "" : Number(r.present_f) || 0
@@ -766,9 +764,9 @@ totalOutTotal += outTotal
   totalLeave += leave
   totalAbsent += absent
   
-  totalAll += total
-  totalMale += male
-  totalFemale += female
+totalAll += total
+totalMale += currMale
+totalFemale += currFemale
 
   totalPresent += present
   totalPresentMale += presentMale
@@ -776,16 +774,18 @@ totalOutTotal += outTotal
   
   levels[level].rows.push({
     room:r.room,
-    total,male,female,
+    total,
+male: currMale,
+female: currFemale,
     present,presentMale,presentFemale,
     sick,leave,absent,
     inMale, inFemale, inTotal,
     outMale, outFemale, outTotal
   })
 
-  levels[level].total += total
-  levels[level].male += male
-  levels[level].female += female
+levels[level].male += currMale
+levels[level].female += currFemale
+levels[level].total += total
   levels[level].present += present
   levels[level].presentMale += presentMale
   levels[level].presentFemale += presentFemale
