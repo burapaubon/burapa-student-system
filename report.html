@@ -400,18 +400,14 @@ const params = new URLSearchParams(location.search)
 const date = params.get("date") || new Date().toISOString().split("T")[0]
   
 function formatThaiDate(dateStr){
-  
-const d = new Date(dateStr)
+  const d = new Date(dateStr)
 
-const day = d.toLocaleDateString('th-TH',{ weekday:'long' }).replace("วัน","")
-  
-const dNum = d.getDate()
-  
-const month = d.toLocaleDateString('th-TH',{ month:'long' })
-  
-const year = d.getFullYear() + 543
+  const day = d.toLocaleDateString('th-TH',{ weekday:'long' }).replace("วัน","")
+  const dNum = d.getDate()
+  const month = d.toLocaleDateString('th-TH',{ month:'long' })
+  const year = d.getFullYear() + 543
 
-return `
+  return `
 วัน&nbsp;&nbsp;&nbsp;&nbsp;${day}
 &nbsp;&nbsp;&nbsp;&nbsp;ที่&nbsp;&nbsp;&nbsp;&nbsp;${dNum}
 &nbsp;&nbsp;&nbsp;&nbsp;เดือน&nbsp;&nbsp;&nbsp;&nbsp;${month}
@@ -419,6 +415,16 @@ return `
 `
 }
 
+function formatTitleDate(dateStr){
+  const d = new Date(dateStr)
+  const day = d.getDate()
+  const month = d.toLocaleDateString('th-TH',{ month:'short' })
+  const year = d.getFullYear() + 543
+  return `${day} ${month} ${year}`
+}
+
+document.title = `รายงานสถิตินักเรียน (${formatTitleDate(date)})`
+  
 document.getElementById("loading").innerText = "⏳ กำลังโหลดข้อมูล..."
 
 function show(v){
@@ -522,7 +528,9 @@ document.getElementById("dataBody").innerHTML = `
 
 <tr><td colspan="16">⚠ ไม่พบข้อมูล</td></tr>
 `
-  
+
+document.getElementById("dateText").innerHTML = formatThaiDate(date)
+
 document.getElementById("loading").style.display = "none"
   
 return
