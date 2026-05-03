@@ -499,7 +499,7 @@ async function fetchWithFallback(dateStr){
 
 let d = new Date(dateStr)
 
-for(let i=0;i<90;i++){
+for(let i=0;i<7;i++){
     
 const tryDate = d.toISOString().split("T")[0]
 
@@ -508,7 +508,7 @@ try{
 const res = await fetch(API + "?mode=report&date=" + tryDate)
 const data = await res.json()
 
-if(data && data.length > 0){
+if(Array.isArray(data) && data.length > 0){
 
 return { data, fallbackDate: tryDate }
 
@@ -601,108 +601,108 @@ let totalSick = 0
 let totalLeave = 0
 let totalAbsent = 0
   
-for (const r of data) {
+const prevResults = await Promise.all(
+  data.map(r => getPreviousData(r.room, date))
+)
 
-const prev = await getPreviousData(r.room, date)
+data.forEach((r, i) => {
 
-const prevMale = Number(prev.all_boys) || 0
-const prevFemale = Number(prev.all_girls) || 0
+  const prev = prevResults[i] || {}
 
-const currMale = Number(r.male) || 0
-const currFemale = Number(r.female) || 0
+  const prevMale = Number(prev.all_boys) || 0
+  const prevFemale = Number(prev.all_girls) || 0
 
-let inMale = ""
-let inFemale = ""
-let outMale = ""
-let outFemale = ""
+  const currMale = Number(r.male) || 0
+  const currFemale = Number(r.female) || 0
 
-let inTotal = 0
-let outTotal = 0
+  let inMale = 0
+  let inFemale = 0
+  let outMale = 0
+  let outFemale = 0
+  let inTotal = 0
+  let outTotal = 0
 
-if(prev.all_boys !== undefined){
+  if (prev.all_boys !== undefined) {
 
-if(currMale > prevMale){
-inMale = currMale - prevMale
-inTotal += inMale
-}else if(currMale < prevMale){
-outMale = prevMale - currMale
-outTotal += outMale
+  if (currMale > prevMale) {
+    inMale = currMale - prevMale
+    inTotal += inMale
+  } else if (currMale < prevMale) {
+    outMale = prevMale - currMale
+    outTotal += outMale
+  }
+
+  if (currFemale > prevFemale) {
+    inFemale = currFemale - prevFemale
+    inTotal += inFemale
+  } else if (currFemale < prevFemale) {
+    outFemale = prevFemale - currFemale
+    outTotal += outFemale
+  }
+
 }
 
-if(currFemale > prevFemale){
-inFemale = currFemale - prevFemale
-inTotal += inFemale
-}else if(currFemale < prevFemale){
-outFemale = prevFemale - currFemale
-outTotal += outFemale
-}
+  const level = getLevel(r.room)
 
-}
+  if(!levels[level]){
+    levels[level] = {
+      rows:[],
+      total:0,
+      male:0,
+      female:0,
+      present:0,
+      presentMale:0,
+      presentFemale:0,
+      sick:0,
+      leave:0,
+      absent:0
+    }
+  }
 
-const level = getLevel(r.room)
+  const total = Number(r.total)||0
+  const male = Number(r.male)||0
+  const female = Number(r.female)||0
 
-if(!levels[level]){
-levels[level] = {
-rows:[],
-total:0,
-male:0,
-female:0,
-present:0,
-presentMale:0,
-presentFemale:0,
-sick:0,
-leave:0,
-absent:0
+  const present = isFallback ? 0 : Number(r.present) || 0
+  const presentMale = isFallback ? 0 : Number(r.present_m) || 0
+  const presentFemale = isFallback ? 0 : Number(r.present_f) || 0
+
+  const sick = Number(r.sick) || 0
+  const leave = Number(r.leave) || 0
+  const absent = Number(r.absent) || 0
+
+  totalSick += sick
+  totalLeave += leave
+  totalAbsent += absent
   
-}
+  totalAll += total
+  totalMale += male
+  totalFemale += female
+
+  totalPresent += present
+  totalPresentMale += presentMale
+  totalPresentFemale += presentFemale
   
-}
+  levels[level].rows.push({
+    room:r.room,
+    total,male,female,
+    present,presentMale,presentFemale,
+    sick,leave,absent,
+    inMale, inFemale, inTotal,
+    outMale, outFemale, outTotal
+  })
 
-const total = Number(r.total)||0
-const male = Number(r.male)||0
-const female = Number(r.female)||0
+  levels[level].total += total
+  levels[level].male += male
+  levels[level].female += female
+  levels[level].present += present
+  levels[level].presentMale += presentMale
+  levels[level].presentFemale += presentFemale
+  levels[level].sick += sick
+  levels[level].leave += leave
+  levels[level].absent += absent
 
-const present = isFallback ? "" : Number(r.present)||0
-const presentMale = isFallback ? 0 : Number(r.present_m)||0
-const presentFemale = isFallback ? 0 : Number(r.present_f)||0
-
-const sick = isFallback ? "" : (r.sick||"")
-const leave = isFallback ? "" : (r.leave||"")
-const absent = isFallback ? "" : (r.absent||"")
-
-levels[level].rows.push({
-  room:r.room,
-  total,male,female,
-  present,presentMale,presentFemale,
-  sick,leave,absent,
-
-  inMale, inFemale, inTotal,
-  outMale, outFemale, outTotal
 })
-
-levels[level].total += total
-levels[level].male += male
-levels[level].female += female
-
-levels[level].present += present
-levels[level].presentMale += presentMale
-levels[level].presentFemale += presentFemale
-levels[level].sick += Number(sick)||0
-levels[level].leave += Number(leave)||0
-levels[level].absent += Number(absent)||0
-
-totalAll += total
-totalMale += male
-totalFemale += female
-
-totalPresent += present
-totalPresentMale += presentMale
-totalPresentFemale += presentFemale
-
-totalSick += Number(sick)||0
-totalLeave += Number(leave)||0
-totalAbsent += Number(absent)||0
-}
 
 let groupSum = {
   "ป.": {male:0,female:0,total:0,presentMale:0,presentFemale:0,present:0, sick:0, leave:0, absent:0},
@@ -712,35 +712,35 @@ let groupSum = {
 
 const order = ["ป.1","ป.2","ป.3","ป.4","ป.5","ป.6","ม.1","ม.2","ม.3","ม.4","ม.5","ม.6","ปวช.1","ปวช.2","ปวช.3"]
 
-order.forEach(level=>{
+order.forEach(lv => {
 
 let groupKey = ""
 
-if(level.startsWith("ป.")) groupKey = "ป."
-else if(level.startsWith("ม.")) groupKey = "ม."
-else if(level.startsWith("ปวช")) groupKey = "ปวช"
+if(lv.startsWith("ป.")) groupKey = "ป."
+else if(lv.startsWith("ม.")) groupKey = "ม."
+else if(lv.startsWith("ปวช")) groupKey = "ปวช"
 
-if(groupKey && levels[level]){
-groupSum[groupKey].male += levels[level].male
-groupSum[groupKey].female += levels[level].female
-groupSum[groupKey].total += levels[level].total
+if(groupKey && levels[lv]){
+groupSum[groupKey].male += levels[lv].male
+groupSum[groupKey].female += levels[lv].female
+groupSum[groupKey].total += levels[lv].total
 
-groupSum[groupKey].presentMale += levels[level].presentMale
-groupSum[groupKey].presentFemale += levels[level].presentFemale
-groupSum[groupKey].present += levels[level].present
+groupSum[groupKey].presentMale += levels[lv].presentMale
+groupSum[groupKey].presentFemale += levels[lv].presentFemale
+groupSum[groupKey].present += levels[lv].present
 
-groupSum[groupKey].sick += levels[level].sick
-groupSum[groupKey].leave += levels[level].leave
-groupSum[groupKey].absent += levels[level].absent
+groupSum[groupKey].sick += levels[lv].sick
+groupSum[groupKey].leave += levels[lv].leave
+groupSum[groupKey].absent += levels[lv].absent
   
 }
   
-if(!levels[level]) return
+if(!levels[lv]) return
   
-levels[level].rows.sort((a,b)=>{
+levels[lv].rows.sort((a,b)=>{
 
-const numA = a.room.match(/\d+/g)
-const numB = b.room.match(/\d+/g)
+const numA = (a.room.match(/\d+/g) || ["0","0"])
+const numB = (b.room.match(/\d+/g) || ["0","0"])
 
 if(!numA || !numB) return 0
 
@@ -754,7 +754,7 @@ return (Number(numA[1]||0)) - (Number(numB[1]||0))
   
 })
   
-levels[level].rows.forEach(r=>{
+levels[lv].rows.forEach(r=>{
   
 html += `
 <tr>
@@ -786,31 +786,31 @@ html += `
 
 let colorClass = ""
 
-if(level.startsWith("ป.")){
+if(lv.startsWith("ป.")){
   colorClass = "primary"
-}else if(level.startsWith("ม.") || level.startsWith("ปวช")){
+}else if(lv.startsWith("ม.") || lv.startsWith("ปวช")){
   colorClass = "secondary"
 }
   
 html += `
 <tr class="sum-row ${colorClass}">
-<td>รวม ${level}</td>
+<td>รวม ${lv}</td>
 
-<td>${levels[level].male}</td>
-<td>${levels[level].female}</td>
-<td>${levels[level].total}</td>
+<td>${levels[lv].male}</td>
+<td>${levels[lv].female}</td>
+<td>${levels[lv].total}</td>
 
-<td>${levels[level].presentMale}</td>
-<td>${levels[level].presentFemale}</td>
-<td>${levels[level].present}</td>
+<td>${levels[lv].presentMale}</td>
+<td>${levels[lv].presentFemale}</td>
+<td>${levels[lv].present}</td>
 
-<td>${levels[level].sick}</td>
-<td>${levels[level].leave}</td>
-<td>${levels[level].absent}</td>
+<td>${levels[lv].sick}</td>
+<td>${levels[lv].leave}</td>
+<td>${levels[lv].absent}</td>
 </tr>
 `
   
-if(level === "ป.6"){
+if(lv === "ป.6"){
 html += `
 <tr class="sum-row primary section-break">
 <td>รวมประถมทั้งหมด</td>
@@ -828,7 +828,7 @@ html += `
   
 }
 
-if(level === "ม.6"){
+if(lv === "ม.6"){
 html += `
 <tr class="sum-row secondary section-break">
 <td>รวมมัธยมทั้งหมด</td>
@@ -846,7 +846,7 @@ html += `
   
 }
 
-if(level === "ปวช.3"){
+if(lv === "ปวช.3"){
 html += `
 <tr class="sum-row secondary section-break">
 <td>รวม ปวช ทั้งหมด</td>
