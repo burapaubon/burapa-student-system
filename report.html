@@ -287,9 +287,6 @@ z-index:9999;
 ⏳ กำลังสร้างแบบรายงาน...
 </div>
   
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  
 <div class="report" id="report">
 
 <h2>รายงานสถิตินักเรียนประจำวัน</h2>
@@ -665,14 +662,11 @@ totalOutTotal += outTotal
     }
   }
 
-const hasTodayInput = (
-  r.present_m !== undefined &&
-  r.present_f !== undefined
-)
+const presentMale = Number(r.present_m) || 0
+const presentFemale = Number(r.present_f) || 0
+const present = presentMale + presentFemale
 
-const presentMale = hasTodayInput ? Number(r.present_m) : 0
-const presentFemale = hasTodayInput ? Number(r.present_f) : 0
-const present = hasTodayInput ? (presentMale + presentFemale) : 0
+const hasTodayInput = present > 0
 
   const sick = Number(r.sick) || 0
   const leave = Number(r.leave) || 0
@@ -794,9 +788,9 @@ html += `
 <td>${r.female}</td>
 <td>${r.total}</td>
 
-<td>${r.hasTodayInput ? r.presentMale : ""}</td>
-<td>${r.hasTodayInput ? r.presentFemale : ""}</td>
-<td>${r.hasTodayInput ? r.present : ""}</td>
+<td>${r.presentMale}</td>
+<td>${r.presentFemale}</td>
+<td>${r.present}</td>
 
 <td>${show(r.sick)}</td>
 <td>${show(r.leave)}</td>
