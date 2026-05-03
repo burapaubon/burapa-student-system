@@ -435,7 +435,7 @@ async function fetchWithFallback(dateStr){
 
 let d = new Date(dateStr)
 
-for(let i=0;i<7;i++){
+for(let i=0;i<30;i++){
     
 const tryDate = d.toISOString().split("T")[0]
 
@@ -493,7 +493,7 @@ if(cache[room]) return cache[room]
 
 let d = new Date(date)
 
-for(let i=0;i<7;i++){
+for(let i=0;i<60;i++){
   d.setDate(d.getDate() - 1)
   const prevDate = d.toISOString().split("T")[0]
 
@@ -611,7 +611,6 @@ const total = currMale + currFemale
   let outTotal = 0
 
 if (
-  (useDate === date) &&
   Object.keys(prev).length > 0 &&
   (currMale + currFemale) > 0
 ) {
