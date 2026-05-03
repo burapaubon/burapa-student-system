@@ -883,11 +883,11 @@ html += `
 
 <td>${show(r.inMale)}</td>
 <td>${show(r.inFemale)}</td>
-<td>${show(r.inTotal)}</td>
+<td>${r.inTotal || 0}</td>
 
 <td>${show(r.outMale)}</td>
 <td>${show(r.outFemale)}</td>
-<td>${show(r.outTotal)}</td>
+<td>${r.outTotal || 0}</td>
 </tr>
 `
   
@@ -919,11 +919,11 @@ html += `
 
 <td>${show(levels[lv].inMale)}</td>
 <td>${show(levels[lv].inFemale)}</td>
-<td>${show(levels[lv].inTotal)}</td>
+<td>${levels[lv].inTotal || 0}</td>
 
 <td>${show(levels[lv].outMale)}</td>
 <td>${show(levels[lv].outFemale)}</td>
-<td>${show(levels[lv].outTotal)}</td>
+<td>${levels[lv].outTotal || 0}</td>
 </tr>
 `
   
@@ -946,11 +946,11 @@ html += `
 
 <td>${groupSum["ป."].inMale}</td>
 <td>${groupSum["ป."].inFemale}</td>
-<td>${groupSum["ป."].inTotal}</td>
+<td>${groupSum["ป."].inTotal || 0}</td>
 
 <td>${groupSum["ป."].outMale}</td>
 <td>${groupSum["ป."].outFemale}</td>
-<td>${groupSum["ป."].outTotal}</td>
+<td>${groupSum["ป."].outTotal || 0}</td>
 </tr>
 `
   
