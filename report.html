@@ -592,7 +592,7 @@ if(data.length === 0){
   
 document.getElementById("dataBody").innerHTML = `
 
-<tr><td colspan="17">⚠ ไม่พบข้อมูล</td></tr>
+<tr><td colspan="16">⚠ ไม่พบข้อมูล</td></tr>
 `
   
 document.getElementById("loading").style.display = "none"
@@ -614,7 +614,7 @@ return
 let html=""
   
 document.getElementById("loading").innerText = "⏳ กำลังสร้างรายงาน..."
-document.getElementById("dataBody").innerHTML = `<tr><td colspan="17">⏳ กำลังสร้าง Report...</td></tr>`;
+document.getElementById("dataBody").innerHTML = `<tr><td colspan="16">⏳ กำลังสร้าง Report...</td></tr>`;
 
 let levels = {}
 
@@ -871,15 +871,26 @@ if(lv === "ป.6"){
 html += `
 <tr class="sum-row primary section-break">
 <td>รวมประถมทั้งหมด</td>
+
 <td>${groupSum["ป."].male}</td>
 <td>${groupSum["ป."].female}</td>
 <td>${groupSum["ป."].total}</td>
+
 <td>${groupSum["ป."].presentMale}</td>
 <td>${groupSum["ป."].presentFemale}</td>
 <td>${groupSum["ป."].present}</td>
+
 <td>${groupSum["ป."].sick}</td>
 <td>${groupSum["ป."].leave}</td>
 <td>${groupSum["ป."].absent}</td>
+
+<td>${groupSum["ป."].inMale}</td>
+<td>${groupSum["ป."].inFemale}</td>
+<td>${groupSum["ป."].inTotal}</td>
+
+<td>${groupSum["ป."].outMale}</td>
+<td>${groupSum["ป."].outFemale}</td>
+<td>${groupSum["ป."].outTotal}</td>
 </tr>
 `
   
@@ -889,15 +900,26 @@ if(lv === "ม.6"){
 html += `
 <tr class="sum-row secondary section-break">
 <td>รวมมัธยมทั้งหมด</td>
+
 <td>${groupSum["ม."].male}</td>
 <td>${groupSum["ม."].female}</td>
 <td>${groupSum["ม."].total}</td>
+
 <td>${groupSum["ม."].presentMale}</td>
 <td>${groupSum["ม."].presentFemale}</td>
 <td>${groupSum["ม."].present}</td>
+
 <td>${groupSum["ม."].sick}</td>
 <td>${groupSum["ม."].leave}</td>
 <td>${groupSum["ม."].absent}</td>
+
+<td>${groupSum["ม."].inMale}</td>
+<td>${groupSum["ม."].inFemale}</td>
+<td>${groupSum["ม."].inTotal}</td>
+
+<td>${groupSum["ม."].outMale}</td>
+<td>${groupSum["ม."].outFemale}</td>
+<td>${groupSum["ม."].outTotal}</td>
 </tr>
 `
   
@@ -907,15 +929,26 @@ if(lv === "ปวช.3"){
 html += `
 <tr class="sum-row secondary section-break">
 <td>รวม ปวช ทั้งหมด</td>
+
 <td>${groupSum["ปวช"].male}</td>
 <td>${groupSum["ปวช"].female}</td>
 <td>${groupSum["ปวช"].total}</td>
+
 <td>${groupSum["ปวช"].presentMale}</td>
 <td>${groupSum["ปวช"].presentFemale}</td>
 <td>${groupSum["ปวช"].present}</td>
+
 <td>${groupSum["ปวช"].sick}</td>
 <td>${groupSum["ปวช"].leave}</td>
 <td>${groupSum["ปวช"].absent}</td>
+
+<td>${groupSum["ปวช"].inMale}</td>
+<td>${groupSum["ปวช"].inFemale}</td>
+<td>${groupSum["ปวช"].inTotal}</td>
+
+<td>${groupSum["ปวช"].outMale}</td>
+<td>${groupSum["ปวช"].outFemale}</td>
+<td>${groupSum["ปวช"].outTotal}</td>
 </tr>
 `
   
