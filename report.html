@@ -317,6 +317,17 @@ z-index:9999;
 </tr>
 </thead>
 
+<colgroup>
+<col style="width:120px">
+<col span="3" style="width:60px">
+<col span="3" style="width:60px">
+<col style="width:60px">
+<col style="width:60px">
+<col style="width:60px">
+<col span="3" style="width:60px">
+<col span="3" style="width:60px">
+</colgroup>
+  
 <tbody id="dataBody"></tbody>
 </table>
 </div>
@@ -494,6 +505,10 @@ return `
 }
 
 document.getElementById("loading").innerText = "⏳ กำลังโหลดข้อมูล..."
+
+function show(v){
+  return (v === 0 || v === "0") ? "" : v
+}
   
 async function fetchWithFallback(dateStr){
 
@@ -629,6 +644,14 @@ let totalPresentFemale = 0
 let totalSick = 0
 let totalLeave = 0
 let totalAbsent = 0
+
+let totalInMale = 0
+let totalInFemale = 0
+let totalInTotal = 0
+
+let totalOutMale = 0
+let totalOutFemale = 0
+let totalOutTotal = 0
   
 const prevResults = await Promise.all(
   data.map(r => getPreviousDataFast(r.room, date))
@@ -651,7 +674,7 @@ data.forEach((r, i) => {
   let inTotal = 0
   let outTotal = 0
 
-  if (prev && (prev.all_boys != null || prev.all_girls != null)) {
+  if (Object.keys(prev).length > 0) {
 
   if (currMale > prevMale) {
     inMale = currMale - prevMale
@@ -669,6 +692,14 @@ data.forEach((r, i) => {
     outTotal += outFemale
   }
 
+totalInMale += inMale
+totalInFemale += inFemale
+totalInTotal += inTotal
+
+totalOutMale += outMale
+totalOutFemale += outFemale
+totalOutTotal += outTotal
+    
 }
 
   const level = getLevel(r.room)
@@ -817,17 +848,17 @@ html += `
 <td>${r.presentFemale}</td>
 <td>${r.present}</td>
 
-<td>${r.sick}</td>
-<td>${r.leave}</td>
-<td>${r.absent}</td>
+<td>${show(r.sick)}</td>
+<td>${show(r.leave)}</td>
+<td>${show(r.absent)}</td>
 
-<td>${r.inMale}</td>
-<td>${r.inFemale}</td>
-<td>${r.inTotal}</td>
+<td>${show(r.inMale)}</td>
+<td>${show(r.inFemale)}</td>
+<td>${show(r.inTotal)}</td>
 
-<td>${r.outMale}</td>
-<td>${r.outFemale}</td>
-<td>${r.outTotal}</td>
+<td>${show(r.outMale)}</td>
+<td>${show(r.outFemale)}</td>
+<td>${show(r.outTotal)}</td>
 </tr>
 `
   
@@ -853,17 +884,17 @@ html += `
 <td>${levels[lv].presentFemale}</td>
 <td>${levels[lv].present}</td>
 
-<td>${levels[lv].sick}</td>
-<td>${levels[lv].leave}</td>
-<td>${levels[lv].absent}</td>
+<td>${show(levels[lv].sick)}</td>
+<td>${show(levels[lv].leave)}</td>
+<td>${show(levels[lv].absent)}</td>
 
-<td>${levels[lv].inMale}</td>
-<td>${levels[lv].inFemale}</td>
-<td>${levels[lv].inTotal}</td>
+<td>${show(levels[lv].inMale)}</td>
+<td>${show(levels[lv].inFemale)}</td>
+<td>${show(levels[lv].inTotal)}</td>
 
-<td>${levels[lv].outMale}</td>
-<td>${levels[lv].outFemale}</td>
-<td>${levels[lv].outTotal}</td>
+<td>${show(levels[lv].outMale)}</td>
+<td>${show(levels[lv].outFemale)}</td>
+<td>${show(levels[lv].outTotal)}</td>
 </tr>
 `
   
@@ -971,6 +1002,14 @@ html += `
 <td>${totalSick}</td>
 <td>${totalLeave}</td>
 <td>${totalAbsent}</td>
+
+<td>${totalInMale || 0}</td>
+<td>${totalInFemale || 0}</td>
+<td>${totalInTotal || 0}</td>
+
+<td>${totalOutMale || 0}</td>
+<td>${totalOutFemale || 0}</td>
+<td>${totalOutTotal || 0}</td>
 </tr>
 `
 
