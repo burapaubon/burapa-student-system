@@ -386,7 +386,7 @@ z-index:9999;
 
 <div class="actions">
 <button class="btn primary" onclick="window.print()">
-📄 ดาวน์โหลดหรือพิมพ์เอกสาร
+📄 ดาวน์โหลด / พิมพ์เอกสาร
 </button>
 </div>
 
@@ -514,6 +514,8 @@ return {}
   
 async function loadReport(){
 
+document.getElementById("dateText").innerHTML = formatThaiDate(date)
+  
 let data = []
 let isFallback = false
 
@@ -591,8 +593,8 @@ let currMale = Number(r.male ?? r.all_boys ?? prevMale) || 0
 let currFemale = Number(r.female ?? r.all_girls ?? prevFemale) || 0
 
 if(prevMale || prevFemale){
-  currMale = prevMale
-  currFemale = prevFemale
+  currMale = Number(r.all_boys ?? prevMale)
+  currFemale = Number(r.all_girls ?? prevFemale)
 } else {
   currMale = Number(r.all_boys) || 0
   currFemale = Number(r.all_girls) || 0
@@ -666,8 +668,8 @@ totalOutTotal += outTotal
   }
 
   const present = (!hasPresentData || isFallback) ? "" : Number(r.present) || 0
-  const presentMale = (!hasPresentData || isFallback) ? "" : Number(r.present_m) || 0
-  const presentFemale = (!hasPresentData || isFallback) ? "" : Number(r.present_f) || 0
+  const presentMale = (!hasPresentData || isFallback) ? "" : (r.present_m ?? "")
+  const presentFemale = (!hasPresentData || isFallback) ? "" : (r.present_f ?? "")
 
   const sick = Number(r.sick) || 0
   const leave = Number(r.leave) || 0
