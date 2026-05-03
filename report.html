@@ -77,9 +77,9 @@ th{
 }
 
 tr{
-  page-break-inside: avoid !important;
+  page-break-inside: avoid;
   page-break-after:auto;
-  break-inside: avoid !important;
+  break-inside: avoid;
 }
   
 .summary, .footer{
@@ -145,11 +145,6 @@ font-weight:bold;
 print-color-adjust: exact;
 page-break-inside: avoid !important;
 break-inside: avoid;
-}
-
-tr:last-child{
-page-break-after: avoid;
-page-break-inside: avoid;
 }
   
 .footer{
@@ -241,7 +236,7 @@ page-break-before: avoid;
 overflow:hidden;
 }
 
-  table {
+table {
     page-break-inside: auto;
   }
 
@@ -471,7 +466,7 @@ for(let i=0;i<30;i++){
     const res = await fetch(API + `?mode=getbydate&room=${room}&date=${prevDate}`)
     const data = await res.json()
 
-    if(data && (data.all_boys !== undefined || data.all_girls !== undefined)){
+    if(data && (data.all_boys != null || data.all_girls != null)){
       return data
     }
 
@@ -488,25 +483,17 @@ async function getPreviousDataFast(cache, room, date){
 
 if(cache[room]) return cache[room]
 
-let d = new Date(date)
+try{
+  const res = await fetch(API + `?mode=getprevious&room=${room}&date=${date}`)
+  const data = await res.json()
 
-for(let i=0;i<60;i++){
-  d.setDate(d.getDate() - 1)
-  const prevDate = d.toISOString().split("T")[0]
+  cache[room] = data || {}
+  return cache[room]
 
-  try{
-    const res = await fetch(API + `?mode=getbydate&room=${room}&date=${prevDate}`)
-    const data = await res.json()
-
-    if(data && (data.all_boys !== undefined || data.all_girls !== undefined)){
-      cache[room] = data
-      return data
-    }
-  }catch(e){}
+}catch(e){
+  cache[room] = {}
+  return {}
 }
-
-cache[room] = {}
-return {}
 }
   
 async function loadReport(){
@@ -576,19 +563,13 @@ let totalInTotal = 0
 let totalOutMale = 0
 let totalOutFemale = 0
 let totalOutTotal = 0
-  
-const prevResults = await Promise.all(
-data.map(r => getPreviousDataFast(roomCache, r.room, useDate))
-)
 
 data.forEach((r, i) => {
 
 const hasPresentData = r.present_m !== undefined && r.present_f !== undefined
   
-const prev = prevResults[i] || {}
-
-const prevMale = Number(prev.all_boys) || 0
-const prevFemale = Number(prev.all_girls) || 0
+const prevMale = Number(r.prev_male) || 0
+const prevFemale = Number(r.prev_female) || 0
 
 let currMale = (r.male !== undefined && r.male !== "")
   ? Number(r.male)
@@ -607,10 +588,7 @@ const total = currMale + currFemale
   let inTotal = 0
   let outTotal = 0
 
-if (
-  Object.keys(prev).length > 0 &&
-  (currMale + currFemale) > 0
-) {
+if (prevMale !== 0 || prevFemale !== 0) {
 
   if (currMale > prevMale) {
     inMale = currMale - prevMale
@@ -1023,7 +1001,13 @@ async function loadSignatureToReport(){
 try{
 
 const res = await fetch(API + "?mode=getsigconfig")
-const data = await res.json()
+let data = {}
+
+try{
+  data = await res.json()
+}catch(e){
+  data = {}
+}
 
 const day = new Date(date).getDay()
 
