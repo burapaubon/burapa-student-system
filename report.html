@@ -590,12 +590,12 @@ const prev = prevResults[i] || {}
 const prevMale = Number(prev.all_boys) || 0
 const prevFemale = Number(prev.all_girls) || 0
 
-let currMale = (r.all_boys !== undefined && r.all_boys !== "")
-  ? Number(r.all_boys)
+let currMale = (r.male !== undefined && r.male !== "")
+  ? Number(r.male)
   : prevMale
 
-let currFemale = (r.all_girls !== undefined && r.all_girls !== "")
-  ? Number(r.all_girls)
+let currFemale = (r.female !== undefined && r.female !== "")
+  ? Number(r.female)
   : prevFemale
 
 const total = currMale + currFemale
