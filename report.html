@@ -593,13 +593,11 @@ const prev = prevResults[i] || {}
 const prevMale = Number(prev.all_boys) || 0
 const prevFemale = Number(prev.all_girls) || 0
 
-let currMale = (r.all_boys !== undefined && r.all_boys !== "")
-  ? Number(r.all_boys)
-  : prevMale
+let currMale = Number(r.all_boys)
+if (isNaN(currMale)) currMale = prevMale
 
-let currFemale = (r.all_girls !== undefined && r.all_girls !== "")
-  ? Number(r.all_girls)
-  : prevFemale
+let currFemale = Number(r.all_girls)
+if (isNaN(currFemale)) currFemale = prevFemale
 
 const total = currMale + currFemale
   
@@ -667,8 +665,7 @@ totalOutTotal += outTotal
 
 const hasTodayInput = (
   r.present_m !== undefined &&
-  r.present_f !== undefined &&
-  (useDate === date)
+  r.present_f !== undefined
 )
 
 const presentMale = hasTodayInput ? Number(r.present_m) : 0
