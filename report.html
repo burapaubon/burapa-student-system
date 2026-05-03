@@ -297,8 +297,17 @@ z-index:9999;
 <th rowspan="2">ป่วย</th>
 <th rowspan="2">ลา</th>
 <th rowspan="2">ขาด</th>
+<th colspan="3">เข้าใหม่</th>
+<th colspan="3">จำหน่าย</th>
 </tr>
 <tr>
+<th>ชาย</th>
+<th>หญิง</th>
+<th>รวม</th>
+<th>ชาย</th>
+<th>หญิง</th>
+<th>รวม</th>
+
 <th>ชาย</th>
 <th>หญิง</th>
 <th>รวม</th>
@@ -490,7 +499,7 @@ async function fetchWithFallback(dateStr){
 
 let d = new Date(dateStr)
 
-for(let i=0;i<365;i++){
+for(let i=0;i<90;i++){
     
 const tryDate = d.toISOString().split("T")[0]
 
@@ -513,6 +522,31 @@ d.setDate(d.getDate()-1)
 
 return { data:[], fallbackDate:null }
   
+}
+
+async function getPreviousData(room, date){
+
+let d = new Date(date)
+
+for(let i=0;i<90;i++){
+
+  d.setDate(d.getDate() - 1)
+  const prevDate = d.toISOString().split("T")[0]
+
+  try{
+
+    const res = await fetch(API + `?mode=getbydate&room=${room}&date=${prevDate}`)
+    const data = await res.json()
+
+    if(data && (data.all_boys !== undefined || data.all_girls !== undefined)){
+      return data
+    }
+
+  }catch(e){}
+
+}
+
+return {}
 }
   
 async function loadReport(){
@@ -567,7 +601,43 @@ let totalSick = 0
 let totalLeave = 0
 let totalAbsent = 0
   
-data.forEach(r=>{
+for (const r of data) {
+
+const prev = await getPreviousData(r.room, date)
+
+const prevMale = Number(prev.all_boys) || 0
+const prevFemale = Number(prev.all_girls) || 0
+
+const currMale = Number(r.male) || 0
+const currFemale = Number(r.female) || 0
+
+let inMale = ""
+let inFemale = ""
+let outMale = ""
+let outFemale = ""
+
+let inTotal = 0
+let outTotal = 0
+
+if(prev.all_boys !== undefined){
+
+if(currMale > prevMale){
+inMale = currMale - prevMale
+inTotal += inMale
+}else if(currMale < prevMale){
+outMale = prevMale - currMale
+outTotal += outMale
+}
+
+if(currFemale > prevFemale){
+inFemale = currFemale - prevFemale
+inTotal += inFemale
+}else if(currFemale < prevFemale){
+outFemale = prevFemale - currFemale
+outTotal += outFemale
+}
+
+}
 
 const level = getLevel(r.room)
 
@@ -604,7 +674,10 @@ levels[level].rows.push({
   room:r.room,
   total,male,female,
   present,presentMale,presentFemale,
-  sick,leave,absent
+  sick,leave,absent,
+
+  inMale, inFemale, inTotal,
+  outMale, outFemale, outTotal
 })
 
 levels[level].total += total
@@ -629,7 +702,7 @@ totalPresentFemale += presentFemale
 totalSick += Number(sick)||0
 totalLeave += Number(leave)||0
 totalAbsent += Number(absent)||0
-})
+}
 
 let groupSum = {
   "ป.": {male:0,female:0,total:0,presentMale:0,presentFemale:0,present:0, sick:0, leave:0, absent:0},
@@ -698,6 +771,14 @@ html += `
 <td>${r.sick}</td>
 <td>${r.leave}</td>
 <td>${r.absent}</td>
+
+<td>${r.inMale}</td>
+<td>${r.inFemale}</td>
+<td>${r.inTotal}</td>
+
+<td>${r.outMale}</td>
+<td>${r.outFemale}</td>
+<td>${r.outTotal}</td>
 </tr>
 `
   
