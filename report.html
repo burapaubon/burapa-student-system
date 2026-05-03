@@ -102,7 +102,7 @@ thead th{
 } 
 
 th:first-child, td:first-child{
-  width:16%;
+  width:25%;
 }
 
 .total{
@@ -290,7 +290,7 @@ z-index:9999;
 <tr>
 
 <colgroup>
-  <col style="width:16%">
+  <col style="width:25%">
 
   <col style="width:4.5%">
   <col style="width:4.5%">
@@ -913,16 +913,16 @@ html += `
 <td>${levels[lv].presentFemale}</td>
 <td>${levels[lv].present}</td>
 
-<td>${show(levels[lv].sick)}</td>
-<td>${show(levels[lv].leave)}</td>
-<td>${show(levels[lv].absent)}</td>
+<td>${levels[lv].sick || 0}</td>
+<td>${levels[lv].leave || 0}</td>
+<td>${levels[lv].absent || 0}</td>
 
-<td>${show(levels[lv].inMale)}</td>
-<td>${show(levels[lv].inFemale)}</td>
+<td>${levels[lv].inMale || 0}</td>
+<td>${levels[lv].inFemale || 0}</td>
 <td>${levels[lv].inTotal || 0}</td>
 
-<td>${show(levels[lv].outMale)}</td>
-<td>${show(levels[lv].outFemale)}</td>
+<td>${levels[lv].outMale || 0}</td>
+<td>${levels[lv].outFemale || 0}</td>
 <td>${levels[lv].outTotal || 0}</td>
 </tr>
 `
