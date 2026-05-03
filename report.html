@@ -589,16 +589,13 @@ const prev = prevResults[i] || {}
 const prevMale = Number(prev.all_boys) || 0
 const prevFemale = Number(prev.all_girls) || 0
 
-let currMale = Number(r.male ?? r.all_boys ?? prevMale) || 0
-let currFemale = Number(r.female ?? r.all_girls ?? prevFemale) || 0
+let currMale = (r.all_boys !== undefined && r.all_boys !== "")
+  ? Number(r.all_boys)
+  : prevMale
 
-if(prevMale || prevFemale){
-  currMale = (r.all_boys !== undefined) ? Number(r.all_boys) : prevMale
-  currFemale = (r.all_girls !== undefined) ? Number(r.all_girls) : prevFemale
-} else {
-  currMale = Number(r.all_boys) || 0
-  currFemale = Number(r.all_girls) || 0
-}
+let currFemale = (r.all_girls !== undefined && r.all_girls !== "")
+  ? Number(r.all_girls)
+  : prevFemale
 
 const total = currMale + currFemale
   
@@ -612,8 +609,8 @@ const total = currMale + currFemale
 const hasTodayData = !isFallback
 
 if (
-  Object.keys(prev).length > 0 &&
   !isFallback &&
+  Object.keys(prev).length > 0 &&
   (currMale + currFemale) > 0
 ) {
 
