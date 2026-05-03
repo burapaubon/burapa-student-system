@@ -519,12 +519,14 @@ document.getElementById("dateText").innerHTML = formatThaiDate(date)
 let data = []
 let isFallback = false
 
-try{
-const result = await fetchWithFallback(date)
-data = result.data
-isFallback = result.fallbackDate !== date
+let useDate = date
 
-const useDate = result.fallbackDate || date
+try{
+  const result = await fetchWithFallback(date)
+  data = result.data
+  isFallback = result.fallbackDate !== date
+
+  useDate = result.fallbackDate || date
 
 if(data.length === 0){
   
