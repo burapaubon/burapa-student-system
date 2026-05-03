@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <title>แบบรายงานสถิตินักเรียนประจำวัน</title>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet">
   
 <style>
 body{
@@ -24,7 +25,6 @@ box-sizing:border-box;
 box-shadow:none !important;
 page-break-inside:auto;
 font-family:'Sarabun',Tahoma,sans-serif;
-page-break-inside:auto;
 }
 
 h2{
@@ -55,20 +55,16 @@ table{
   font-size:13.5px;
   page-break-before:auto;
   page-break-inside:auto;
-  table-layout: fixed;
+  table-layout: auto;
 }
   
 td, th{
   border:1px solid #000;
   padding:5px 3px;
   text-align:center;
-  word-break:break-word;
-  white-space:normal;
+  word-break: normal;
+  white-space: nowrap;
   page-break-inside: auto;
-}
-
-table, thead, tbody, tr, td, th{
-  break-inside: avoid !important;
 }
 
 tr, td, th{
@@ -92,7 +88,7 @@ tr{
 }
   
 .summary, .footer{
-  page-break-inside: avoid;
+page-break-inside: avoid;
 }
   
 thead{
@@ -140,7 +136,7 @@ border-top:2px solid #000;
 text-align:center;
 letter-spacing:0.5px;
 font-family:'Sarabun',sans-serif;
-page-break-before:auto;
+page-break-before: auto;
 break-inside: avoid;
 }
   
@@ -160,7 +156,7 @@ tr:last-child{
 page-break-after: avoid;
 page-break-inside: avoid;
 }
-
+  
 .footer{
 margin-top:50px;
 display:grid;
@@ -170,6 +166,7 @@ text-align:center;
 font-size:14px;
 break-inside: avoid;
 page-break-before: avoid;
+page-break-inside: avoid;
 }
 
 .sign{
@@ -392,7 +389,9 @@ const canvas = await html2canvas(element, {
 scale: 2,
 useCORS: true,
 letterRendering: true,
-backgroundColor: "#ffffff"
+backgroundColor: "#ffffff",
+width: element.scrollWidth,
+height: element.scrollHeight
 })
 
 const { jsPDF } = window.jspdf
@@ -401,7 +400,6 @@ const pdf = new jsPDF("p", "mm", "a4")
 const margin = 12
 const imgWidth = 210 - (margin * 2)
 const pageHeight = 297
-const imgHeight = canvas.height * imgWidth / canvas.width
 
 const pageHeightPx = canvas.height * (pageHeight / imgHeight)
 
@@ -413,7 +411,7 @@ const pageCanvas = document.createElement("canvas")
 const pageCtx = pageCanvas.getContext("2d")
 
 pageCanvas.width = canvas.width
-const safePadding = 10
+const safePadding = 20
 pageCanvas.height = pageHeightPx - safePadding
 
 pageCtx.fillStyle = "#ffffff"
@@ -431,7 +429,10 @@ const imgDataPage = pageCanvas.toDataURL("image/png")
 
 if (renderedHeight > 0) pdf.addPage()
 
-pdf.addImage(imgDataPage, "PNG", margin, margin, imgWidth, pageHeight - (margin * 2) - 2)
+const ratio = imgWidth / canvas.width
+const imgHeightScaled = pageCanvas.height * (imgWidth / pageCanvas.width)
+
+pdf.addImage(imgDataPage, "PNG", margin, margin, imgWidth, imgHeightScaled)
 
 renderedHeight += pageCanvas.height
   
@@ -801,7 +802,14 @@ groupSum[groupKey].present += levels[lv].present
 groupSum[groupKey].sick += levels[lv].sick
 groupSum[groupKey].leave += levels[lv].leave
 groupSum[groupKey].absent += levels[lv].absent
-  
+
+groupSum[groupKey].inMale += levels[lv].inMale
+groupSum[groupKey].inFemale += levels[lv].inFemale
+groupSum[groupKey].inTotal += levels[lv].inTotal
+
+groupSum[groupKey].outMale += levels[lv].outMale
+groupSum[groupKey].outFemale += levels[lv].outFemale
+groupSum[groupKey].outTotal += levels[lv].outTotal
 }
   
 if(!levels[lv]) return
