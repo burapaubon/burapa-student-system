@@ -593,11 +593,13 @@ const prev = prevResults[i] || {}
 const prevMale = Number(prev.all_boys) || 0
 const prevFemale = Number(prev.all_girls) || 0
 
-let currMale = Number(r.all_boys)
-if (isNaN(currMale)) currMale = prevMale
+let currMale = (r.all_boys !== undefined && r.all_boys !== "")
+  ? Number(r.all_boys)
+  : prevMale
 
-let currFemale = Number(r.all_girls)
-if (isNaN(currFemale)) currFemale = prevFemale
+let currFemale = (r.all_girls !== undefined && r.all_girls !== "")
+  ? Number(r.all_girls)
+  : prevFemale
 
 const total = currMale + currFemale
   
@@ -794,7 +796,7 @@ html += `
 
 <td>${r.hasTodayInput ? r.presentMale : ""}</td>
 <td>${r.hasTodayInput ? r.presentFemale : ""}</td>
-<td>${r.hasTodayInput ? r.present : 0}</td>
+<td>${r.hasTodayInput ? r.present : ""}</td>
 
 <td>${show(r.sick)}</td>
 <td>${show(r.leave)}</td>
