@@ -75,7 +75,7 @@ rgba(255,255,255,.35) 50%,
 rgba(255,255,255,.25) 60%,
 rgba(255,255,255,0) 100%
 );
-  
+
 filter:blur(28px);
 animation:shine 6s linear infinite;
 pointer-events:none;
@@ -96,7 +96,7 @@ pointer-events:none;
 0%{transform:translateX(-100%)}
 100%{transform:translateX(100%)}
 }
-  
+
 .logo{
 width:clamp(80px,16vw,110px);
 margin-bottom:4px;
@@ -111,7 +111,7 @@ drop-shadow(0 0 25px rgba(255,255,255,.35));
 50%{transform:translateY(-6px)}
 100%{transform:translateY(0)}
 }
-  
+
 .system-name{font-size:13px;}
 .school-name{font-size:26px;font-weight:700;}
 
@@ -137,7 +137,7 @@ margin-top:3px;
 font-size:14px;
 margin-top:2px;
 }
-  
+
 main{
 flex:1;
 max-width:1100px;
@@ -198,7 +198,7 @@ flex-shrink:0;
 font-size:16px;
 font-weight:600;
 }
-  
+
 .card{
 background:white;
 border-radius:18px;
@@ -215,14 +215,14 @@ height:420px;
 transform:translateY(-2px);
 box-shadow:0 14px 30px rgba(0,0,0,.12);
 }
-  
+
 .card-title{
 text-align:center;
 font-size:16px;
 font-weight:600;
 margin-bottom:4px;
 }
-  
+
 .chartBox{
 flex:1;
 display:flex;
@@ -248,7 +248,7 @@ font-size:16px;
 color:#888;
 font-weight:500;
 }
-  
+
 #classList{
 flex:1;
 overflow-y:auto;
@@ -287,7 +287,7 @@ font-size:13px;
 font-weight:700;
 white-space:nowrap;
 }
-  
+
 .class{
 padding:14px 10px;
 border-bottom:1px solid #f1f5f9;
@@ -323,13 +323,13 @@ color:#166534;
 background:#fee2e2;
 color:#991b1b;
 }
-  
+
 .class-top div{
 font-size:18px;
 font-weight:700;
 color:#333;
 }
-  
+
 .green{
 color:#6BCB77;
 }
@@ -367,14 +367,14 @@ box-shadow:0 4px 10px rgba(0,0,0,.15);
 button:active{
 transform:scale(0.97);
 }
-  
+
 .btn-edit{background:#ffd166;}
-  
+
 .btn-main{
 background:linear-gradient(135deg,#e63946,#ff6b6b);
 color:white;
 }
-  
+
 .btn-sub{background:#eef1f6;}
 
 footer{
@@ -399,7 +399,7 @@ transition:opacity .6s ease;
 overflow:hidden;
 touch-action:none;
 }
-  
+
 .loader{
 width:45px;
 height:45px;
@@ -459,14 +459,14 @@ width:100%;
 50%{opacity:.4}
 100%{opacity:1}
 }
-  
+
 </style>
 </head>
 
 <body>
 
 <script src="ui-effects.js"></script>
-  
+
 <div id="loading">
 <div class="loader"></div>
 <div style="margin-top:12px;font-size:14px;color:#555">
@@ -477,7 +477,7 @@ width:100%;
 <header>
 
 <a class="back" href="index.html">← กลับหน้าแรก</a>
-  
+
 <img src="burapa-logo.png" class="logo">
 
 <div class="system-name">ระบบบริหารจัดการสถิตินักเรียน</div>
@@ -569,7 +569,7 @@ font-weight:600;
 </footer>
 
 <script>
-  
+
 const API="https://script.google.com/macros/s/AKfycbyV4PNjlFskTfF0Ol6xrZdWpSCJm54bi33l0M66QpluNo8X6B7Js8LZRtuY7T05KsShoQ/exec"
 
 async function fetchWithRetry(url, options = {}, retries = 3){
@@ -602,7 +602,7 @@ await new Promise(r => setTimeout(r, 1500))
 }
 
 }
-  
+
 loadTermFromAPI()
 
 async function loadTermFromAPI(){
@@ -654,13 +654,13 @@ el.style.display = "none"
 }
 
 }
-  
+
 
 let chartInstance=null
 let loadingNow=false
 
 let firstLoad = true
-  
+
 async function load(){
 
 if(loadingNow)return
@@ -747,7 +747,7 @@ noData.style.display = "block"
 noData.innerText = "⏳ กำลังอัพเดทข้อมูล..."
 
 }
-  
+
 function showError(msg){
 
 let noData = document.getElementById("noData")
@@ -758,7 +758,7 @@ noData.style.display = "block"
 noData.innerText = msg
 
 }
-  
+
 function hideLoading(){
 
 const loading=document.getElementById("loading")
@@ -770,7 +770,7 @@ loading.style.opacity="0"
 setTimeout(()=>{
 loading.style.display="none"
 },600)
-  
+
 }
 
 function animateNumber(id,value){
@@ -807,7 +807,7 @@ el.innerText=value
 requestAnimationFrame(step)
 
 }
-  
+
 function renderDash(d){
 
 let total = isNaN(Number(d.total)) ? 0 : Number(d.total)
@@ -864,9 +864,9 @@ data=[present,sick,leave,absent,unknown]
 }
 
 if (!(canvas instanceof HTMLCanvasElement)) return;
-  
+
 const ctx = canvas.getContext("2d");
-  
+
 if (!ctx) return;
 
 if (typeof Chart === "undefined"){
@@ -934,7 +934,7 @@ return percent<0.1 && v>0 ? "<0.1%" : percent+"%"
 function renderRooms(rooms){
 
 document.getElementById("roomCount").innerText="("+rooms.length+" ห้อง)"
-  
+
 let html=""
 
 if(rooms.length===0){
@@ -946,7 +946,7 @@ document.getElementById("alertBar").style.display = "none"
 
 return
 }
-  
+
 let done = rooms.filter(r => r.submitted).length
 
 let pending = rooms.filter(r => !r.submitted).length
@@ -1022,13 +1022,13 @@ let refreshTimer
 function startAutoRefresh(){
 
 clearInterval(refreshTimer)
-  
+
 refreshTimer = setInterval(load,30000)
-  
+
 }
 
 startAutoRefresh()
-  
+
 document.addEventListener("visibilitychange", () => {
 
 if (document.hidden) {
@@ -1053,7 +1053,7 @@ return String(str).replace(/[&<>"']/g, m => ({
 "'":"&#039;"
 }[m]))
 }
-  
+
 function updateClock(){
 
 let now=new Date()
