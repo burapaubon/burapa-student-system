@@ -107,7 +107,7 @@ pointer-events:none;
 0%{transform:translateX(-100%)}
 100%{transform:translateX(100%)}
 }
-  
+
 .back{
 position:absolute;
 left:12px;
@@ -130,7 +130,7 @@ margin-top:3px;
 font-size:14px;
 margin-top:2px;
 }
-  
+
 main{
 flex:1;
 max-width:1000px;
@@ -220,7 +220,7 @@ font-size:13px;
 font-size:16px;
 color:#c1121f;
 }
-  
+
 .error{
 border:2px solid #e63946;
 }
@@ -296,7 +296,7 @@ grid-template-columns:1fr;
 }
 
 }
-  
+
 #toastOverlay{
 position:fixed;
 inset:0;
@@ -373,20 +373,20 @@ transform:scaleX(0);
 </head>
 
 <body>
-  
+
 <script src="ui-effects.js"></script>
 <script src="session.js"></script>
-  
+
 <div id="loading">
 <div class="loader"></div>
 <div style="margin-top:12px;font-size:14px;color:#555">
 โปรดรอสักครู่...
 </div>
 </div>
-  
+
 <header>
 
-  
+
 <a class="back" onclick="goBack()">← กลับ Dashboard</a>
 
 <img src="burapa-logo.png" class="logo">
@@ -416,7 +416,7 @@ transform:scaleX(0);
 </div>
 
 <div class="card-grid">
-  
+
 <div class="card">
 
 <div class="section">👨‍🎓 นักเรียนทั้งหมด</div>
@@ -436,7 +436,7 @@ transform:scaleX(0);
 </div>
 
 </div>
-  
+
 <div class="card">
 
 <div class="section">📅 มาเรียนวันนี้</div>
@@ -495,18 +495,18 @@ transform:scaleX(0);
 <br>
 สำนักการศึกษา เทศบาลนครอุบลราชธานี
 </footer>
-  
+
 <div id="toast"></div>
 <div id="toastOverlay"></div>
 
 <script>
-  
+
 const API="https://script.google.com/macros/s/AKfycbyV4PNjlFskTfF0Ol6xrZdWpSCJm54bi33l0M66QpluNo8X6B7Js8LZRtuY7T05KsShoQ/exec"
 
 let inputs = null
 let isUserTyping = false
 let hasLoadedOnce = false
-  
+
 function showLoading(text){
 
 const loading=document.getElementById("loading")
@@ -531,7 +531,7 @@ loading.style.display="none"
 },300)
 
 }
-  
+
 async function loadTerm(){
 
 let el = document.getElementById("termDisplay")
@@ -575,7 +575,7 @@ el.style.display = "none"
 }
 
 }
-  
+
 function updateClock(){
 
 let now=new Date()
@@ -599,30 +599,30 @@ day+"ที่ "+date+" "+month+" พ.ศ."+year+" เวลา "+h+":"+m+":"+s+
 
 setInterval(updateClock,1000)
 updateClock()
-  
+
 const params=new URLSearchParams(location.search)
 
 const room=params.get("room")
 
 const from = params.get("from")
-  
+
 function goBack(){
-  if(from === "admin"){
-    location.href = "admin-dashboard.html"
-  } else {
-    location.href = "teacher-dashboard.html"
-  }
-}
-  
-if(!room){
 if(from === "admin"){
   location.href = "admin-dashboard.html"
 } else {
   location.href = "teacher-dashboard.html"
 }
+}
+
+if(!room){
+if(from === "admin"){
+location.href = "admin-dashboard.html"
+} else {
+location.href = "teacher-dashboard.html"
+}
 throw new Error("room not found")
 }
-  
+
 const edit=params.get("edit")
 
 const backdate=params.get("backdate")
@@ -706,7 +706,7 @@ async function loadDateData(){
 
 showLoading("กำลังซิงค์ข้อมูล...")
 clearInputs()
-  
+
 let date=dateInput.value
 
 if(!date){
@@ -725,7 +725,7 @@ let data = await res.json()
 if(!data || Object.keys(data).length===0){
 
 calculate()
-  
+
 const check = await fetch(
 API+"?mode=hasdata&date="+date+"&t="+Date.now()
 )
@@ -761,18 +761,18 @@ document.getElementById("girls_today").value=data.girls_today ?? ""
 document.getElementById("sick").value=data.sick ?? ""
 document.getElementById("leave").value=data.leave ?? ""
 document.getElementById("absent").value=data.absent ?? ""
-  
+
 document.getElementById("sourceInfo").innerText =
 "ที่มาของข้อมูล : " + (data.source || "-")
 
 calculate()
-  
+
 if(inputs){
 inputs.forEach(i=>i.classList.remove("error"))
 }
-  
+
 let all_total = num("all_boys") + num("all_girls")
-  
+
 if(all_total === 0){
 document.getElementById("errorMsg").style.display="none"
 document.getElementById("saveBtn").disabled=true
@@ -848,7 +848,7 @@ return
 }
 
 let maxStudents = all_total
-  
+
 document.getElementById("boys_today").max = num("all_boys")
 document.getElementById("girls_today").max = num("all_girls")
 document.getElementById("sick").max = maxStudents
@@ -882,7 +882,7 @@ document.getElementById("saveBtn").disabled=true
 inputs.forEach(i=>i.classList.add("error"))
 
 }
-  
+
 else{
 
 document.getElementById("errorMsg").style.display="none"
@@ -895,7 +895,7 @@ inputs.forEach(i=>i.classList.remove("error"))
 }
 
 let saving=false
-  
+
 async function save(){
 
 if(saving) return
@@ -931,7 +931,7 @@ source:"บันทึกโดยคุณครู"
 }
 
 try{
-  
+
 let res = await fetch(API,{
 method:"POST",
 body:new URLSearchParams(data)
@@ -969,13 +969,13 @@ hideLoading()
 }
 
 }
-  
+
 async function loadLatest(){
 
 showLoading("กำลังซิงค์ข้อมูล...")
 
 let date=dateInput.value
-  
+
 try{
 
 const res = await fetchWithTimeout(
@@ -985,9 +985,9 @@ API+"?mode=getbydate&room="+encodeURIComponent(room)+"&date="+date+"&t="+Date.no
 let data = {}
 
 try{
-  data = await res.json()
+data = await res.json()
 }catch{
-  data = {}
+data = {}
 }
 
 if(!data || Object.keys(data).length === 0){
@@ -1019,7 +1019,7 @@ async function loadLastRoomData(){
 
 if(hasLoadedOnce) return
 hasLoadedOnce = true
-  
+
 showLoading("รอสักครู่...")
 
 try{
@@ -1031,13 +1031,13 @@ API+"?mode=getlatestroom&room="+encodeURIComponent(room)+"&t="+Date.now()
 let data = {}
 
 try{
-  
+
 data = await res.json()
-  
+
 }catch{
-  
+
 data = {}
-  
+
 }
 
 if(!data || Object.keys(data).length === 0) return
@@ -1049,13 +1049,13 @@ document.getElementById("all_girls").value = data.all_girls ?? ""
 
 calculate()
 }catch(e){
-  
+
 console.error(e)
-  
+
 } finally {
 hideLoading()
 }
-  
+
 }
 
 window.onbeforeunload=function(){
@@ -1064,7 +1064,7 @@ const btn=document.getElementById("saveBtn")
 
 if(!btn.disabled){
 return "⚠ ข้อมูลยังไม่ได้ทำการบันทึก"
-  
+
 }
 
 }
@@ -1074,7 +1074,7 @@ document.addEventListener("DOMContentLoaded",function(){
 loadTerm()
 
 })
-  
+
 let toastTimeout
 
 function showToast(message, type="info", duration=5000){
@@ -1104,14 +1104,14 @@ overlay.classList.add("show")
 toast.classList.add("show")
 
 setTimeout(()=>{
-  toast.classList.add("hide")
+toast.classList.add("hide")
 }, 50)
 
 clearTimeout(toastTimeout)
 
 toastTimeout = setTimeout(()=>{
-  toast.classList.remove("show")
-  overlay.classList.remove("show")
+toast.classList.remove("show")
+overlay.classList.remove("show")
 }, duration)
 
 }
