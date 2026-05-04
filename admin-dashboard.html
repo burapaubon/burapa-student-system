@@ -11,7 +11,7 @@
 <script src="session.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <style>
-  
+
 *{
 box-sizing:border-box;
 margin:0;
@@ -26,7 +26,7 @@ flex-direction:column;
 background:linear-gradient(180deg,#f6f7fb,#eef1f8);
 overflow-y: scroll;
 }
- 
+
 header{
 background:linear-gradient(135deg,#c1121f,#e63946,#ff6b6b);
 background-size:200% 200%;
@@ -73,7 +73,7 @@ rgba(255,255,255,.35) 50%,
 rgba(255,255,255,.25) 60%,
 rgba(255,255,255,0) 100%
 );
-  
+
 filter:blur(28px);
 animation:shine 6s linear infinite;
 pointer-events:none;
@@ -94,7 +94,7 @@ pointer-events:none;
 0%{transform:translateX(-100%)}
 100%{transform:translateX(100%)}
 }
-  
+
 .logo{
 width:clamp(80px,16vw,110px);
 margin-bottom:4px;
@@ -109,7 +109,7 @@ drop-shadow(0 0 25px rgba(255,255,255,.35));
 50%{transform:translateY(-6px)}
 100%{transform:translateY(0)}
 }
-  
+
 .system-name{font-size:13px;}
 .school-name{font-size:26px;font-weight:700;}
 
@@ -135,7 +135,7 @@ margin-top:3px;
 font-size:14px;
 margin-top:2px;
 }
-  
+
 main{
 flex:1;
 max-width:1100px;
@@ -160,7 +160,7 @@ box-shadow:0 8px 20px rgba(0,0,0,.08);
 }
 
 .stat h3{font-size:12px;color:#666;}
-  
+
 .num{
 font-size:26px;
 font-weight:700;
@@ -174,7 +174,7 @@ gap:8px;
 margin-left:auto;
 flex-wrap:wrap;
 }
-  
+
 .num:hover{
 transform:scale(1.1);
 }
@@ -215,7 +215,7 @@ justify-content:center;
 display:flex;
 flex-direction:column;
 }
-  
+
 .card-header{
 display:flex;
 justify-content:space-between;
@@ -233,12 +233,12 @@ font-size:11px;
 border-radius:8px;
 white-space:nowrap;
 }
-  
+
 .card-header span:first-child{
 font-size:16px;
 font-weight:600;
 }
-  
+
 .card:hover{
 transform:translateY(-2px);
 box-shadow:0 14px 30px rgba(0,0,0,.12);
@@ -249,7 +249,7 @@ text-align:center;
 margin-bottom:12px;
 flex-shrink:0;
 }
-  
+
 .chartBox{
 flex:1;
 display:flex;
@@ -279,7 +279,7 @@ font-size:15px;
 color:#9ca3af;
 font-weight:500;
 }
-  
+
 #classList{
 flex:1;
 overflow-y:auto;
@@ -297,7 +297,7 @@ width:6px;
 background:#e5e7eb;
 border-radius:10px;
 }
-  
+
 .class{
 padding:14px 10px;
 border-bottom:1px solid #f1f5f9;
@@ -326,12 +326,12 @@ color:#333;
 background:#f87171;
 color:white;
 }
-  
+
 .status{
 font-size:13px;
 font-weight:700;
 }
-  
+
 .green{
 color:#6BCB77;
 }
@@ -344,7 +344,7 @@ animation:blink 1.4s infinite;
 .p {
 align-items: center;
 }
-  
+
 .buttons{
 margin-top:12px;
 display:flex;
@@ -365,7 +365,7 @@ justify-content: center;
 gap: 6px;
 font-weight: 500;
 }
-  
+
 .buttons button {
 flex: 0 1 calc(33.33% - 8px);
 min-width: 110px;
@@ -378,7 +378,7 @@ cursor: pointer;
 font-weight: 500;
 transition: .2s;
 }
-  
+
 button:hover{
 transform:translateY(-1px);
 box-shadow: 0 6px 15px rgba(0,0,0,0.1);
@@ -395,7 +395,7 @@ box-shadow:0 4px 10px rgba(251,191,36,.3);
 background:#f59e0b;
 box-shadow:0 6px 14px rgba(245,158,11,.4);
 }
-  
+
 .btn-main{
 background:linear-gradient(135deg,#F15F79,#fd746c);
 color:white;
@@ -405,7 +405,7 @@ color:white;
 background: linear-gradient(135deg,#f46b45,#eea849);
 color:white;
 }
-  
+
 .btn-sub{background:#e5e7eb; color:#374151;}
 
 button:disabled{
@@ -430,7 +430,7 @@ border:1px solid #e5e7eb;
 .control-section:hover{
 background:#f1f5f9;
 }
-  
+
 .control-title{
 font-size:13px;
 font-weight:600;
@@ -465,7 +465,7 @@ color:#92400e;
 }
 
 .btn-control.warn:hover{
-  background:#fcd34d;
+background:#fcd34d;
 }
 
 .btn-control.danger{
@@ -551,7 +551,7 @@ width:100%;
 padding:12px;
 font-size:13px;
 }
-  
+
 input[type="date"].select-modern {
 width: 100% !important;
 display: block;
@@ -565,7 +565,7 @@ appearance: none;
 .field input[type="date"] {
 width: 100% !important;
 }
-  
+
 .select-modern{
 padding:10px 12px;
 border-radius:12px;
@@ -585,7 +585,7 @@ border-color:#e63946;
 border-color:#e63946;
 box-shadow:0 0 0 3px rgba(230,57,70,0.15);
 }
-  
+
 footer{
 background:linear-gradient(135deg,#c1121f,#e63946,#ff6b6b);
 color:white;
@@ -608,7 +608,7 @@ transition:opacity .6s ease;
 overflow:hidden;
 touch-action:none;
 }
-  
+
 .loader{
 width:45px;
 height:45px;
@@ -645,7 +645,7 @@ color:#991b1b;
 border:1px solid #fecaca;
 animation: blink 1.4s infinite;
 }
-  
+
 .updateBy{
 display:inline;
 margin-left:4px;
@@ -663,7 +663,7 @@ justify-content:flex-start;
 .card button{
 flex-shrink:0;
 }
-  
+
 .card-scroll::-webkit-scrollbar{
 width:6px;
 }
@@ -676,7 +676,7 @@ border-radius:10px;
 #sigForm{
 transition: all .3s ease;
 }
-  
+
 @media (max-width:768px){
 
 .stats{
@@ -699,13 +699,13 @@ height:auto;
 flex-direction:column;
 align-items:flex-start;
 }
-  
+
 .updateText{
 display:block;
 text-align:center;
 width:100%;
 }
-  
+
 .chartBox canvas{
 width:100% !important;
 max-width:320px;
@@ -727,7 +727,7 @@ flex-direction:column;
 flex: 1 1 100%;
 width: 100%;
 }
-  
+
 }
 
 @keyframes blink{
@@ -751,7 +751,7 @@ transition:.2s;
 .ok{ border-left:5px solid #22c55e; }
 .warn{ border-left:5px solid #f59e0b; }
 .err{ border-left:5px solid #ef4444; }
-  
+
 .system-status{
 display:flex;
 flex-direction:column;
@@ -761,7 +761,7 @@ gap:10px;
 .status-box:hover{
 transform:translateY(-1px);
 }
-  
+
 .system-status div{
 margin:6px 0;
 font-size:15px;
@@ -821,11 +821,11 @@ transform:translateX(0);
 }
 </style>
 </head>
-  
+
 <body>                  
-  
+
 <script src="ui-effects.js"></script>
-  
+
 <div id="loading">
 <div class="loader"></div>
 <div style="margin-top:12px;font-size:14px;color:#555">
@@ -837,9 +837,9 @@ transform:translateX(0);
 
 <header>
 
-  
+
 <a class="back" onclick="logout()">← ออกจากระบบ</a>
-  
+
 <img src="burapa-logo.png" class="logo">
 
 <div class="system-name">ระบบบริหารจัดการสถิตินักเรียน</div>
@@ -859,11 +859,11 @@ display:none;
 font-weight:600;
 ">
 </div>
-  
+
 <main>
 
 <div class="stats">
-  
+
 <div class="stat total">
 <h3>👨‍🎓 นักเรียนทั้งหมด</h3>
 <div class="num" id="total">0</div>
@@ -988,11 +988,11 @@ font-weight:600;
 </div>
 </div>
 </div>
-  
+
 <div class="card card-rooms">
 <div class="card-header">
 <span>🏫 รายการห้องเรียนทั้งหมด <span id="roomCount"></span></span>
-  
+
 <div class="header-actions">
 <button onclick="addRoom()" class="btn-main">+ เพิ่มห้อง</button>
 <button onclick="toggleSort()" class="btn-sub" id="sortBtn">⇌ จัดลำดับห้อง</button>
@@ -1062,7 +1062,7 @@ font-weight:600;
 
 </div>
 </main>
-  
+
 <footer>
 ระบบบริหารจัดการสถิตินักเรียน (BURAPA STUDENT SYSTEM)
 <br>
@@ -1088,7 +1088,7 @@ setTimeout(() => reject(new Error("timeout")), timeout)
 )
 ])
 }
-  
+
 const API="https://script.google.com/macros/s/AKfycbyV4PNjlFskTfF0Ol6xrZdWpSCJm54bi33l0M66QpluNo8X6B7Js8LZRtuY7T05KsShoQ/exec"
 
 function showToast(type, title, message, autoReload = false) {
@@ -1147,7 +1147,7 @@ return str.replace(/[&<>"']/g, m => ({
 "'":"&#039;"
 }[m]));
 }
-  
+
 async function loadTerm(){
 
 try{
@@ -1194,7 +1194,7 @@ let loadingNow=false
 let firstLoad = true
 let sortableInstance;
 let sortMode = false;
-  
+
 async function load(){
 
 if(loadingNow) return
@@ -1222,7 +1222,7 @@ const dash = await res.json()
 if(!dash || typeof dash !== "object"){
 throw new Error("invalid data")
 }
-    
+  
 renderDash(dash)
 renderRooms(dash.rooms || [])
 renderWeeklyChart(dash.weekly || {})
@@ -1233,17 +1233,17 @@ renderMonthlyChart(dash.monthly || {})
 console.error(e)
 
 if(firstLoad){
-  
+
 if(e.message === "timeout"){
-  
+
 showToast("error","เกิดข้อผิดพลาด","กรุณารีเฟรชใหม่อีกครั้ง")
-  
+
 }else{
-  
+
 showToast("error","โหลดข้อมูลไม่สำเร็จ","กรุณาลองใหม่อีกครั้ง")
-  
+
 }
-  
+
 }
 
 console.warn("โหลดข้อมูลไม่สำเร็จ ลองรีเฟรชอีกครั้ง");
@@ -1255,7 +1255,7 @@ loadingNow = false
 firstLoad = false
 
 }
-  
+
 }
 
 function hideLoading(){
@@ -1425,7 +1425,7 @@ return percent + "%"
 
 let weeklyChartInstance = null
 let monthlyChartInstance = null
-  
+
 function renderWeeklyChart(data){
 
 const canvas = document.getElementById("weeklyChart")
@@ -1440,7 +1440,7 @@ canvas.style.display = "none"
 noData.style.display = "block"
 return
 }
-  
+
 if(weeklyChartInstance){
 weeklyChartInstance.destroy()
 }
@@ -1453,7 +1453,7 @@ return
 
 canvas.style.display = "block"
 noData.style.display = "none"
-  
+
 const ctx = canvas.getContext("2d")
 
 if(weeklyChartInstance){
@@ -1567,7 +1567,7 @@ callback: value => value + "%"
 }
 })
 }
-  
+
 function renderRooms(rooms){
 
 let html=""
@@ -1582,7 +1582,7 @@ document.getElementById("classList").innerHTML =
 document.getElementById("alertBar").style.display="none"
 
 return
-  
+
 }
 
 let done = rooms.filter(r => r.submitted).length
@@ -1670,7 +1670,7 @@ data-room="${escapeHTML(r.room)}" class="btn-edit">
 document.getElementById("classList").innerHTML=html
 
 }
-  
+
 let refreshTimer
 
 async function editRoom(oldRoom){
@@ -1730,27 +1730,27 @@ if(!res.ok) throw new Error("network")
 const data = await res.json()
 
 if(data.status === "success"){
-  
+
 showToast(
 "success",
 "ลบห้องสำเร็จ",
 "ระบบจะนำห้องออกในไม่ช้า",
 true
 )
-  
+
 }else{
-  
+
 showToast("error","ทำการลบห้องไม่สำเร็จ"," ลองใหม่อีกครั้ง")
 }
 
 }catch(e){
-  
+
 showToast("error","เกิดข้อผิดพลาด","กรุณาลองใหม่อีกครั้ง")
-  
+
 }
 
 }
-  
+
 async function checkSystemStatusOnce(){
 
 try{
@@ -1818,11 +1818,11 @@ document.getElementById("sttAPI").className = "status-box err"
 document.getElementById("sttDB").className = "status-box err"
 document.getElementById("sttMSG").className = "status-box err"
 document.getElementById("sttREC").className = "status-box err"
-  
+
 }
-  
+
 }
-  
+
 function startAutoRefresh(){
 
 load()
@@ -1834,13 +1834,13 @@ refreshTimer = setInterval(()=>{
 if(sortMode) return
 
 if(!loadingNow && document.visibilityState === "visible"){
-  
+
 load()
-      
+    
 }
 
 },45000)
-  
+
 }
 
 function updateClock(){
@@ -1886,7 +1886,7 @@ year += 543
 
 return `${day.padStart(2,"0")}/${month.padStart(2,"0")}/${year}`
 }
-  
+
 function renderUpdateInfo(r){
 if(!r.lastUpdateTime){
 return `<span style="color:#9ca3af;font-size:12px">ยังไม่มีข้อมูล</span>`;
@@ -1907,7 +1907,7 @@ return `
 สถิติล่าสุด ${dateText} เวลา ${time} น. 
 <span class="updateBy">(${text})</span>
 </span>
-  `;
+`;
 }
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -1967,9 +1967,9 @@ showToast(
 "หากต้องการแก้ไข ให้ทำการจัดลำดับห้องใหม่",
 true
 )
-    
-}
   
+}
+
 }
 
 async function addRoom(){
@@ -1977,7 +1977,7 @@ async function addRoom(){
 if(loadingNow) return
 
 let name = prompt("📍 พิมพ์ชื่อห้อง เช่น ชั้นประถมศึกษาปีที่ 1 , ชั้นมัธยมศึกษาปีที่ 1/2")
-  
+
 if (!name || !name.trim()) return;
 
 name = name.trim();
@@ -2038,34 +2038,34 @@ if(!res.ok) throw new Error()
 const data = await res.json()
 
 if(data.status === "success"){
-  
+
 showToast(
 "success",
 "เพิ่มห้องสำเร็จ",
 "ระบบจะเพิ่มห้องในไม่ช้า (ด้านล่างสุด)",
 true
 )
-  
+
 }else{
-  
+
 showToast(
 "error",
 "เพิ่มห้องไม่สำเร็จ",
 "กรุณาลองใหม่อีกครั้ง"
 )
-  
+
 }
 
 }catch(e){
-  
+
 showToast("error","เกิดข้อผิดพลาด"," ลองใหม่อีกครั้ง")
-  
+
 }
 
 loadingNow = false
-  
+
 }
-  
+
 async function resetRoom(e, room){
 
 room = decodeURIComponent(room)
@@ -2084,9 +2084,9 @@ try{
 const res = await fetch(API + "?mode=resetRoom&room=" + encodeURIComponent(room) + "&token=" + token)
 
 if(!res.ok){
-  
+
 throw new Error()
-  
+
 }
 
 showToast(
@@ -2097,16 +2097,16 @@ true
 )
 
 } catch(e){
-  
+
 showToast("error","รีเซ็ตไม่สำเร็จ","กรุณาลองใหม่อีกครั้ง")
-  
+
 }
 
 btn.innerText = "🔄 รีเซ็ตสถิติวันนี้"
 btn.disabled = false
 
 loadingNow = false
-  
+
 }
 
 async function resetTodayAll(e){
@@ -2128,9 +2128,9 @@ try{
 const res = await fetch(API + "?mode=resetTodayAll&token=" + token)
 
 if(!res.ok){
-  
+
 throw new Error()
-  
+
 }
 
 showToast(
@@ -2141,18 +2141,18 @@ true
 )
 
 }catch(e){
-  
+
 showToast("error","เกิดข้อผิดพลาด" ,"ลองใหม่อีกครั้ง")
-  
+
 }
 
 btn.disabled = false
 btn.innerText = "รีเซ็ตข้อมูลวันนี้ทั้งหมด"
-  
+
 loadingNow = false
-  
+
 }
-  
+
 async function resetRange(){
 
 if(loadingNow) return
@@ -2161,23 +2161,23 @@ let start=document.getElementById("startDate").value
 let end=document.getElementById("endDate").value
 
 if(!start || !end){
-  
+
 showToast("error","กรุณาเลือกวันที่ก่อน","โปรดเลือกวันที่เริ่มต้นและสิ้นสุด")
-  
+
 return
-  
+
 }
 
 if(!confirm("⚠ รีเซ็ตข้อมูลช่วง "+start+" ถึง "+end+" ใช่หรือไม่")) return
 
 if(new Date(start) > new Date(end)){
-  
+
 showToast("warn","วันที่ไม่ถูกต้อง","วันที่เริ่มต้องไม่มากกว่าวันที่สิ้นสุด")
-  
+
 return
-  
+
 }
-  
+
 loadingNow = true
 
 try{
@@ -2185,9 +2185,9 @@ try{
 const res = await fetch(API+`?mode=resetRange&start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}&token=${token}`)
 
 if(!res.ok){
-  
+
 throw new Error()
-  
+
 }
 
 showToast(
@@ -2198,9 +2198,9 @@ true
 )
 
 }catch(e){
-  
+
 showToast("error","เกิดข้อผิดพลาด","ลองใหม่อีกครั้ง")
-  
+
 }
 
 loadingNow = false
@@ -2212,17 +2212,17 @@ if(loadingNow) return
 
 if(!confirm("⚠ คุณต้องการล้างข้อมูลสถิติในระบบทั้งหมดใช่หรือไม่")) return
 if(!confirm("❗ ข้อมูลสถิติจะหายทั้งหมด ยืนยันอีกครั้ง")) return
-  
+
 let confirmText = prompt("พิมพ์ 'RESET' เพื่อยืนยัน")
 
 if(confirmText !== "RESET"){
-  
+
 alert("❌ ล้างข้อมูลไม่สำเร็จ")
-  
+
 return
-  
+
 }
-  
+
 loadingNow = true
 
 try{
@@ -2248,9 +2248,9 @@ loadingNow = false
 }
 
 async function changeTermYear(e){
-  
+
 const btn = e.target
-  
+
 btn.disabled = true
 btn.innerText = "กำลังบันทึก..."
 
@@ -2258,14 +2258,14 @@ const term = document.getElementById("termInput").value
 const year = document.getElementById("yearInput").value
 
 if(!term || !year){
-  
+
 showToast("warn","เลือกข้อมูลไม่ครบ","กรุณาเลือกให้ครบถ้วน")
-  
+
 btn.disabled = false
 btn.innerText = "บันทึกการตั้งค่า"
-  
+
 return
-  
+
 }
 
 try{
@@ -2277,9 +2277,9 @@ if(!res.ok) throw new Error()
 const data = await res.json()
 
 if(data.status !== "success"){
-  
+
 throw new Error()
-  
+
 }
 
 showToast(
@@ -2299,7 +2299,7 @@ showToast("error","เกิดข้อผิดพลาดในการบ�
 
 btn.disabled = false
 btn.innerText = "บันทึกการตั้งค่า"
-  
+
 }
 
 function generateYearOptions(){
@@ -2342,7 +2342,7 @@ console.error("⚠ โหลดรายชื่อไม่สำเร็จ"
 
 }
 }
-  
+
 async function saveSignature(e){
 
 const btn = e.target
@@ -2411,27 +2411,27 @@ behavior: "smooth"
 },100)
 
 }else{
-  
+
 form.style.display = "none"
-  
+
 }
 
 }
-  
+
 function printReport(e){
-  const btn = e.target
+const btn = e.target
 const date = document.getElementById("reportDate").value
 
 if(!date){
-  
+
 showToast(
 "warn",
 "ยังไม่ได้เลือกวันที่",
 "โปรดเลือกวันที่ต้องการทำรายงาน"
 )
-  
+
 return
-  
+
 }
 
 btn.disabled = true
@@ -2443,24 +2443,24 @@ window.open(
 )
 
 setTimeout(()=>{
-  
+
 btn.disabled = false
 btn.innerText = "📤 Export รายงาน"
-  
+
 },1500)
 
 }
-  
+
 generateYearOptions()
-  
+
 loadTerm()
-  
+
 window.addEventListener("DOMContentLoaded", () => {
 startAutoRefresh()
 checkSystemStatusOnce()
 loadSignature()
 })
-  
+
 document.getElementById("reportDate").valueAsDate = new Date()
 </script>
 </body>
