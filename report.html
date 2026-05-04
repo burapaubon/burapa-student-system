@@ -5,7 +5,7 @@
 <title>แบบรายงานสถิตินักเรียนประจำวัน</title>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet">
-  
+
 <style>
 body{
 font-family:'Sarabun',Tahoma,sans-serif;
@@ -28,93 +28,93 @@ font-family:'Sarabun',Tahoma,sans-serif;
 }
 
 h2{
-  text-align:center;
-  margin-bottom:4px;
+text-align:center;
+margin-bottom:4px;
 }
 
 .date{
-  text-align:center;
-  margin-bottom:15px;
-  font-size:15px;
-  color:#555;
+text-align:center;
+margin-bottom:15px;
+font-size:15px;
+color:#555;
 }
 
 h2, .date{
-  page-break-after: avoid;
+page-break-after: avoid;
 }
-  
+
 .section{
-  page-break-inside:auto;
-  margin-top:10px;
-  page-break-before: auto;
+page-break-inside:auto;
+margin-top:10px;
+page-break-before: auto;
 }
-  
+
 table{
-  width:99%;
-  border-collapse:collapse;
-  font-size:13.5px;
-  page-break-before:auto;
-  page-break-inside:auto;
-  table-layout: fixed;
+width:99%;
+border-collapse:collapse;
+font-size:13.5px;
+page-break-before:auto;
+page-break-inside:auto;
+table-layout: fixed;
 }
-  
+
 th, td{
-  border:1px solid #000;
-  padding:5px 3px;
-  text-align:center;
-  word-break: normal;
-  white-space: nowrap;
-  page-break-inside: auto;
+border:1px solid #000;
+padding:5px 3px;
+text-align:center;
+word-break: normal;
+white-space: nowrap;
+page-break-inside: auto;
 }
-  
+
 td:first-child{
-  white-space:normal;
+white-space:normal;
 }
-  
+
 th{
-  background:#e5e7eb;
-  font-weight:600;
+background:#e5e7eb;
+font-weight:600;
 }
 
 tr{
-  page-break-inside: avoid;
-  page-break-after:auto;
-  break-inside: avoid;
+page-break-inside: avoid;
+page-break-after:auto;
+break-inside: avoid;
 }
-  
+
 .summary, .footer{
 page-break-inside: avoid;
 }
-  
+
 thead{
-  display: table-header-group;
+display: table-header-group;
 }  
 
 thead th{
-  background:#e5e7eb !important;
-  -webkit-print-color-adjust: exact;
-  print-color-adjust: exact;
+background:#e5e7eb !important;
+-webkit-print-color-adjust: exact;
+print-color-adjust: exact;
 } 
 
 th:first-child, td:first-child{
-  width:27%;
+width:27%;
 }
 
 .total{
-  background:#fde68a;
-  font-weight:bold;
+background:#fde68a;
+font-weight:bold;
 }
 
 .primary{
-  background:#fde68a;
+background:#fde68a;
 }
 
 .secondary{
-  background:#86efac;
+background:#86efac;
 }
 
 .total-all{
-  background:#93c5fd;
+background:#93c5fd;
 }
 
 .primary, .secondary, .total-all{
@@ -134,7 +134,7 @@ font-family:'Sarabun',sans-serif;
 page-break-before: auto;
 break-inside: avoid;
 }
-  
+
 .summary br{
 margin-bottom:10px;
 }
@@ -146,7 +146,7 @@ print-color-adjust: exact;
 page-break-inside: avoid !important;
 break-inside: avoid;
 }
-  
+
 .footer{
 margin-top:50px;
 display:grid;
@@ -213,20 +213,20 @@ background:#d1d5db;
 .section-break{
 page-break-inside: avoid;
 }
-  
+
 @media print{
-  
+
 *{
 -webkit-print-color-adjust: exact !important;
 print-color-adjust: exact !important;
 }
-  
+
 body{
 background:white;
 -webkit-font-smoothing: antialiased;
 zoom: 100%;
 }
-  
+
 .report{
 box-shadow:none;
 margin:0 !important;
@@ -237,21 +237,21 @@ overflow:hidden;
 }
 
 table {
-    page-break-inside: auto;
-  }
+  page-break-inside: auto;
+}
 
-  thead {
-    display: table-header-group !important;
-  }
+thead {
+  display: table-header-group !important;
+}
 
-  tfoot {
-    display: table-footer-group;
-  }
+tfoot {
+  display: table-footer-group;
+}
 
-  tr {
-    page-break-inside: avoid;
-  }
-  
+tr {
+  page-break-inside: avoid;
+}
+
 .actions, button{
 display:none !important;
 }
@@ -259,9 +259,9 @@ display:none !important;
 @page{ 
 size:A4;
 margin:10mm;
-  
+
 }
-  
+
 }
 </style>
 </head>
@@ -281,7 +281,7 @@ z-index:9999;
 ">
 ⏳ กำลังสร้างแบบรายงาน...
 </div>
-  
+
 <div class="report" id="report">
 
 <h2>รายงานสถิตินักเรียนประจำวัน</h2>
@@ -293,29 +293,29 @@ z-index:9999;
 <tr>
 
 <colgroup>
-  <col style="width:27%">
+<col style="width:27%">
 
-  <col style="width:4.6%">
-  <col style="width:4.8%">
-  <col style="width:4.6%">
+<col style="width:4.6%">
+<col style="width:4.8%">
+<col style="width:4.6%">
 
-  <col style="width:4.6%">
-  <col style="width:4.8%">
-  <col style="width:4.6%">
+<col style="width:4.6%">
+<col style="width:4.8%">
+<col style="width:4.6%">
 
-  <col style="width:4.6%">
-  <col style="width:4.6%">
-  <col style="width:4.6%">
+<col style="width:4.6%">
+<col style="width:4.6%">
+<col style="width:4.6%">
 
-  <col style="width:4.6%">
-  <col style="width:4.8%">
-  <col style="width:4.6%">
+<col style="width:4.6%">
+<col style="width:4.8%">
+<col style="width:4.6%">
 
-  <col style="width:4.6%">
-  <col style="width:4.8%">
-  <col style="width:4.6%">
+<col style="width:4.6%">
+<col style="width:4.8%">
+<col style="width:4.6%">
 </colgroup>
-  
+
 <th rowspan="2">ชั้น</th>
 <th colspan="3">นักเรียนทั้งหมด</th>
 <th colspan="3">มาเรียนวันนี้</th>
@@ -341,11 +341,11 @@ z-index:9999;
 <th>รวม</th>
 </tr>
 </thead>
-  
+
 <tbody id="dataBody"></tbody>
 </table>
 </div>
-  
+
 <div class="summary" id="summary"></div>
 
 <div class="footer">
@@ -385,21 +385,21 @@ z-index:9999;
 <script>
 
 let isLoaded = false
-  
+
 const API="https://script.google.com/macros/s/AKfycbyV4PNjlFskTfF0Ol6xrZdWpSCJm54bi33l0M66QpluNo8X6B7Js8LZRtuY7T05KsShoQ/exec"
 
 const params = new URLSearchParams(location.search)
 const date = params.get("date") || new Date().toISOString().split("T")[0]
-  
+
 function formatThaiDate(dateStr){
-  const d = new Date(dateStr)
+const d = new Date(dateStr)
 
-  const day = d.toLocaleDateString('th-TH',{ weekday:'long' }).replace("วัน","")
-  const dNum = d.getDate()
-  const month = d.toLocaleDateString('th-TH',{ month:'long' })
-  const year = d.getFullYear() + 543
+const day = d.toLocaleDateString('th-TH',{ weekday:'long' }).replace("วัน","")
+const dNum = d.getDate()
+const month = d.toLocaleDateString('th-TH',{ month:'long' })
+const year = d.getFullYear() + 543
 
-  return `
+return `
 วัน&nbsp;&nbsp;&nbsp;&nbsp;${day}
 &nbsp;&nbsp;&nbsp;&nbsp;ที่&nbsp;&nbsp;&nbsp;&nbsp;${dNum}
 &nbsp;&nbsp;&nbsp;&nbsp;เดือน&nbsp;&nbsp;&nbsp;&nbsp;${month}
@@ -408,31 +408,31 @@ function formatThaiDate(dateStr){
 }
 
 function formatTitleDate(dateStr){
-  const d = new Date(dateStr)
-  const day = d.getDate()
-  const month = d.toLocaleDateString('th-TH',{ month:'short' })
-  const year = d.getFullYear() + 543
-  return `${day} ${month} ${year}`
+const d = new Date(dateStr)
+const day = d.getDate()
+const month = d.toLocaleDateString('th-TH',{ month:'short' })
+const year = d.getFullYear() + 543
+return `${day} ${month} ${year}`
 }
 
 document.title = `รายงานสถิตินักเรียน (${formatTitleDate(date)})`
-  
+
 document.getElementById("loading").innerText = "⏳ กำลังโหลดข้อมูล..."
 
 function show(v){
-  return (v === 0 || v === "0") ? "" : v
+return (v === 0 || v === "0") ? "" : v
 }
-  
+
 async function fetchWithFallback(dateStr){
 
 let d = new Date(dateStr)
 
 for(let i=0;i<30;i++){
-    
+  
 const tryDate = d.toISOString().split("T")[0]
 
 try{
-  
+
 const res = await fetch(API + "?mode=report&date=" + tryDate)
 const data = await res.json()
 
@@ -445,11 +445,11 @@ return { data, fallbackDate: tryDate }
 }catch(e){}
 
 d.setDate(d.getDate()-1)
-  
+
 }
 
 return { data:[], fallbackDate:null }
-  
+
 }
 
 async function getPreviousData(room, date){
@@ -458,19 +458,19 @@ let d = new Date(date)
 
 for(let i=0;i<30;i++){
 
-  d.setDate(d.getDate() - 1)
-  const prevDate = d.toISOString().split("T")[0]
+d.setDate(d.getDate() - 1)
+const prevDate = d.toISOString().split("T")[0]
 
-  try{
+try{
 
-    const res = await fetch(API + `?mode=getbydate&room=${room}&date=${prevDate}`)
-    const data = await res.json()
+  const res = await fetch(API + `?mode=getbydate&room=${room}&date=${prevDate}`)
+  const data = await res.json()
 
-    if(data && (data.all_boys != null || data.all_girls != null)){
-      return data
-    }
+  if(data && (data.all_boys != null || data.all_girls != null)){
+    return data
+  }
 
-  }catch(e){}
+}catch(e){}
 
 }
 
@@ -484,36 +484,36 @@ async function getPreviousDataFast(cache, room, date){
 if(cache[room]) return cache[room]
 
 try{
-  const res = await fetch(API + `?mode=getprevious&room=${room}&date=${date}`)
-  const data = await res.json()
+const res = await fetch(API + `?mode=getprevious&room=${room}&date=${date}`)
+const data = await res.json()
 
-  cache[room] = data || {}
-  return cache[room]
+cache[room] = data || {}
+return cache[room]
 
 }catch(e){
-  cache[room] = {}
-  return {}
+cache[room] = {}
+return {}
 }
 }
-  
+
 async function loadReport(){
 
 document.getElementById("dateText").innerHTML = formatThaiDate(date)
-  
+
 let data = []
 let isFallback = false
 
 let useDate = date
 
 try{
-  const result = await fetchWithFallback(date)
-  data = result.data
-  isFallback = result.fallbackDate !== date
+const result = await fetchWithFallback(date)
+data = result.data
+isFallback = result.fallbackDate !== date
 
-  useDate = result.fallbackDate || date
+useDate = result.fallbackDate || date
 
 if(data.length === 0){
-  
+
 document.getElementById("dataBody").innerHTML = `
 
 <tr><td colspan="16">⚠ ไม่พบข้อมูล</td></tr>
@@ -522,23 +522,23 @@ document.getElementById("dataBody").innerHTML = `
 document.getElementById("dateText").innerHTML = formatThaiDate(date)
 
 document.getElementById("loading").style.display = "none"
-  
+
 return
-  
+
 }
 
 }catch(e){
-  
+
 alert("❌ โหลดข้อมูลไม่สำเร็จ กรุณาลองใหม่อีกครั้ง")
-  
+
 document.getElementById("loading").style.display = "none"
-  
+
 return
-  
+
 }
 
 let html=""
-  
+
 document.getElementById("loading").innerText = "⏳ กำลังสร้างรายงาน..."
 document.getElementById("dataBody").innerHTML = `<tr><td colspan="16">⏳ กำลังสร้าง Report...</td></tr>`;
 
@@ -566,47 +566,47 @@ let totalOutTotal = 0
 
 for (const r of data) {
 
-  const prevData = await getPreviousDataFast(roomCache, r.room, useDate)
+const prevData = await getPreviousDataFast(roomCache, r.room, useDate)
 
-  const prevMale = Number(prevData.all_boys) || 0
-  const prevFemale = Number(prevData.all_girls) || 0
+const prevMale = Number(prevData.all_boys) || 0
+const prevFemale = Number(prevData.all_girls) || 0
 
-  let currMale = (r.male !== undefined && r.male !== "")
-    ? Number(r.male)
-    : prevMale
+let currMale = (r.male !== undefined && r.male !== "")
+  ? Number(r.male)
+  : prevMale
 
-  let currFemale = (r.female !== undefined && r.female !== "")
-    ? Number(r.female)
-    : prevFemale
+let currFemale = (r.female !== undefined && r.female !== "")
+  ? Number(r.female)
+  : prevFemale
 
 const hasPresentData = r.present_m !== undefined && r.present_f !== undefined
 
 const total = currMale + currFemale
-  
-  let inMale = 0
-  let inFemale = 0
-  let outMale = 0
-  let outFemale = 0
-  let inTotal = 0
-  let outTotal = 0
+
+let inMale = 0
+let inFemale = 0
+let outMale = 0
+let outFemale = 0
+let inTotal = 0
+let outTotal = 0
 
 if (prevMale !== 0 || prevFemale !== 0) {
 
-  if (currMale > prevMale) {
-    inMale = currMale - prevMale
-    inTotal += inMale
-  } else if (currMale < prevMale) {
-    outMale = prevMale - currMale
-    outTotal += outMale
-  }
+if (currMale > prevMale) {
+  inMale = currMale - prevMale
+  inTotal += inMale
+} else if (currMale < prevMale) {
+  outMale = prevMale - currMale
+  outTotal += outMale
+}
 
-  if (currFemale > prevFemale) {
-    inFemale = currFemale - prevFemale
-    inTotal += inFemale
-  } else if (currFemale < prevFemale) {
-    outFemale = prevFemale - currFemale
-    outTotal += outFemale
-  }
+if (currFemale > prevFemale) {
+  inFemale = currFemale - prevFemale
+  inTotal += inFemale
+} else if (currFemale < prevFemale) {
+  outFemale = prevFemale - currFemale
+  outTotal += outFemale
+}
 
 totalInMale += inMale
 totalInFemale += inFemale
@@ -615,32 +615,32 @@ totalInTotal += inTotal
 totalOutMale += outMale
 totalOutFemale += outFemale
 totalOutTotal += outTotal
-    
+  
 }
 
-  const level = getLevel(r.room)
+const level = getLevel(r.room)
 
-  if(!levels[level]){
-    levels[level] = {
-      rows:[],
-      total:0,
-      male:0,
-      female:0,
-      present:0,
-      presentMale:0,
-      presentFemale:0,
-      sick:0,
-      leave:0,
-      absent:0,
-      inMale:0,
-      inFemale:0, 
-      inTotal:0,
-      
-      outMale:0, 
-      outFemale:0, 
-      outTotal:0,
-    }
+if(!levels[level]){
+  levels[level] = {
+    rows:[],
+    total:0,
+    male:0,
+    female:0,
+    present:0,
+    presentMale:0,
+    presentFemale:0,
+    sick:0,
+    leave:0,
+    absent:0,
+    inMale:0,
+    inFemale:0, 
+    inTotal:0,
+    
+    outMale:0, 
+    outFemale:0, 
+    outTotal:0,
   }
+}
 
 const hasTodayInput = r.present_m !== undefined && r.present_f !== undefined
 
@@ -648,63 +648,63 @@ const presentMale = hasTodayInput ? Number(r.present_m) || 0 : ""
 const presentFemale = hasTodayInput ? Number(r.present_f) || 0 : ""
 const present = hasTodayInput ? (presentMale + presentFemale) : 0
 
-  const sick = Number(r.sick) || 0
-  const leave = Number(r.leave) || 0
-  const absent = Number(r.absent) || 0
+const sick = Number(r.sick) || 0
+const leave = Number(r.leave) || 0
+const absent = Number(r.absent) || 0
 
-  totalSick += sick
-  totalLeave += leave
-  totalAbsent += absent
-  
+totalSick += sick
+totalLeave += leave
+totalAbsent += absent
+
 totalAll += total
 totalMale += currMale
 totalFemale += currFemale
 
-  totalPresent += present
-  totalPresentMale += presentMale
-  totalPresentFemale += presentFemale
-  
-  levels[level].rows.push({
-    room:r.room,
-    total,
+totalPresent += present
+totalPresentMale += presentMale
+totalPresentFemale += presentFemale
+
+levels[level].rows.push({
+  room:r.room,
+  total,
 male: currMale,
 female: currFemale,
-    present,presentMale,presentFemale,
-    hasTodayInput,
-    sick,leave,absent,
-    inMale, inFemale, inTotal,
-    outMale, outFemale, outTotal
-  })
+  present,presentMale,presentFemale,
+  hasTodayInput,
+  sick,leave,absent,
+  inMale, inFemale, inTotal,
+  outMale, outFemale, outTotal
+})
 
 levels[level].male += currMale
 levels[level].female += currFemale
 levels[level].total += total
-  levels[level].present += present
-  levels[level].presentMale += presentMale
-  levels[level].presentFemale += presentFemale
-  levels[level].sick += sick
-  levels[level].leave += leave
-  levels[level].absent += absent
+levels[level].present += present
+levels[level].presentMale += presentMale
+levels[level].presentFemale += presentFemale
+levels[level].sick += sick
+levels[level].leave += leave
+levels[level].absent += absent
 
-  levels[level].inMale += inMale
-  levels[level].inFemale += inFemale
-  levels[level].inTotal += inTotal
+levels[level].inMale += inMale
+levels[level].inFemale += inFemale
+levels[level].inTotal += inTotal
 
-  levels[level].outMale += outMale
-  levels[level].outFemale += outFemale
-  levels[level].outTotal += outTotal
+levels[level].outMale += outMale
+levels[level].outFemale += outFemale
+levels[level].outTotal += outTotal
 }
 
 let groupSum = {
-  "ป.": {male:0,female:0,total:0,presentMale:0,presentFemale:0,present:0, sick:0, leave:0, absent:0,
-  inMale:0,inFemale:0,inTotal:0,
-  outMale:0,outFemale:0,outTotal:0},
-  "ม.": {male:0,female:0,total:0,presentMale:0,presentFemale:0,present:0, sick:0, leave:0, absent:0,
-  inMale:0,inFemale:0,inTotal:0,
-  outMale:0,outFemale:0,outTotal:0},
-  "ปวช": {male:0,female:0,total:0,presentMale:0,presentFemale:0,present:0, sick:0, leave:0, absent:0,
-  inMale:0,inFemale:0,inTotal:0,
-  outMale:0,outFemale:0,outTotal:0}
+"ป.": {male:0,female:0,total:0,presentMale:0,presentFemale:0,present:0, sick:0, leave:0, absent:0,
+inMale:0,inFemale:0,inTotal:0,
+outMale:0,outFemale:0,outTotal:0},
+"ม.": {male:0,female:0,total:0,presentMale:0,presentFemale:0,present:0, sick:0, leave:0, absent:0,
+inMale:0,inFemale:0,inTotal:0,
+outMale:0,outFemale:0,outTotal:0},
+"ปวช": {male:0,female:0,total:0,presentMale:0,presentFemale:0,present:0, sick:0, leave:0, absent:0,
+inMale:0,inFemale:0,inTotal:0,
+outMale:0,outFemale:0,outTotal:0}
 }
 
 const order = ["ป.1","ป.2","ป.3","ป.4","ป.5","ป.6","ม.1","ม.2","ม.3","ม.4","ม.5","ม.6","ปวช.1","ปวช.2","ปวช.3"]
@@ -738,9 +738,9 @@ groupSum[groupKey].outMale += levels[lv].outMale
 groupSum[groupKey].outFemale += levels[lv].outFemale
 groupSum[groupKey].outTotal += levels[lv].outTotal
 }
-  
+
 if(!levels[lv]) return
-  
+
 levels[lv].rows.sort((a,b)=>{
 
 const numA = a.room.match(/\d+/g) || [0,0]
@@ -749,17 +749,17 @@ const numB = b.room.match(/\d+/g) || [0,0]
 if(!numA || !numB) return 0
 
 if(numA[0] != numB[0]){
-  
+
 return Number(numA[0]) - Number(numB[0])
-  
+
 }
 
 return (Number(numA[1]||0)) - (Number(numB[1]||0))
-  
+
 })
-  
+
 levels[lv].rows.forEach(r=>{
-  
+
 html += `
 <tr>
 <td>${r.room}</td>
@@ -785,17 +785,17 @@ html += `
 <td>${r.outTotal || 0}</td>
 </tr>
 `
-  
+
 })
 
 let colorClass = ""
 
 if(lv.startsWith("ป.")){
-  colorClass = "primary"
+colorClass = "primary"
 }else if(lv.startsWith("ม.") || lv.startsWith("ปวช")){
-  colorClass = "secondary"
+colorClass = "secondary"
 }
-  
+
 html += `
 <tr class="sum-row ${colorClass}">
 <td>รวม ${lv}</td>
@@ -821,7 +821,7 @@ html += `
 <td>${levels[lv].outTotal || 0}</td>
 </tr>
 `
-  
+
 if(lv === "ป.6"){
 html += `
 <tr class="sum-row primary section-break">
@@ -848,7 +848,7 @@ html += `
 <td>${groupSum["ป."].outTotal || 0}</td>
 </tr>
 `
-  
+
 }
 
 if(lv === "ม.6"){
@@ -877,7 +877,7 @@ html += `
 <td>${groupSum["ม."].outTotal}</td>
 </tr>
 `
-  
+
 }
 
 if(lv === "ปวช.3"){
@@ -906,11 +906,11 @@ html += `
 <td>${groupSum["ปวช"].outTotal}</td>
 </tr>
 `
-  
+
 }
-  
+
 })
-  
+
 html += `
 <tr class="sum-row total-all">
 <td>รวมทั้งหมด</td>
@@ -961,7 +961,7 @@ document.getElementById("summary").innerHTML = `
 document.getElementById("loading").style.display = "none"
 
 isLoaded = true
-  
+
 }
 
 function getLevel(room){
@@ -995,7 +995,7 @@ if(match) return "ปวช." + match[0]
 }
 
 return "อื่นๆ"
-  
+
 }
 
 async function loadSignatureToReport(){
@@ -1006,9 +1006,9 @@ const res = await fetch(API + "?mode=getsigconfig")
 let data = {}
 
 try{
-  data = await res.json()
+data = await res.json()
 }catch(e){
-  data = {}
+data = {}
 }
 
 const day = new Date(date).getDay()
@@ -1027,13 +1027,13 @@ document.getElementById("deputyName").innerText = `(${data.deputy || "-"})`
 document.getElementById("directorName").innerText = `(${data.director || "-"})`
 
 }catch(e){
-  
+
 console.log("โหลดลายเซ็นไม่สำเร็จ")
-  
+
 }
 
 }
-  
+
 loadReport()
 loadSignatureToReport()
 </script>
