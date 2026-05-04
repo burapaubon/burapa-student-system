@@ -677,6 +677,20 @@ transition: all .3s ease;
   
 @media (max-width:768px){
 
+header{
+animation: gradientMove 20s linear infinite;
+backdrop-filter:none;
+}
+
+header::before{
+animation: none;
+opacity: .15;
+}
+
+header::after{
+display:none;
+}
+  
 .stats{
 grid-template-columns:1fr 1fr;
 }
@@ -691,11 +705,19 @@ grid-template-columns:1fr;
 
 .card{
 height:auto;
+box-shadow:0 6px 12px rgba(0,0,0,.06);
 }
 
 .card-header{
 flex-direction:column;
 align-items:flex-start;
+}
+
+.card:hover,
+.num:hover,
+button:hover{
+transform:none;
+box-shadow:0 4px 10px rgba(0,0,0,.05);
 }
   
 .updateText{
@@ -1380,11 +1402,13 @@ borderColor: "#fff"
 },
 plugins:[ChartDataLabels],
 options:{
+responsive:true,
+maintainAspectRatio:false
 animation:{
 animateRotate:true,
 animateScale:true,
-duration:900,
-easing:"easeOutQuart"
+duration:400,
+easing: "linear"
 },
 plugins:{
 legend:{
@@ -1671,6 +1695,15 @@ document.getElementById("classList").innerHTML=html
   
 let refreshTimer
 
+async function fetchRetry(url, options, retries = 2){
+  try{
+    return await fetchWithTimeout(url, options)
+  }catch(e){
+    if(retries > 0) return fetchRetry(url, options, retries - 1)
+    throw e
+  }
+}
+  
 async function editRoom(oldRoom){
 
 oldRoom = decodeURIComponent(oldRoom)
