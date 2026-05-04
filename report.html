@@ -237,19 +237,19 @@ overflow:hidden;
 }
 
 table {
-  page-break-inside: auto;
+page-break-inside: auto;
 }
 
 thead {
-  display: table-header-group !important;
+display: table-header-group !important;
 }
 
 tfoot {
-  display: table-footer-group;
+display: table-footer-group;
 }
 
 tr {
-  page-break-inside: avoid;
+page-break-inside: avoid;
 }
 
 .actions, button{
@@ -313,7 +313,7 @@ z-index:9999;
 <col style="width:4.8%">
 <col style="width:4.6%">
 </colgroup>
-  
+
 <thead>
 <tr>
 
@@ -429,7 +429,7 @@ async function fetchWithFallback(dateStr){
 let d = new Date(dateStr)
 
 for(let i=0;i<30;i++){
-  
+
 const tryDate = d.toISOString().split("T")[0]
 
 try{
@@ -464,12 +464,12 @@ const prevDate = d.toISOString().split("T")[0]
 
 try{
 
-  const res = await fetch(API + `?mode=getbydate&room=${room}&date=${prevDate}`)
-  const data = await res.json()
+const res = await fetch(API + `?mode=getbydate&room=${room}&date=${prevDate}`)
+const data = await res.json()
 
-  if(data && (data.all_boys != null || data.all_girls != null)){
-    return data
-  }
+if(data && (data.all_boys != null || data.all_girls != null)){
+  return data
+}
 
 }catch(e){}
 
@@ -568,10 +568,10 @@ let totalOutTotal = 0
 const prevResults = await Promise.all(
 data.map(r => getPreviousDataFast(roomCache, r.room, useDate))
 )
-  
+
 for (let i = 0; i < data.length; i++) {
-  const r = data[i]
-  const prevData = prevResults[i]
+const r = data[i]
+const prevData = prevResults[i]
 
 const prevMale = Number(prevData.all_boys) || 0
 const prevFemale = Number(prevData.all_girls) || 0
@@ -593,19 +593,19 @@ let outTotal = 0
 if (prevMale !== 0 || prevFemale !== 0) {
 
 if (currMale > prevMale) {
-  inMale = currMale - prevMale
-  inTotal += inMale
+inMale = currMale - prevMale
+inTotal += inMale
 } else if (currMale < prevMale) {
-  outMale = prevMale - currMale
-  outTotal += outMale
+outMale = prevMale - currMale
+outTotal += outMale
 }
 
 if (currFemale > prevFemale) {
-  inFemale = currFemale - prevFemale
-  inTotal += inFemale
+inFemale = currFemale - prevFemale
+inTotal += inFemale
 } else if (currFemale < prevFemale) {
-  outFemale = prevFemale - currFemale
-  outTotal += outFemale
+outFemale = prevFemale - currFemale
+outTotal += outFemale
 }
 
 totalInMale += inMale
@@ -615,31 +615,31 @@ totalInTotal += inTotal
 totalOutMale += outMale
 totalOutFemale += outFemale
 totalOutTotal += outTotal
-  
+
 }
 
 const level = getLevel(r.room)
 
 if(!levels[level]){
-  levels[level] = {
-    rows:[],
-    total:0,
-    male:0,
-    female:0,
-    present:0,
-    presentMale:0,
-    presentFemale:0,
-    sick:0,
-    leave:0,
-    absent:0,
-    inMale:0,
-    inFemale:0, 
-    inTotal:0,
-    
-    outMale:0, 
-    outFemale:0, 
-    outTotal:0,
-  }
+levels[level] = {
+  rows:[],
+  total:0,
+  male:0,
+  female:0,
+  present:0,
+  presentMale:0,
+  presentFemale:0,
+  sick:0,
+  leave:0,
+  absent:0,
+  inMale:0,
+  inFemale:0, 
+  inTotal:0,
+  
+  outMale:0, 
+  outFemale:0, 
+  outTotal:0,
+}
 }
 
 const hasTodayInput = r.present_m !== undefined && r.present_f !== undefined
@@ -668,15 +668,15 @@ totalPresentMale += presentMaleVal
 totalPresentFemale += presentFemaleVal
 
 levels[level].rows.push({
-  room:r.room,
-  total,
+room:r.room,
+total,
 male: currMale,
 female: currFemale,
-  present,presentMale,presentFemale,
-  hasTodayInput,
-  sick,leave,absent,
-  inMale, inFemale, inTotal,
-  outMale, outFemale, outTotal
+present,presentMale,presentFemale,
+hasTodayInput,
+sick,leave,absent,
+inMale, inFemale, inTotal,
+outMale, outFemale, outTotal
 })
 
 levels[level].male += currMale
