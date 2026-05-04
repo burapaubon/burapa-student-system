@@ -22,7 +22,7 @@ html,body{
 max-width:100%;
 overflow-x:hidden;
 }
-  
+
 body{
 min-height:100vh;
 display:flex;
@@ -80,7 +80,7 @@ rgba(255,255,255,.35) 50%,
 rgba(255,255,255,.25) 60%,
 rgba(255,255,255,0) 100%
 );
-  
+
 filter:blur(28px);
 animation:shine 6s linear infinite;
 pointer-events:none;
@@ -101,7 +101,7 @@ pointer-events:none;
 0%{transform:translateX(-100%)}
 100%{transform:translateX(100%)}
 }
-  
+
 .logo{
 width:clamp(80px,16vw,110px);
 margin-bottom:4px;
@@ -116,7 +116,7 @@ drop-shadow(0 0 25px rgba(255,255,255,.35));
 50%{transform:translateY(-6px)}
 100%{transform:translateY(0)}
 }
-  
+
 .system-name{font-size:13px;}
 .school-name{font-size:26px;font-weight:700;}
 
@@ -251,24 +251,24 @@ animation:spin 1s linear infinite;
 @keyframes spin{
 to{transform:rotate(360deg)}
 }
-  
+
 </style>
 </head>
 
 <body>
-  
+
 <script src="ui-effects.js"></script>
-  
+
 <div id="loading">
 <div class="loader"></div>
 <div style="margin-top:12px;font-size:14px;color:#555">
 กำลังเปิดหน้า Login...
 </div>
 </div>
-  
+
 <header>
 
-  
+
 <a class="back" href="index.html">← กลับหน้าแรก</a>
 
 <img src="burapa-logo.png" class="logo">
@@ -298,17 +298,17 @@ to{transform:rotate(360deg)}
 <input id="pass" class="input" type="password" placeholder="Password" required>
 
 <i class="bi bi-eye-slash"
-   id="togglePass"
-   onclick="togglePassword()"
-   style="
-   position:absolute;
-   right:12px;
-   top:50%;
-   transform:translateY(-50%);
-   cursor:pointer;
-   font-size:18px;
-   color:#888;
-   ">
+id="togglePass"
+onclick="togglePassword()"
+style="
+position:absolute;
+right:12px;
+top:50%;
+transform:translateY(-50%);
+cursor:pointer;
+font-size:18px;
+color:#888;
+">
 </i>
 </div>
 
@@ -330,9 +330,9 @@ to{transform:rotate(360deg)}
 </footer>
 
 <script>
-  
+
 const API_URL = "https://script.google.com/macros/s/AKfycbyV4PNjlFskTfF0Ol6xrZdWpSCJm54bi33l0M66QpluNo8X6B7Js8LZRtuY7T05KsShoQ/exec"
-  
+
 fetch(API_URL + "?ping=1").catch(()=>{})
 
 async function loginAdmin(){
@@ -340,7 +340,7 @@ async function loginAdmin(){
 const btn = document.getElementById("loginBtn")
 if(btn.disabled) return
 const btnText = document.getElementById("btnText")
-  
+
 const u=document.getElementById("user").value.trim()
 const p=document.getElementById("pass").value.trim()
 
@@ -355,7 +355,7 @@ btn.disabled = true
 btnText.innerHTML = "กำลังเข้าสู่ระบบ..."
 
 await new Promise(r=>setTimeout(r,300))
-  
+
 try{
 
 const formData = new FormData()
@@ -376,13 +376,13 @@ signal: controller.signal
 if(!res.ok){
 throw new Error("server error")
 }
-  
+
 const data = await res.json()
 
 if(data.status==="success"){
 
 loginAttempts = 0
-  
+
 sessionStorage.setItem("adminToken",data.token)
 sessionStorage.setItem("loginTime",Date.now())
 
@@ -391,9 +391,9 @@ location.replace("admin-dashboard.html")
 }else{
 
 alert("Username หรือ Password ไม่ถูกต้อง")
-  
+
 document.getElementById("pass").value=""
-  
+
 btn.disabled=false
 btnText.innerHTML="เข้าสู่ระบบ"
 
@@ -421,7 +421,7 @@ if(e.key==="Enter" && !document.getElementById("loginBtn").disabled){
 loginAdmin()
 }
 })
-  
+
 async function loadTerm(){
 
 let el = document.getElementById("termDisplay")
@@ -494,7 +494,7 @@ window.onload=function(){
 loadTerm()
 
 const token = sessionStorage.getItem("adminToken")
-  
+
 const loginTime = sessionStorage.getItem("loginTime")
 
 if(loginTime){
@@ -523,7 +523,7 @@ location.href = "admin-login.html"
 }
 }
 },60000)
-  
+
 setTimeout(()=>{
 let loading=document.getElementById("loading")
 loading.style.opacity="0"
@@ -552,7 +552,7 @@ icon.classList.add("bi-eye-slash")
 }
 
 }
-  
+
 </script>
 </body>
 </html>
