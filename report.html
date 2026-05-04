@@ -644,9 +644,12 @@ if(!levels[level]){
 
 const hasTodayInput = r.present_m !== undefined && r.present_f !== undefined
 
-const presentMale = hasTodayInput ? Number(r.present_m) || 0 : ""
-const presentFemale = hasTodayInput ? Number(r.present_f) || 0 : ""
-const present = hasTodayInput ? (presentMale + presentFemale) : 0
+const presentMaleVal = hasTodayInput ? Number(r.present_m) || 0 : 0
+const presentFemaleVal = hasTodayInput ? Number(r.present_f) || 0 : 0
+
+const presentMale = hasTodayInput ? (presentMaleVal || "") : ""
+const presentFemale = hasTodayInput ? (presentFemaleVal || "") : ""
+const present = hasTodayInput ? (presentMaleVal + presentFemaleVal) : 0
 
 const sick = Number(r.sick) || 0
 const leave = Number(r.leave) || 0
@@ -661,8 +664,8 @@ totalMale += currMale
 totalFemale += currFemale
 
 totalPresent += present
-totalPresentMale += presentMale
-totalPresentFemale += presentFemale
+totalPresentMale += presentMaleVal
+totalPresentFemale += presentFemaleVal
 
 levels[level].rows.push({
   room:r.room,
