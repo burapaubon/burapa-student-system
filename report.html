@@ -390,10 +390,25 @@ let isLoaded = false
 const API="https://script.google.com/macros/s/AKfycbyV4PNjlFskTfF0Ol6xrZdWpSCJm54bi33l0M66QpluNo8X6B7Js8LZRtuY7T05KsShoQ/exec"
 
 const params = new URLSearchParams(location.search)
-const date = params.get("date") || new Date().toISOString().split("T")[0]
+function getLocalDate(){
+const d = new Date()
+const year = d.getFullYear()
+const month = String(d.getMonth()+1).padStart(2,'0')
+const day = String(d.getDate()).padStart(2,'0')
+return `${year}-${month}-${day}`
+}
 
+const date = params.get("date") || getLocalDate()
+
+function toLocalDate(d){
+const year = d.getFullYear()
+const month = String(d.getMonth()+1).padStart(2,'0')
+const day = String(d.getDate()).padStart(2,'0')
+return `${year}-${month}-${day}`
+}
+  
 function formatThaiDate(dateStr){
-const d = new Date(dateStr)
+const d = new Date(dateStr + "T00:00:00")
 
 const day = d.toLocaleDateString('th-TH',{ weekday:'long' }).replace("วัน","")
 const dNum = d.getDate()
@@ -409,7 +424,7 @@ return `
 }
 
 function formatTitleDate(dateStr){
-const d = new Date(dateStr)
+const d = new Date(dateStr + "T00:00:00")
 const day = d.getDate()
 const month = d.toLocaleDateString('th-TH',{ month:'short' })
 const year = d.getFullYear() + 543
@@ -426,11 +441,11 @@ return (v === 0 || v === "0") ? "" : v
 
 async function fetchWithFallback(dateStr){
 
-let d = new Date(dateStr)
+let d = new Date(dateStr + "T00:00:00")
 
 for(let i=0;i<30;i++){
 
-const tryDate = d.toISOString().split("T")[0]
+const tryDate = toLocalDate(d)
 
 try{
 
@@ -460,7 +475,7 @@ let d = new Date(date)
 for(let i=0;i<30;i++){
 
 d.setDate(d.getDate() - 1)
-const prevDate = d.toISOString().split("T")[0]
+const prevDate = toLocalDate(d)
 
 try{
 
@@ -742,7 +757,7 @@ groupSum[groupKey].outFemale += levels[lv].outFemale
 groupSum[groupKey].outTotal += levels[lv].outTotal
 }
 
-if(!levels[lv]) return
+if(!levels[lv]) return;
 
 levels[lv].rows.sort((a,b)=>{
 
@@ -883,7 +898,7 @@ html += `
 
 }
 
-if(lv === "ปวช.3"){
+if(lv === "ปวช.3" || lv === "ปวช.2" || lv === "ปวช.1"){
 html += `
 <tr class="sum-row secondary section-break">
 <td>รวม ปวช ทั้งหมด</td>
