@@ -564,20 +564,19 @@ let totalOutMale = 0
 let totalOutFemale = 0
 let totalOutTotal = 0
 
-for (const r of data) {
-
-const prevData = await getPreviousDataFast(roomCache, r.room, useDate)
+const prevResults = await Promise.all(
+data.map(r => getPreviousDataFast(roomCache, r.room, useDate))
+)
+  
+for (let i = 0; i < data.length; i++) {
+  const r = data[i]
+  const prevData = prevResults[i]
 
 const prevMale = Number(prevData.all_boys) || 0
 const prevFemale = Number(prevData.all_girls) || 0
 
-let currMale = (r.male !== undefined && r.male !== "")
-  ? Number(r.male)
-  : prevMale
-
-let currFemale = (r.female !== undefined && r.female !== "")
-  ? Number(r.female)
-  : prevFemale
+let currMale = Number(r.male) || prevMale
+let currFemale = Number(r.female) || prevFemale
 
 const hasPresentData = r.present_m !== undefined && r.present_f !== undefined
 
