@@ -564,20 +564,22 @@ let totalOutMale = 0
 let totalOutFemale = 0
 let totalOutTotal = 0
 
-data.forEach((r, i) => {
+for (const r of data) {
+
+  const prevData = await getPreviousDataFast(roomCache, r.room, useDate)
+
+  const prevMale = Number(prevData.all_boys) || 0
+  const prevFemale = Number(prevData.all_girls) || 0
+
+  let currMale = (r.male !== undefined && r.male !== "")
+    ? Number(r.male)
+    : prevMale
+
+  let currFemale = (r.female !== undefined && r.female !== "")
+    ? Number(r.female)
+    : prevFemale
 
 const hasPresentData = r.present_m !== undefined && r.present_f !== undefined
-  
-const prevMale = Number(r.prev_male) || 0
-const prevFemale = Number(r.prev_female) || 0
-
-let currMale = (r.male !== undefined && r.male !== "")
-  ? Number(r.male)
-  : prevMale
-
-let currFemale = (r.female !== undefined && r.female !== "")
-  ? Number(r.female)
-  : prevFemale
 
 const total = currMale + currFemale
   
@@ -640,11 +642,11 @@ totalOutTotal += outTotal
     }
   }
 
-const presentMale = Number(r.present_m) || 0
-const presentFemale = Number(r.present_f) || 0
-const present = presentMale + presentFemale
+const hasTodayInput = r.present_m !== undefined && r.present_f !== undefined
 
-const hasTodayInput = present > 0
+const presentMale = hasTodayInput ? Number(r.present_m) || 0 : ""
+const presentFemale = hasTodayInput ? Number(r.present_f) || 0 : ""
+const present = hasTodayInput ? (presentMale + presentFemale) : 0
 
   const sick = Number(r.sick) || 0
   const leave = Number(r.leave) || 0
@@ -766,8 +768,8 @@ html += `
 <td>${r.female}</td>
 <td>${r.total}</td>
 
-<td>${r.presentMale}</td>
-<td>${r.presentFemale}</td>
+<td>${r.hasTodayInput ? r.presentMale : ""}</td>
+<td>${r.hasTodayInput ? r.presentFemale : ""}</td>
 <td>${r.present}</td>
 
 <td>${show(r.sick)}</td>
