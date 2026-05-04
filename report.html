@@ -421,7 +421,7 @@ document.title = `รายงานสถิตินักเรียน (${f
 document.getElementById("loading").innerText = "⏳ กำลังโหลดข้อมูล..."
 
 function show(v){
-return (v === 0 || v === "0") ? "" : v
+return (v === 0 || v === "0" || v == null) ? 0 : v
 }
 
 async function fetchWithFallback(dateStr){
@@ -430,7 +430,8 @@ let d = new Date(dateStr)
 
 for(let i=0;i<30;i++){
   
-const tryDate = d.toISOString().split("T")[0]
+const tryDate = const tryDate = new Date(d).toISOString().split("T")[0]
+  .toISOString().split("T")[0]
 
 try{
 
@@ -576,8 +577,8 @@ for (let i = 0; i < data.length; i++) {
 const prevMale = Number(prevData.all_boys) || 0
 const prevFemale = Number(prevData.all_girls) || 0
 
-let currMale = Number(r.male) || prevMale
-let currFemale = Number(r.female) || prevFemale
+let currMale = (r.male !== undefined && r.male !== null) ? Number(r.male) : prevMale
+let currFemale = (r.female !== undefined && r.female !== null) ? Number(r.female) : prevFemale
 
 const hasPresentData = r.present_m !== undefined && r.present_f !== undefined
 
@@ -683,8 +684,8 @@ levels[level].male += currMale
 levels[level].female += currFemale
 levels[level].total += total
 levels[level].present += present
-levels[level].presentMale += presentMale
-levels[level].presentFemale += presentFemale
+levels[level].presentMale += presentMaleVal
+levels[level].presentFemale += presentFemaleVal
 levels[level].sick += sick
 levels[level].leave += leave
 levels[level].absent += absent
@@ -698,71 +699,13 @@ levels[level].outFemale += outFemale
 levels[level].outTotal += outTotal
 }
 
-let groupSum = {
-"ป.": {male:0,female:0,total:0,presentMale:0,presentFemale:0,present:0, sick:0, leave:0, absent:0,
-inMale:0,inFemale:0,inTotal:0,
-outMale:0,outFemale:0,outTotal:0},
-"ม.": {male:0,female:0,total:0,presentMale:0,presentFemale:0,present:0, sick:0, leave:0, absent:0,
-inMale:0,inFemale:0,inTotal:0,
-outMale:0,outFemale:0,outTotal:0},
-"ปวช": {male:0,female:0,total:0,presentMale:0,presentFemale:0,present:0, sick:0, leave:0, absent:0,
-inMale:0,inFemale:0,inTotal:0,
-outMale:0,outFemale:0,outTotal:0}
-}
-
 const order = ["ป.1","ป.2","ป.3","ป.4","ป.5","ป.6","ม.1","ม.2","ม.3","ม.4","ม.5","ม.6","ปวช.1","ปวช.2","ปวช.3"]
-
+  
 order.forEach(lv => {
-
-let groupKey = ""
-
-if(lv.startsWith("ป.")) groupKey = "ป."
-else if(lv.startsWith("ม.")) groupKey = "ม."
-else if(lv.startsWith("ปวช")) groupKey = "ปวช"
-
-if(groupKey && levels[lv]){
-groupSum[groupKey].male += levels[lv].male
-groupSum[groupKey].female += levels[lv].female
-groupSum[groupKey].total += levels[lv].total
-
-groupSum[groupKey].presentMale += levels[lv].presentMale
-groupSum[groupKey].presentFemale += levels[lv].presentFemale
-groupSum[groupKey].present += levels[lv].present
-
-groupSum[groupKey].sick += levels[lv].sick
-groupSum[groupKey].leave += levels[lv].leave
-groupSum[groupKey].absent += levels[lv].absent
-
-groupSum[groupKey].inMale += levels[lv].inMale
-groupSum[groupKey].inFemale += levels[lv].inFemale
-groupSum[groupKey].inTotal += levels[lv].inTotal
-
-groupSum[groupKey].outMale += levels[lv].outMale
-groupSum[groupKey].outFemale += levels[lv].outFemale
-groupSum[groupKey].outTotal += levels[lv].outTotal
-}
 
 if(!levels[lv]) return
 
-levels[lv].rows.sort((a,b)=>{
-
-const numA = a.room.match(/\d+/g) || [0,0]
-const numB = b.room.match(/\d+/g) || [0,0]
-
-if(!numA || !numB) return 0
-
-if(numA[0] != numB[0]){
-
-return Number(numA[0]) - Number(numB[0])
-
-}
-
-return (Number(numA[1]||0)) - (Number(numB[1]||0))
-
-})
-
-levels[lv].rows.forEach(r=>{
-
+levels[lv].rows.forEach(r => {
 html += `
 <tr>
 <td>${r.room}</td>
@@ -788,16 +731,12 @@ html += `
 <td>${r.outTotal || 0}</td>
 </tr>
 `
-
 })
 
 let colorClass = ""
 
-if(lv.startsWith("ป.")){
-colorClass = "primary"
-}else if(lv.startsWith("ม.") || lv.startsWith("ปวช")){
-colorClass = "secondary"
-}
+if(lv.startsWith("ป.")) colorClass = "primary"
+else if(lv.startsWith("ม.") || lv.startsWith("ปวช")) colorClass = "secondary"
 
 html += `
 <tr class="sum-row ${colorClass}">
@@ -811,106 +750,19 @@ html += `
 <td>${levels[lv].presentFemale}</td>
 <td>${levels[lv].present}</td>
 
-<td>${levels[lv].sick || 0}</td>
-<td>${levels[lv].leave || 0}</td>
-<td>${levels[lv].absent || 0}</td>
+<td>${levels[lv].sick}</td>
+<td>${levels[lv].leave}</td>
+<td>${levels[lv].absent}</td>
 
-<td>${levels[lv].inMale || 0}</td>
-<td>${levels[lv].inFemale || 0}</td>
-<td>${levels[lv].inTotal || 0}</td>
+<td>${levels[lv].inMale}</td>
+<td>${levels[lv].inFemale}</td>
+<td>${levels[lv].inTotal}</td>
 
-<td>${levels[lv].outMale || 0}</td>
-<td>${levels[lv].outFemale || 0}</td>
-<td>${levels[lv].outTotal || 0}</td>
+<td>${levels[lv].outMale}</td>
+<td>${levels[lv].outFemale}</td>
+<td>${levels[lv].outTotal}</td>
 </tr>
 `
-
-if(lv === "ป.6"){
-html += `
-<tr class="sum-row primary section-break">
-<td>รวมประถมทั้งหมด</td>
-
-<td>${groupSum["ป."].male}</td>
-<td>${groupSum["ป."].female}</td>
-<td>${groupSum["ป."].total}</td>
-
-<td>${groupSum["ป."].presentMale}</td>
-<td>${groupSum["ป."].presentFemale}</td>
-<td>${groupSum["ป."].present}</td>
-
-<td>${groupSum["ป."].sick}</td>
-<td>${groupSum["ป."].leave}</td>
-<td>${groupSum["ป."].absent}</td>
-
-<td>${groupSum["ป."].inMale}</td>
-<td>${groupSum["ป."].inFemale}</td>
-<td>${groupSum["ป."].inTotal || 0}</td>
-
-<td>${groupSum["ป."].outMale}</td>
-<td>${groupSum["ป."].outFemale}</td>
-<td>${groupSum["ป."].outTotal || 0}</td>
-</tr>
-`
-
-}
-
-if(lv === "ม.6"){
-html += `
-<tr class="sum-row secondary section-break">
-<td>รวมมัธยมทั้งหมด</td>
-
-<td>${groupSum["ม."].male}</td>
-<td>${groupSum["ม."].female}</td>
-<td>${groupSum["ม."].total}</td>
-
-<td>${groupSum["ม."].presentMale}</td>
-<td>${groupSum["ม."].presentFemale}</td>
-<td>${groupSum["ม."].present}</td>
-
-<td>${groupSum["ม."].sick}</td>
-<td>${groupSum["ม."].leave}</td>
-<td>${groupSum["ม."].absent}</td>
-
-<td>${groupSum["ม."].inMale}</td>
-<td>${groupSum["ม."].inFemale}</td>
-<td>${groupSum["ม."].inTotal}</td>
-
-<td>${groupSum["ม."].outMale}</td>
-<td>${groupSum["ม."].outFemale}</td>
-<td>${groupSum["ม."].outTotal}</td>
-</tr>
-`
-
-}
-
-if(lv === "ปวช.3"){
-html += `
-<tr class="sum-row secondary section-break">
-<td>รวม ปวช ทั้งหมด</td>
-
-<td>${groupSum["ปวช"].male}</td>
-<td>${groupSum["ปวช"].female}</td>
-<td>${groupSum["ปวช"].total}</td>
-
-<td>${groupSum["ปวช"].presentMale}</td>
-<td>${groupSum["ปวช"].presentFemale}</td>
-<td>${groupSum["ปวช"].present}</td>
-
-<td>${groupSum["ปวช"].sick}</td>
-<td>${groupSum["ปวช"].leave}</td>
-<td>${groupSum["ปวช"].absent}</td>
-
-<td>${groupSum["ปวช"].inMale}</td>
-<td>${groupSum["ปวช"].inFemale}</td>
-<td>${groupSum["ปวช"].inTotal}</td>
-
-<td>${groupSum["ปวช"].outMale}</td>
-<td>${groupSum["ปวช"].outFemale}</td>
-<td>${groupSum["ปวช"].outTotal}</td>
-</tr>
-`
-
-}
 
 })
 
