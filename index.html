@@ -32,7 +32,7 @@ radial-gradient(circle at 15% 20%, rgba(230,57,70,.06), transparent 45%),
 radial-gradient(circle at 85% 80%, rgba(230,57,70,.05), transparent 45%);
 
 }
-  
+
 header{
 background:linear-gradient(135deg,#c1121f,#e63946,#ff6b6b);
 background-size:200% 200%;
@@ -79,7 +79,7 @@ rgba(255,255,255,.35) 50%,
 rgba(255,255,255,.25) 60%,
 rgba(255,255,255,0) 100%
 );
-  
+
 filter:blur(28px);
 animation:shine 6s linear infinite;
 pointer-events:none;
@@ -100,7 +100,7 @@ pointer-events:none;
 0%{transform:translateX(-100%)}
 100%{transform:translateX(100%)}
 }
-  
+
 .logo{
 width:clamp(80px,16vw,110px);
 margin-bottom:4px;
@@ -115,7 +115,7 @@ drop-shadow(0 0 25px rgba(255,255,255,.35));
 50%{transform:translateY(-6px)}
 100%{transform:translateY(0)}
 }
-  
+
 .system-name{font-size:13px;}
 .school-name{font-size:26px;font-weight:700;}
 
@@ -131,7 +131,7 @@ padding:6px 10px;
 border-radius:8px;
 cursor:pointer;
 }
-  
+
 .term{
 font-size:16px;
 margin-top:3px;
@@ -173,7 +173,7 @@ font-size:12px;
 color:#666;
 margin-bottom:14px;
 }
-  
+
 .btn{
 display:flex;
 align-items:center;
@@ -254,18 +254,18 @@ animation:spin 1s linear infinite;
 @keyframes spin{
 to{transform:rotate(360deg)}
 }
-  
+
 </style>
 </head>
 
 <body>
 
 <script src="ui-effects.js"></script>
-  
+
 <div id="loading">
-  
+
 <div class="loader"></div>
-  
+
 <div style="margin-top:12px;font-size:14px;color:#555">
 กำลังเปิดหน้าเริ่มต้นระบบ...
 </div>
@@ -309,9 +309,9 @@ onclick="window.open('teacher-manual.pdf','_blank')">
 
 <i class="bi bi-book"></i>
 คู่มือการใช้งานสำหรับคุณครู
-  
+
 </button>
-  
+
 <button class="btn btn-admin"
 onclick="openAdminLogin()">
 
@@ -325,11 +325,11 @@ onclick="window.open('admin-manual.pdf','_blank')">
 
 <i class="bi bi-book"></i>
 คู่มือการใช้งานสำหรับผู้บริหาร
-  
+
 </button>
 </div>
 </main>
-  
+
 <footer>
 ระบบบริหารจัดการสถิตินักเรียน (BURAPA STUDENT SYSTEM)
 <br>
@@ -337,13 +337,13 @@ onclick="window.open('admin-manual.pdf','_blank')">
 <br>
 สำนักการศึกษา เทศบาลนครอุบลราชธานี
 </footer>
-  
+
 <script>
 
 const API = "https://script.google.com/macros/s/AKfycbyV4PNjlFskTfF0Ol6xrZdWpSCJm54bi33l0M66QpluNo8X6B7Js8LZRtuY7T05KsShoQ/exec"
 
 loadTermFromAPI()
-  
+
 function openTeacherDashboard(){
 
 localStorage.setItem("last_active", Date.now())
@@ -438,7 +438,7 @@ el.style.display = "block"
 
 }
 }
-  
+
 function updateClock(){
 
 let now=new Date()
