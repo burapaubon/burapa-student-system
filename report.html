@@ -436,7 +436,7 @@ document.title = `รายงานสถิตินักเรียน (${f
 document.getElementById("loading").innerText = "⏳ กำลังโหลดข้อมูล..."
 
 function show(v){
-return (v === 0 || v === "0") ? "" : v
+return (v === undefined || v === null || v === "") ? "" : v
 }
 
 async function fetchWithFallback(dateStr){
@@ -662,8 +662,8 @@ const hasTodayInput = r.present_m !== undefined && r.present_f !== undefined
 const presentMaleVal = hasTodayInput ? Number(r.present_m) || 0 : 0
 const presentFemaleVal = hasTodayInput ? Number(r.present_f) || 0 : 0
 
-const presentMale = hasTodayInput ? (presentMaleVal || "") : ""
-const presentFemale = hasTodayInput ? (presentFemaleVal || "") : ""
+const presentMale = hasTodayInput ? presentMaleVal : ""
+const presentFemale = hasTodayInput ? presentFemaleVal : ""
 const present = hasTodayInput ? (presentMaleVal + presentFemaleVal) : 0
 
 const sick = Number(r.sick) || 0
@@ -786,8 +786,8 @@ html += `
 <td>${r.female}</td>
 <td>${r.total}</td>
 
-<td>${r.hasTodayInput ? r.presentMale : ""}</td>
-<td>${r.hasTodayInput ? r.presentFemale : ""}</td>
+<td>${r.hasTodayInput ? show(r.presentMale) : ""}</td>
+<td>${r.hasTodayInput ? show(r.presentFemale) : ""}</td>
 <td>${r.present}</td>
 
 <td>${show(r.sick)}</td>
