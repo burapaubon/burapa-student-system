@@ -436,7 +436,7 @@ document.title = `รายงานสถิตินักเรียน (${f
 document.getElementById("loading").innerText = "⏳ กำลังโหลดข้อมูล..."
 
 function show(v){
-return (v === undefined || v === null || v === "") ? "" : v
+return (v === 0 || v === "0") ? "" : v
 }
 
 async function fetchWithFallback(dateStr){
@@ -786,8 +786,8 @@ html += `
 <td>${r.female}</td>
 <td>${r.total}</td>
 
-<td>${r.hasTodayInput ? show(r.presentMale) : ""}</td>
-<td>${r.hasTodayInput ? show(r.presentFemale) : ""}</td>
+<td>${r.hasTodayInput ? r.presentMale : ""}</td>
+<td>${r.hasTodayInput ? r.presentFemale : ""}</td>
 <td>${r.present}</td>
 
 <td>${show(r.sick)}</td>
