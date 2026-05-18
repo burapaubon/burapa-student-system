@@ -814,6 +814,9 @@ colorClass = "primary"
 colorClass = "secondary"
 }
 
+if(!(lv === "ม.4" || lv === "ม.5" || lv === "ม.6" || 
+     lv === "ปวช.1" || lv === "ปวช.2" || lv === "ปวช.3")){
+
 html += `
 <tr class="sum-row ${colorClass}">
 <td>รวม ${lv}</td>
@@ -839,6 +842,7 @@ html += `
 <td>${levels[lv].outTotal || 0}</td>
 </tr>
 `
+}
 
 if(lv === "ป.6"){
 html += `
@@ -948,7 +952,7 @@ const lowerOutTotal =
 
 html += `
 <tr class="sum-row secondary section-break">
-<td>รวม ม.ต้น</td>
+<td>รวมมัธยมต้น</td>
 
 <td>${lowerMale}</td>
 <td>${lowerFemale}</td>
@@ -1052,7 +1056,7 @@ const upperOutTotal =
 
 html += `
 <tr class="sum-row secondary section-break">
-<td>รวม ม.ปลาย</td>
+<td>รวมมัธยมปลาย</td>
 
 <td>${upperMale}</td>
 <td>${upperFemale}</td>
