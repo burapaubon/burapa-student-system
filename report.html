@@ -899,31 +899,34 @@ html += `
 }
 
 if(lv === "ปวช.3"){
+if(!lv.startsWith("ปวช")){
+
 html += `
-<tr class="sum-row secondary section-break">
-<td>รวม ปวช ทั้งหมด</td>
+<tr class="sum-row ${colorClass}">
+<td>รวม ${lv}</td>
 
-<td>${groupSum["ปวช"].male}</td>
-<td>${groupSum["ปวช"].female}</td>
-<td>${groupSum["ปวช"].total}</td>
+<td>${levels[lv].male}</td>
+<td>${levels[lv].female}</td>
+<td>${levels[lv].total}</td>
 
-<td>${groupSum["ปวช"].presentMale}</td>
-<td>${groupSum["ปวช"].presentFemale}</td>
-<td>${groupSum["ปวช"].present}</td>
+<td>${levels[lv].presentMale}</td>
+<td>${levels[lv].presentFemale}</td>
+<td>${levels[lv].present}</td>
 
-<td>${groupSum["ปวช"].sick}</td>
-<td>${groupSum["ปวช"].leave}</td>
-<td>${groupSum["ปวช"].absent}</td>
+<td>${levels[lv].sick || 0}</td>
+<td>${levels[lv].leave || 0}</td>
+<td>${levels[lv].absent || 0}</td>
 
-<td>${groupSum["ปวช"].inMale}</td>
-<td>${groupSum["ปวช"].inFemale}</td>
-<td>${groupSum["ปวช"].inTotal}</td>
+<td>${levels[lv].inMale || 0}</td>
+<td>${levels[lv].inFemale || 0}</td>
+<td>${levels[lv].inTotal || 0}</td>
 
-<td>${groupSum["ปวช"].outMale}</td>
-<td>${groupSum["ปวช"].outFemale}</td>
-<td>${groupSum["ปวช"].outTotal}</td>
+<td>${levels[lv].outMale || 0}</td>
+<td>${levels[lv].outFemale || 0}</td>
+<td>${levels[lv].outTotal || 0}</td>
 </tr>
 `
+}
 }
 
 })
