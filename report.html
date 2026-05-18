@@ -869,7 +869,213 @@ html += `
 
 }
 
+if(lv === "ม.3"){
+    
+const lowerMale =
+(levels["ม.1"]?.male || 0) +
+(levels["ม.2"]?.male || 0) +
+(levels["ม.3"]?.male || 0)
+
+const lowerFemale =
+(levels["ม.1"]?.female || 0) +
+(levels["ม.2"]?.female || 0) +
+(levels["ม.3"]?.female || 0)
+
+const lowerTotal =
+(levels["ม.1"]?.total || 0) +
+(levels["ม.2"]?.total || 0) +
+(levels["ม.3"]?.total || 0)
+
+const lowerPresentMale =
+(levels["ม.1"]?.presentMale || 0) +
+(levels["ม.2"]?.presentMale || 0) +
+(levels["ม.3"]?.presentMale || 0)
+
+const lowerPresentFemale =
+(levels["ม.1"]?.presentFemale || 0) +
+(levels["ม.2"]?.presentFemale || 0) +
+(levels["ม.3"]?.presentFemale || 0)
+
+const lowerPresent =
+(levels["ม.1"]?.present || 0) +
+(levels["ม.2"]?.present || 0) +
+(levels["ม.3"]?.present || 0)
+
+const lowerSick =
+(levels["ม.1"]?.sick || 0) +
+(levels["ม.2"]?.sick || 0) +
+(levels["ม.3"]?.sick || 0)
+
+const lowerLeave =
+(levels["ม.1"]?.leave || 0) +
+(levels["ม.2"]?.leave || 0) +
+(levels["ม.3"]?.leave || 0)
+
+const lowerAbsent =
+(levels["ม.1"]?.absent || 0) +
+(levels["ม.2"]?.absent || 0) +
+(levels["ม.3"]?.absent || 0)
+
+const lowerInMale =
+(levels["ม.1"]?.inMale || 0) +
+(levels["ม.2"]?.inMale || 0) +
+(levels["ม.3"]?.inMale || 0)
+
+const lowerInFemale =
+(levels["ม.1"]?.inFemale || 0) +
+(levels["ม.2"]?.inFemale || 0) +
+(levels["ม.3"]?.inFemale || 0)
+
+const lowerInTotal =
+(levels["ม.1"]?.inTotal || 0) +
+(levels["ม.2"]?.inTotal || 0) +
+(levels["ม.3"]?.inTotal || 0)
+
+const lowerOutMale =
+(levels["ม.1"]?.outMale || 0) +
+(levels["ม.2"]?.outMale || 0) +
+(levels["ม.3"]?.outMale || 0)
+
+const lowerOutFemale =
+(levels["ม.1"]?.outFemale || 0) +
+(levels["ม.2"]?.outFemale || 0) +
+(levels["ม.3"]?.outFemale || 0)
+
+const lowerOutTotal =
+(levels["ม.1"]?.outTotal || 0) +
+(levels["ม.2"]?.outTotal || 0) +
+(levels["ม.3"]?.outTotal || 0)
+
+html += `
+<tr class="sum-row secondary section-break">
+<td>รวม ม.ต้น</td>
+
+<td>${lowerMale}</td>
+<td>${lowerFemale}</td>
+<td>${lowerTotal}</td>
+
+<td>${lowerPresentMale}</td>
+<td>${lowerPresentFemale}</td>
+<td>${lowerPresent}</td>
+
+<td>${lowerSick}</td>
+<td>${lowerLeave}</td>
+<td>${lowerAbsent}</td>
+
+<td>${lowerInMale}</td>
+<td>${lowerInFemale}</td>
+<td>${lowerInTotal}</td>
+
+<td>${lowerOutMale}</td>
+<td>${lowerOutFemale}</td>
+<td>${lowerOutTotal}</td>
+</tr>
+`
+}
+
 if(lv === "ม.6"){
+
+const upperMale =
+(levels["ม.4"]?.male || 0) +
+(levels["ม.5"]?.male || 0) +
+(levels["ม.6"]?.male || 0)
+
+const upperFemale =
+(levels["ม.4"]?.female || 0) +
+(levels["ม.5"]?.female || 0) +
+(levels["ม.6"]?.female || 0)
+
+const upperTotal =
+(levels["ม.4"]?.total || 0) +
+(levels["ม.5"]?.total || 0) +
+(levels["ม.6"]?.total || 0)
+
+const upperPresentMale =
+(levels["ม.4"]?.presentMale || 0) +
+(levels["ม.5"]?.presentMale || 0) +
+(levels["ม.6"]?.presentMale || 0)
+
+const upperPresentFemale =
+(levels["ม.4"]?.presentFemale || 0) +
+(levels["ม.5"]?.presentFemale || 0) +
+(levels["ม.6"]?.presentFemale || 0)
+
+const upperPresent =
+(levels["ม.4"]?.present || 0) +
+(levels["ม.5"]?.present || 0) +
+(levels["ม.6"]?.present || 0)
+
+const upperSick =
+(levels["ม.4"]?.sick || 0) +
+(levels["ม.5"]?.sick || 0) +
+(levels["ม.6"]?.sick || 0)
+
+const upperLeave =
+(levels["ม.4"]?.leave || 0) +
+(levels["ม.5"]?.leave || 0) +
+(levels["ม.6"]?.leave || 0)
+
+const upperAbsent =
+(levels["ม.4"]?.absent || 0) +
+(levels["ม.5"]?.absent || 0) +
+(levels["ม.6"]?.absent || 0)
+
+const upperInMale =
+(levels["ม.4"]?.inMale || 0) +
+(levels["ม.5"]?.inMale || 0) +
+(levels["ม.6"]?.inMale || 0)
+
+const upperInFemale =
+(levels["ม.4"]?.inFemale || 0) +
+(levels["ม.5"]?.inFemale || 0) +
+(levels["ม.6"]?.inFemale || 0)
+
+const upperInTotal =
+(levels["ม.4"]?.inTotal || 0) +
+(levels["ม.5"]?.inTotal || 0) +
+(levels["ม.6"]?.inTotal || 0)
+
+const upperOutMale =
+(levels["ม.4"]?.outMale || 0) +
+(levels["ม.5"]?.outMale || 0) +
+(levels["ม.6"]?.outMale || 0)
+
+const upperOutFemale =
+(levels["ม.4"]?.outFemale || 0) +
+(levels["ม.5"]?.outFemale || 0) +
+(levels["ม.6"]?.outFemale || 0)
+
+const upperOutTotal =
+(levels["ม.4"]?.outTotal || 0) +
+(levels["ม.5"]?.outTotal || 0) +
+(levels["ม.6"]?.outTotal || 0)
+
+html += `
+<tr class="sum-row secondary section-break">
+<td>รวม ม.ปลาย</td>
+
+<td>${upperMale}</td>
+<td>${upperFemale}</td>
+<td>${upperTotal}</td>
+
+<td>${upperPresentMale}</td>
+<td>${upperPresentFemale}</td>
+<td>${upperPresent}</td>
+
+<td>${upperSick}</td>
+<td>${upperLeave}</td>
+<td>${upperAbsent}</td>
+
+<td>${upperInMale}</td>
+<td>${upperInFemale}</td>
+<td>${upperInTotal}</td>
+
+<td>${upperOutMale}</td>
+<td>${upperOutFemale}</td>
+<td>${upperOutTotal}</td>
+</tr>
+`
+
 html += `
 <tr class="sum-row secondary section-break">
 <td>รวมมัธยมทั้งหมด</td>
@@ -895,37 +1101,38 @@ html += `
 <td>${groupSum["ม."].outTotal}</td>
 </tr>
 `
-
 }
 
 if(lv === "ปวช.3"){
-if(!lv.startsWith("ปวช")){
 
 html += `
-<tr class="sum-row ${colorClass}">
-<td>รวม ${lv}</td>
+<tr class="sum-row secondary section-break">
+<td>รวม ปวช ทั้งหมด</td>
 
-<td>${levels[lv].male}</td>
-<td>${levels[lv].female}</td>
-<td>${levels[lv].total}</td>
+<td>${groupSum["ปวช"].male}</td>
+<td>${groupSum["ปวช"].female}</td>
+<td>${groupSum["ปวช"].total}</td>
 
-<td>${levels[lv].presentMale}</td>
-<td>${levels[lv].presentFemale}</td>
-<td>${levels[lv].present}</td>
+<td>${groupSum["ปวช"].presentMale}</td>
+<td>${groupSum["ปวช"].presentFemale}</td>
+<td>${groupSum["ปวช"].present}</td>
 
-<td>${levels[lv].sick || 0}</td>
-<td>${levels[lv].leave || 0}</td>
-<td>${levels[lv].absent || 0}</td>
+<td>${groupSum["ปวช"].sick}</td>
+<td>${groupSum["ปวช"].leave}</td>
+<td>${groupSum["ปวช"].absent}</td>
 
-<td>${levels[lv].inMale || 0}</td>
-<td>${levels[lv].inFemale || 0}</td>
-<td>${levels[lv].inTotal || 0}</td>
+<td>${groupSum["ปวช"].inMale}</td>
+<td>${groupSum["ปวช"].inFemale}</td>
+<td>${groupSum["ปวช"].inTotal}</td>
 
-<td>${levels[lv].outMale || 0}</td>
-<td>${levels[lv].outFemale || 0}</td>
-<td>${levels[lv].outTotal || 0}</td>
+<td>${groupSum["ปวช"].outMale}</td>
+<td>${groupSum["ปวช"].outFemale}</td>
+<td>${groupSum["ปวช"].outTotal}</td>
 </tr>
 `
+
+}
+
 }
 }
 
