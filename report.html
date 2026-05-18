@@ -113,6 +113,23 @@ background:#fde68a;
 background:#86efac;
 }
 
+.primary-total{
+background:#facc15;
+font-weight:bold;
+}
+
+.secondary-total{
+background:#22c55e;
+color:#000000;
+font-weight:bold;
+}
+
+.primary-total,
+.secondary-total{
+-webkit-print-color-adjust: exact;
+print-color-adjust: exact;
+}
+  
 .total-all{
 background:#93c5fd;
 }
@@ -846,7 +863,7 @@ html += `
 
 if(lv === "ป.6"){
 html += `
-<tr class="sum-row primary section-break">
+<tr class="sum-row primary-total section-break">
 <td>รวมประถมทั้งหมด</td>
 
 <td>${groupSum["ป."].male}</td>
@@ -951,7 +968,7 @@ const lowerOutTotal =
 (levels["ม.3"]?.outTotal || 0)
 
 html += `
-<tr class="sum-row secondary section-break">
+<tr class="sum-row secondary-total section-break">
 <td>รวมมัธยมต้น</td>
 
 <td>${lowerMale}</td>
@@ -1055,7 +1072,7 @@ const upperOutTotal =
 (levels["ม.6"]?.outTotal || 0)
 
 html += `
-<tr class="sum-row secondary section-break">
+<tr class="sum-row secondary-total section-break">
 <td>รวมมัธยมปลาย</td>
 
 <td>${upperMale}</td>
@@ -1081,8 +1098,8 @@ html += `
 `
 
 html += `
-<tr class="sum-row secondary section-break">
-<td>รวมมัธยมทั้งหมด</td>
+<tr class="sum-row primary-total section-break">
+<td>รวมมัธยมต้นและมัธยมปลาย</td>
 
 <td>${groupSum["ม."].male}</td>
 <td>${groupSum["ม."].female}</td>
@@ -1141,7 +1158,7 @@ html += `
 
 html += `
 <tr class="sum-row total-all">
-<td>รวมทั้งหมด</td>
+<td>รวมนักเรียนทั้งหมด</td>
 
 <td>${totalMale}</td>
 <td>${totalFemale}</td>
