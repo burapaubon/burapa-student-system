@@ -211,6 +211,10 @@ transition:.25s ease;
 height:420px;
 }
 
+.export-card{
+height:260px;
+}
+
 .grid .card:last-child{
 grid-column:1 / -1;
 }
@@ -647,7 +651,7 @@ font-weight:600;
 <div id="classList"></div>
 </div>
 
-<div class="card">
+<div class="card export-card">
 <div class="card-header" style="justify-content:center; font-weight:700;">
 📄Export แบบรายงานสถิติ
 </div>
@@ -664,62 +668,6 @@ font-weight:600;
 
 <button class="btn-main" onclick="printReport(event)">
 📤 Export รายงาน
-</button>
-
-</div>
-
-<div id="sigForm" class="export-group" style="display:none;">
-
-<div class="export-group-title">
-🖊 ตั้งค่าชื่อผู้ลงนาม
-</div>
-
-<div class="field">
-<label>ครูเวรวันจันทร์</label>
-<input type="text" id="mon" class="select-modern">
-</div>
-
-<div class="field">
-<label>ครูเวรวันอังคาร</label>
-<input type="text" id="tue" class="select-modern">
-</div>
-
-<div class="field">
-<label>ครูเวรวันพุธ</label>
-<input type="text" id="wed" class="select-modern">
-</div>
-
-<div class="field">
-<label>ครูเวรวันพฤหัสบดี</label>
-<input type="text" id="thu" class="select-modern">
-</div>
-
-<div class="field">
-<label>ครูเวรวันศุกร์</label>
-<input type="text" id="fri" class="select-modern">
-</div>
-
-<div class="field">
-<label>ผช.ผอ.ฝ่ายบริหารทั่วไป</label>
-<input type="text" id="assistant" class="select-modern">
-</div>
-
-<div class="field">
-<label>รองผู้อำนวยการ</label>
-<input type="text" id="deputy" class="select-modern">
-</div>
-
-<div class="field">
-<label>ผู้อำนวยการ</label>
-<input type="text" id="director" class="select-modern">
-</div>
-
-<button class="btn-main"
-onclick="saveSignature(event)"
-style="width:100%; padding:12px;">
-
-💾 บันทึกข้อมูลผู้ลงนาม
-
 </button>
 
 </div>
@@ -1221,99 +1169,6 @@ return String(str).replace(/[&<>"']/g, m => ({
 "\"":"&quot;",
 "'":"&#039;"
 }[m]))
-}
-
-async function loadSignature(){
-
-try{
-
-const res = await fetch(API + "?mode=getsigconfig&t=" + Date.now())
-
-if(!res.ok) throw new Error()
-
-const data = await res.json()
-
-document.getElementById("mon").value = data.mon || ""
-document.getElementById("tue").value = data.tue || ""
-document.getElementById("wed").value = data.wed || ""
-document.getElementById("thu").value = data.thu || ""
-document.getElementById("fri").value = data.fri || ""
-document.getElementById("assistant").value = data.assistant || ""
-document.getElementById("deputy").value = data.deputy || ""
-document.getElementById("director").value = data.director || ""
-
-}catch(e){
-
-console.error("โหลดรายชื่อไม่สำเร็จ", e)
-
-}
-
-}
-
-async function saveSignature(e){
-
-const btn = e.target
-
-btn.disabled = true
-btn.innerText = "กำลังบันทึก..."
-
-try{
-
-const url = API +
-`?mode=updatesigconfig
-&mon=${encodeURIComponent(document.getElementById("mon").value)}
-&tue=${encodeURIComponent(document.getElementById("tue").value)}
-&wed=${encodeURIComponent(document.getElementById("wed").value)}
-&thu=${encodeURIComponent(document.getElementById("thu").value)}
-&fri=${encodeURIComponent(document.getElementById("fri").value)}
-&assistant=${encodeURIComponent(document.getElementById("assistant").value)}
-&deputy=${encodeURIComponent(document.getElementById("deputy").value)}
-&director=${encodeURIComponent(document.getElementById("director").value)}`
-
-const res = await fetch(url)
-
-if(!res.ok) throw new Error()
-
-const data = await res.json()
-
-if(data.status === "success"){
-
-alert("บันทึกรายชื่อสำเร็จ")
-loadSignature()
-
-document.getElementById("sigForm").style.display = "none"
-
-}else{
-
-alert("บันทึกไม่สำเร็จ")
-
-}
-
-}catch(e){
-
-alert("เกิดข้อผิดพลาด")
-
-}
-
-btn.disabled = false
-btn.innerText = "💾 บันทึกข้อมูลผู้ลงนาม"
-
-}
-
-function toggleSigForm(){
-
-const form = document.getElementById("sigForm")
-
-if(form.style.display === "none"){
-
-form.style.display = "block"
-
-}else{
-
-form.style.display = "none"
-
-}
-
 }
 
 function printReport(e){
