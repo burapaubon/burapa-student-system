@@ -211,6 +211,10 @@ transition:.25s ease;
 height:420px;
 }
 
+.grid .card:last-child{
+grid-column:1 / -1;
+}
+
 .card:hover{
 transform:translateY(-2px);
 box-shadow:0 14px 30px rgba(0,0,0,.12);
@@ -413,6 +417,91 @@ animation:spin 1s linear infinite;
 to{transform:rotate(360deg)}
 }
 
+.card-scroll{
+overflow-y:auto;
+flex:1;
+padding-right:6px;
+display:flex;
+flex-direction:column;
+justify-content:flex-start;
+}
+
+.card-scroll::-webkit-scrollbar{
+width:6px;
+}
+
+.card-scroll::-webkit-scrollbar-thumb{
+background:#e5e7eb;
+border-radius:10px;
+}
+
+.export-section{
+display:flex;
+flex-direction:column;
+gap:12px;
+}
+
+.export-group{
+background:#f8fafc;
+padding:12px;
+border-radius:12px;
+border:1px solid #e5e7eb;
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+.export-group-title{
+font-size:13px;
+font-weight:600;
+color:#374151;
+}
+
+.export-actions{
+display:flex;
+flex-direction:column;
+gap:8px;
+}
+
+.export-actions button{
+width:100%;
+padding:12px;
+font-size:13px;
+}
+
+.field{
+display:flex;
+flex-direction:column;
+gap:4px;
+margin-bottom:10px;
+}
+
+.field label{
+font-size:13px;
+color:#555;
+font-weight:500;
+}
+
+.select-modern{
+padding:10px 12px;
+border-radius:12px;
+border:1px solid #e5e7eb;
+font-size:14px;
+background:#fff;
+cursor:pointer;
+transition:.25s;
+outline:none;
+}
+
+.select-modern:hover{
+border-color:#e63946;
+}
+
+.select-modern:focus{
+border-color:#e63946;
+box-shadow:0 0 0 3px rgba(230,57,70,0.15);
+}
+
 @media (max-width:768px){
 
 .stats{
@@ -557,6 +646,90 @@ font-weight:600;
 <hr class="divider">
 <div id="classList"></div>
 </div>
+
+<div class="card">
+<div class="card-header" style="justify-content:center; font-weight:700;">
+📄Export แบบรายงานสถิติ
+</div>
+
+<div class="card-scroll export-section">
+
+<div class="export-group">
+<div class="export-group-title">เลือกวันที่ต้องการรายงาน</div>
+
+<input type="date" id="reportDate" class="select-modern">
+</div>
+
+<div class="export-group export-actions">
+
+<button class="btn-main" onclick="printReport(event)">
+📤 Export รายงาน
+</button>
+
+<button class="btn-sub" onclick="toggleSigForm()">
+✏️ แก้ไขรายชื่อผู้ลงนาม
+</button>
+
+</div>
+
+<div id="sigForm" class="export-group" style="display:none;">
+
+<div class="export-group-title">
+🖊 ตั้งค่าชื่อผู้ลงนาม
+</div>
+
+<div class="field">
+<label>ครูเวรวันจันทร์</label>
+<input type="text" id="mon" class="select-modern">
+</div>
+
+<div class="field">
+<label>ครูเวรวันอังคาร</label>
+<input type="text" id="tue" class="select-modern">
+</div>
+
+<div class="field">
+<label>ครูเวรวันพุธ</label>
+<input type="text" id="wed" class="select-modern">
+</div>
+
+<div class="field">
+<label>ครูเวรวันพฤหัสบดี</label>
+<input type="text" id="thu" class="select-modern">
+</div>
+
+<div class="field">
+<label>ครูเวรวันศุกร์</label>
+<input type="text" id="fri" class="select-modern">
+</div>
+
+<div class="field">
+<label>ผช.ผอ.ฝ่ายบริหารทั่วไป</label>
+<input type="text" id="assistant" class="select-modern">
+</div>
+
+<div class="field">
+<label>รองผู้อำนวยการ</label>
+<input type="text" id="deputy" class="select-modern">
+</div>
+
+<div class="field">
+<label>ผู้อำนวยการ</label>
+<input type="text" id="director" class="select-modern">
+</div>
+
+<button class="btn-main"
+onclick="saveSignature(event)"
+style="width:100%; padding:12px;">
+
+💾 บันทึกข้อมูลผู้ลงนาม
+
+</button>
+
+</div>
+</div>
+</div>
+
 </div>
 </main>
 
@@ -1054,6 +1227,130 @@ return String(str).replace(/[&<>"']/g, m => ({
 }[m]))
 }
 
+async function loadSignature(){
+
+try{
+
+const res = await fetch(API + "?mode=getsigconfig&t=" + Date.now())
+
+if(!res.ok) throw new Error()
+
+const data = await res.json()
+
+document.getElementById("mon").value = data.mon || ""
+document.getElementById("tue").value = data.tue || ""
+document.getElementById("wed").value = data.wed || ""
+document.getElementById("thu").value = data.thu || ""
+document.getElementById("fri").value = data.fri || ""
+document.getElementById("assistant").value = data.assistant || ""
+document.getElementById("deputy").value = data.deputy || ""
+document.getElementById("director").value = data.director || ""
+
+}catch(e){
+
+console.error("โหลดรายชื่อไม่สำเร็จ", e)
+
+}
+
+}
+
+async function saveSignature(e){
+
+const btn = e.target
+
+btn.disabled = true
+btn.innerText = "กำลังบันทึก..."
+
+try{
+
+const url = API +
+`?mode=updatesigconfig
+&mon=${encodeURIComponent(document.getElementById("mon").value)}
+&tue=${encodeURIComponent(document.getElementById("tue").value)}
+&wed=${encodeURIComponent(document.getElementById("wed").value)}
+&thu=${encodeURIComponent(document.getElementById("thu").value)}
+&fri=${encodeURIComponent(document.getElementById("fri").value)}
+&assistant=${encodeURIComponent(document.getElementById("assistant").value)}
+&deputy=${encodeURIComponent(document.getElementById("deputy").value)}
+&director=${encodeURIComponent(document.getElementById("director").value)}`
+
+const res = await fetch(url)
+
+if(!res.ok) throw new Error()
+
+const data = await res.json()
+
+if(data.status === "success"){
+
+alert("บันทึกรายชื่อสำเร็จ")
+loadSignature()
+
+document.getElementById("sigForm").style.display = "none"
+
+}else{
+
+alert("บันทึกไม่สำเร็จ")
+
+}
+
+}catch(e){
+
+alert("เกิดข้อผิดพลาด")
+
+}
+
+btn.disabled = false
+btn.innerText = "💾 บันทึกข้อมูลผู้ลงนาม"
+
+}
+
+function toggleSigForm(){
+
+const form = document.getElementById("sigForm")
+
+if(form.style.display === "none"){
+
+form.style.display = "block"
+
+}else{
+
+form.style.display = "none"
+
+}
+
+}
+
+function printReport(e){
+
+const btn = e.target
+
+const date = document.getElementById("reportDate").value
+
+if(!date){
+
+alert("กรุณาเลือกวันที่")
+
+return
+
+}
+
+btn.disabled = true
+btn.innerText = "กำลังสร้างรายงาน..."
+
+window.open(
+"report.html?date=" + date,
+"_blank"
+)
+
+setTimeout(()=>{
+
+btn.disabled = false
+btn.innerText = "📤 Export รายงาน"
+
+},1500)
+
+}
+
 function updateClock(){
 
 let now=new Date()
@@ -1077,6 +1374,10 @@ day+"ที่ "+date+" "+month+" พ.ศ."+year+" เวลา "+h+":"+m+":"+s+
 
 setInterval(updateClock,1000)
 updateClock()
+
+document.getElementById("reportDate").valueAsDate = new Date()
+
+loadSignature()
 
 </script>
 </body>
