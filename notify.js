@@ -15,20 +15,24 @@ appId: "1:1036953943666:web:db300edf1558e0316c0ceb",
 measurementId: "G-L2C232CL06"
 };
 
+const API =
+"https://script.google.com/macros/s/AKfycbyV4PNjlFskTfF0Ol6xrZdWpSCJm54bi33l0M66QpluNo8X6B7Js8LZRtuY7T05KsShoQ/exec";
+
 const app = initializeApp(firebaseConfig);
 
 const messaging = getMessaging(app);
 
-async function initNotification(){
+export async function initNotification(){
+
+if(!("Notification" in window)) return;
+
+if(!("serviceWorker" in navigator)) return;
 
 try{
 
 const permission = await Notification.requestPermission();
 
-if(permission !== "granted"){
-console.log("ไม่อนุญาตแจ้งเตือน");
-return;
-}
+if(permission !== "granted") return;
 
 const registration = await navigator.serviceWorker.register(
 "./firebase-messaging-sw.js"
@@ -39,37 +43,30 @@ vapidKey:"BLtFLsAOb_KbkA6CXk1tPfZtkn2MNz4tzAJqQDmzwjUSpbIr_TQsSM9pabZ08bn-1rCToL
 serviceWorkerRegistration: registration
 });
 
-console.log("TOKEN:", token);
+if(!token){
+console.log("ไม่พบ token");
+return;
+}
 
 localStorage.setItem("fcm_token", token);
 
-alert("เปิดแจ้งเตือนสำเร็จ");
+await fetch(API,{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+mode:"saveToken",
+token:token
+})
+});
+
+console.log("FCM READY");
 
 }catch(err){
 
 console.error("FCM ERROR:", err);
-alert("เปิดแจ้งเตือนไม่สำเร็จ");
 
 }
 
 }
-
-window.addEventListener("load",()=>{
-
-if(Notification.permission === "default"){
-
-setTimeout(()=>{
-
-const ok = confirm(
-"📢 เปิดแจ้งเตือนระบบสถิตินักเรียนหรือไม่?"
-);
-
-if(ok){
-initNotification();
-}
-
-},1200);
-
-}
-
-});
