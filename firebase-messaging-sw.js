@@ -15,15 +15,16 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage(function(payload){
 
 console.log(
-"[firebase-messaging-sw.js] Background message ",
+"[firebase-messaging-sw.js] Background message",
 payload
 );
 
 self.registration.showNotification(
-payload.notification.title,
+payload.notification.title || "BURAPA STUDENT SYSTEM",
 {
-body: payload.notification.body,
-icon: "/burapa-logo.png"
+body: payload.notification.body || "มีการแจ้งเตือนใหม่",
+icon: "./burapa-logo.png",
+badge: "./burapa-logo.png"
 }
 );
 
