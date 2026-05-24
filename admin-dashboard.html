@@ -819,6 +819,22 @@ opacity:1;
 transform:translateX(0);
 }
 }
+
+.card-title-fixed{
+flex-shrink:0;
+margin-bottom:10px;
+text-align:center;
+font-size:18px;
+font-weight:700;
+}
+
+.reset-card .card-scroll{
+display:flex;
+flex-direction:column;
+gap:16px;
+overflow-y:auto;
+padding-right:6px;
+}
 </style>
 </head>
 
@@ -1010,7 +1026,8 @@ font-weight:600;
 </div>
 
 <div class="card reset-card">
-<h3>‼ จัดการข้อมูลสถิติ</h3>
+<h3 class="card-title-fixed">‼ จัดการข้อมูลสถิติ</h3>
+<div class="card-scroll">
 
 <div class="control-section">
 <div class="control-title">รีเซ็ตสถิติวันนี้</div>
@@ -1030,11 +1047,23 @@ font-weight:600;
 </button>
 </div>
 
+<div class="control-section">
+<div class="control-title">สำรองข้อมูลสถิติ</div>
+
+<button class="btn-main"
+style="width:100%; padding:12px;"
+onclick="backupRecords(event)">
+🗃️ สำรองข้อมูลสถิติ
+</button>
+
+</div>
+
 <div class="control-section danger-box">
 <div class="control-title">ล้างข้อมูลทั้งหมด</div>
 <button class="btn-control danger" onclick="resetAll()">
 🚨 ล้างข้อมูลทั้งระบบ
 </button>
+</div>
 </div>
 </div>
 
@@ -2204,6 +2233,66 @@ showToast("error","เกิดข้อผิดพลาด","ลองให�
 }
 
 loadingNow = false
+}
+
+async function backupRecords(e){
+
+if(loadingNow) return
+
+const btn = e.currentTarget
+
+if(!confirm("📦 ต้องการสำรองข้อมูลสถิติในระบบใช่หรือไม่")) return
+
+btn.disabled = true
+btn.innerText = "กำลังสำรองข้อมูล..."
+
+loadingNow = true
+
+try{
+
+const res = await fetch(
+API + "?mode=backupRecords&token=" + token
+)
+
+if(!res.ok){
+throw new Error()
+}
+
+const data = await res.json()
+
+if(data.status === "success"){
+
+showToast(
+"success",
+"สำรองข้อมูลสำเร็จ",
+"สร้างชีท "+data.sheetName+" เรียบร้อยแล้ว"
+)
+
+}else{
+
+showToast(
+"error",
+"สำรองข้อมูลไม่สำเร็จ",
+"กรุณาลองใหม่อีกครั้ง"
+)
+
+}
+
+}catch(e){
+
+showToast(
+"error",
+"เกิดข้อผิดพลาด",
+"ไม่สามารถสำรองข้อมูลได้"
+)
+
+}
+
+btn.disabled = false
+btn.innerText = "🗂️ สำรองข้อมูลสถิติ"
+
+loadingNow = false
+
 }
 
 async function resetAll(){
