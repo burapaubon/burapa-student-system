@@ -1251,7 +1251,7 @@ const dash = await res.json()
 if(!dash || typeof dash !== "object"){
 throw new Error("invalid data")
 }
-  
+
 renderDash(dash)
 renderRooms(dash.rooms || [])
 renderWeeklyChart(dash.weekly || {})
@@ -1806,7 +1806,7 @@ const ms = Math.round(performance.now() - start)
 
 const apiOk = data.apiOk ?? false
 const dbOk = data.dbOk ?? false
-const msgOk = data.msgOk ?? false
+const lastNotify = data.lastNotify || ""
 const rec = data.totalRecords ?? 0
 
 let apiEl = document.getElementById("sttAPI")
@@ -1823,8 +1823,30 @@ dbEl.className = "status-box " + (dbOk ? "ok" : "err")
 dbEl.innerHTML = `Database <b>${dbOk ? "Online" : "Error"}</b>`
 
 let msgEl = document.getElementById("sttMSG")
-msgEl.className = "status-box " + (msgOk ? "ok" : "err")
-msgEl.innerHTML = `Messaging <b>${msgOk ? "Connected" : "Fail"}</b>`
+
+if(lastNotify){
+
+const d = new Date(lastNotify)
+
+const thaiDate =
+d.toLocaleDateString("th-TH") +
+" " +
+d.toLocaleTimeString("th-TH",{
+hour:"2-digit",
+minute:"2-digit"
+})
+
+msgEl.className = "status-box ok"
+msgEl.innerHTML =
+`NotifyMissingRoom <b>${thaiDate}</b>`
+
+}else{
+
+msgEl.className = "status-box warn"
+msgEl.innerHTML =
+`NotifyMissingRoom <b>N/A</b>`
+
+}
 
 let recEl = document.getElementById("sttREC")
 
@@ -1865,7 +1887,7 @@ if(sortMode) return
 if(!loadingNow && document.visibilityState === "visible"){
 
 load()
-    
+
 }
 
 },45000)
@@ -1996,7 +2018,7 @@ showToast(
 "หากต้องการแก้ไข ให้ทำการจัดลำดับห้องใหม่",
 true
 )
-  
+
 }
 
 }
