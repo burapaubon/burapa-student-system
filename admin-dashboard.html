@@ -1048,6 +1048,17 @@ font-weight:600;
 </div>
 
 <div class="control-section">
+<div class="control-title">เรียกใช้ Autofill ทันที</div>
+
+<button
+class="btn-control warn"
+style="width:100%;"
+onclick="runAutofill(event)">
+📈 Autofill สถิติวันนี้
+</button>
+</div>
+
+<div class="control-section">
 <div class="control-title">สำรองข้อมูลสถิติ</div>
 
 <button class="btn-main"
@@ -2255,6 +2266,65 @@ showToast("error","เกิดข้อผิดพลาด","ลองให�
 }
 
 loadingNow = false
+}
+
+async function runAutofill(e){
+
+if(loadingNow) return
+
+const btn = e.currentTarget
+
+if(!confirm("ต้องการ Autofill ห้องที่ยังไม่กรอกสถิติวันนี้ใช่หรือไม่")){
+return
+}
+
+btn.disabled = true
+btn.innerText = "กำลัง Autofill..."
+
+loadingNow = true
+
+try{
+
+const res = await fetch(
+API + "?mode=autofill&token=" + token
+)
+
+const data = await res.json()
+
+if(data.status === "success"){
+
+showToast(
+"success",
+"Autofill สำเร็จ",
+"ระบบได้เติมข้อมูลห้องที่ยังไม่กรอกแล้ว",
+true
+)
+
+}else{
+
+showToast(
+"error",
+"Autofill ไม่สำเร็จ",
+data.message || "กรุณาลองใหม่อีกครั้ง"
+)
+
+}
+
+}catch(err){
+
+showToast(
+"error",
+"เกิดข้อผิดพลาด",
+"ไม่สามารถ Autofill ได้"
+)
+
+}
+
+btn.disabled = false
+btn.innerText = "Autofill สถิติวันนี้"
+
+loadingNow = false
+
 }
 
 async function backupRecords(e){
