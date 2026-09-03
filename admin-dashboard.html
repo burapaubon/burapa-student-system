@@ -1949,25 +1949,70 @@ year += 543
 return `${day.padStart(2,"0")}/${month.padStart(2,"0")}/${year}`
 }
 
-function renderUpdateInfo(r){
-if(!r.lastUpdateTime){
-return `<span style="color:#9ca3af;font-size:12px">ยังไม่มีข้อมูล</span>`;
+function renderUpdateInfo(r) {
+
+if (!r.lastTeacherUpdateDate) {
+return `
+    <span
+    class="updateText"
+    style="color:#9ca3af;font-size:12px;font-weight:500"
+    >
+    อัพเดทข้อมูลล่าสุด : ไม่พบข้อมูล
+    </span>
+`;
 }
 
-let dateText = r.lastUpdateDate || r.date || r.updateDate || "";
-dateText = formatThaiDate(dateText);
+const parts = String(r.lastTeacherUpdateDate).split("-");
 
-let time = (r.lastUpdateTime || "").replace("น.","").trim();
-let source = (r.updatedBy || "").toLowerCase();
-let isAuto = source.includes("autofill");
+const year = Number(parts[0]);
+const month = Number(parts[1]);
+const day = Number(parts[2]);
 
-let color = isAuto ? "#9ca3af" : "#ea580c";
-let text = isAuto ? "A" : "T";
+const dateText =
+`${String(day).padStart(2, "0")}/` +
+`${String(month).padStart(2, "0")}/` +
+`${year + 543}`;
+
+const today = new Date();
+
+const todayDate = new Date(
+today.getFullYear(),
+today.getMonth(),
+today.getDate()
+);
+
+const updateDate = new Date(
+year,
+month - 1,
+day
+);
+
+const diffMs = todayDate.getTime() - updateDate.getTime();
+const diffDays = Math.floor(
+diffMs / (1000 * 60 * 60 * 24)
+);
+
+let relativeText = "";
+
+if (diffDays === 0) {
+relativeText = "วันนี้";
+} 
+else if (diffDays === 1) {
+relativeText = "เมื่อวาน";
+} 
+else if (diffDays > 1) {
+relativeText = `${diffDays} วันที่ผ่านมา`;
+} 
+else {
+relativeText = "พบข้อมูลผิดปกติ";
+}
 
 return `
-<span class="updateText" style="color:${color};font-size:12px;font-weight:500">
-สถิติล่าสุด ${dateText} เวลา ${time} น. 
-<span class="updateBy">(${text})</span>
+<span
+    class="updateText"
+    style="color:#ea580c;font-size:12px;font-weight:500"
+>
+    อัพเดทข้อมูลล่าสุด ${dateText} (${relativeText})
 </span>
 `;
 }
