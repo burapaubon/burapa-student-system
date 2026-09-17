@@ -1822,12 +1822,44 @@ const rec = data.totalRecords ?? 0
 
 let apiEl = document.getElementById("sttAPI")
 let apiStatus = "ok"
+let apiText = ""
+const seconds = (ms / 1000).toFixed(2)
 
-if(!apiOk) apiStatus = "err"
-else if(ms > 2000) apiStatus = "warn"
+if (!apiOk) {
+  apiStatus = "err"
+  apiText = "🔴 ระบบมีปัญหา"
+}
+else if (ms < 1000) {
+  apiStatus = "ok"
+  apiText = "🟢 เร็วมาก"
+}
+else if (ms < 2000) {
+  apiStatus = "ok"
+  apiText = "🟢 ปกติ"
+}
+else if (ms < 4000) {
+  apiStatus = "warn"
+  apiText = "🟡 เริ่มช้า"
+}
+else if (ms < 8000) {
+  apiStatus = "warn"
+  apiText = "🟠 ช้า"
+}
+else {
+  apiStatus = "err"
+  apiText = "🔴 ช้ามาก"
+}
 
 apiEl.className = "status-box " + apiStatus
-apiEl.innerHTML = `API <b>${ms} ms</b>`
+apiEl.innerHTML = `
+  <span>🌐 API</span>
+  <span>
+    <b>${apiText}</b>
+    <small style="display:block;text-align:right;color:#64748b;font-weight:400;">
+      ใช้เวลา ${seconds} วินาที
+    </small>
+  </span>
+`
 
 let dbEl = document.getElementById("sttDB")
 dbEl.className = "status-box " + (dbOk ? "ok" : "err")
