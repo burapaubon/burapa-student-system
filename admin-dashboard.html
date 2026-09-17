@@ -1818,6 +1818,7 @@ const ms = Math.round(performance.now() - start)
 const apiOk = data.apiOk ?? false
 const dbOk = data.dbOk ?? false
 const lastNotify = data.lastNotify || ""
+const lastNotifyText = data.lastNotifyText || ""
 const rec = data.totalRecords ?? 0
 
 let apiEl = document.getElementById("sttAPI")
@@ -1867,6 +1868,23 @@ dbEl.innerHTML = `Database <b>${dbOk ? "Online" : "Error"}</b>`
 
 let msgEl = document.getElementById("sttMSG")
 
+if (lastNotifyText) {
+
+  msgEl.style.cursor = "pointer"
+  msgEl.title = "คลิกเพื่อดูข้อความที่ส่งล่าสุด"
+
+  msgEl.onclick = function () {
+    showNotifyPopup(lastNotify, lastNotifyText)
+  }
+
+} else {
+
+  msgEl.style.cursor = "default"
+  msgEl.removeAttribute("title")
+  msgEl.onclick = null
+
+}
+  
 if(lastNotify){
 
 const d = new Date(lastNotify)
@@ -1917,6 +1935,121 @@ document.getElementById("sttREC").className = "status-box err"
 
 }
 
+function showNotifyPopup(lastNotify, message){
+
+  let thaiDate = "-"
+
+  if(lastNotify){
+    const d = new Date(lastNotify)
+
+    thaiDate =
+      d.toLocaleDateString("th-TH") +
+      " เวลา " +
+      d.toLocaleTimeString("th-TH",{
+        hour:"2-digit",
+        minute:"2-digit"
+      }) +
+      " น."
+  }
+
+  const oldPopup = document.getElementById("notifyPopup")
+  if(oldPopup) oldPopup.remove()
+
+  const popup = document.createElement("div")
+  popup.id = "notifyPopup"
+
+  popup.style.cssText = `
+    position:fixed;
+    inset:0;
+    background:rgba(15,23,42,.55);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:999999;
+    backdrop-filter:blur(4px);
+  `
+
+  popup.innerHTML = `
+    <div style="
+      width:100%;
+      max-width:560px;
+      max-height:80vh;
+      background:white;
+      border-radius:20px;
+      box-shadow:0 25px 60px rgba(0,0,0,.25);
+      overflow:hidden;
+    ">
+
+      <div style="
+        padding:18px 20px;
+        background:linear-gradient(135deg,#16a34a,#22c55e);
+        color:white;
+      ">
+        <div style="font-size:18px;font-weight:700;">
+          📨 ข้อความแจ้งเตือนล่าสุด
+        </div>
+
+        <div style="font-size:12px;margin-top:4px;opacity:.9;">
+          NotifyMissingRoom • ${thaiDate}
+        </div>
+      </div>
+
+      <div style="
+        padding:20px;
+        max-height:55vh;
+        overflow-y:auto;
+      ">
+
+        <div style="
+          background:#f8fafc;
+          border:1px solid #e2e8f0;
+          border-radius:14px;
+          padding:16px;
+          font-size:14px;
+          line-height:1.8;
+          white-space:pre-wrap;
+          color:#334155;
+        ">${escapeHTML(message)}</div>
+
+      </div>
+
+      <div style="
+        padding:0 20px 20px;
+        display:flex;
+        justify-content:center;
+      ">
+
+        <button
+          id="closeNotifyPopup"
+          style="
+            background:#334155;
+            color:white;
+            padding:10px 35px;
+            border-radius:10px;
+            font-size:14px;
+          ">
+          ปิด
+        </button>
+
+      </div>
+
+    </div>
+  `
+
+  document.body.appendChild(popup)
+
+  document.getElementById("closeNotifyPopup").onclick = function(){
+    popup.remove()
+  }
+
+  popup.onclick = function(e){
+    if(e.target === popup){
+      popup.remove()
+    }
+  }
+}
+  
 function startAutoRefresh(){
 
 load()
