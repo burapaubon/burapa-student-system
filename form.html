@@ -1,1121 +1,1158 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ระบบบันทึกสถิตินักเรียน</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบบันทึกสถิตินักเรียน</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-<style>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Prompt', sans-serif;
+    }
 
-*{
-box-sizing:border-box;
-margin:0;
-padding:0;
-font-family:'Prompt',sans-serif;
-}
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background:
+        linear-gradient(180deg, #f6f7fb, #eef1f8);
+    }
 
-body{
-min-height:100vh;
-display:flex;
-flex-direction:column;
-background:
-linear-gradient(180deg,#f6f7fb,#eef1f8);
-}
+    .logo {
+      width: clamp(80px, 16vw, 110px);
+      margin-bottom: 4px;
+      animation: float 4s ease-in-out infinite;
+      filter:
+        drop-shadow(0 8px 14px rgba(0, 0, 0, .3)) drop-shadow(0 0 25px rgba(255, 255, 255, .35));
+    }
 
-.logo{
-width:clamp(80px,16vw,110px);
-margin-bottom:4px;
-animation:float 4s ease-in-out infinite;
-filter:
-drop-shadow(0 8px 14px rgba(0,0,0,.3))
-drop-shadow(0 0 25px rgba(255,255,255,.35));
-}
+    @keyframes float {
+      0% {
+        transform: translateY(0)
+      }
 
-@keyframes float{
-0%{transform:translateY(0)}
-50%{transform:translateY(-6px)}
-100%{transform:translateY(0)}
-}
+      50% {
+        transform: translateY(-6px)
+      }
 
-header{
-background:linear-gradient(135deg,#c1121f,#e63946,#ff6b6b);
-background-size:200% 200%;
-animation:gradientMove 6s ease infinite;
-border-bottom:4px solid rgba(255,255,255,0.25);
-color:white;
-text-align:center;
-padding:22px 10px;
-box-shadow:0 10px 25px rgba(0,0,0,.15);
-position:relative;
-overflow:hidden;
-z-index:1;
-backdrop-filter: blur(2px);
-}
+      100% {
+        transform: translateY(0)
+      }
+    }
 
-header::before{
-content:"";
-position:absolute;
-top:0;
-left:0;
-width:200%;
-height:100%;
-background:
-radial-gradient(rgba(255,255,255,.12) 2px, transparent 2px);
-background-size:40px 40px;
-animation:dotsMove 30s linear infinite;
-opacity:.35;
-pointer-events:none;
-}
+    header {
+      background: linear-gradient(135deg, #c1121f, #e63946, #ff6b6b);
+      background-size: 200% 200%;
+      animation: gradientMove 6s ease infinite;
+      border-bottom: 4px solid rgba(255, 255, 255, 0.25);
+      color: white;
+      text-align: center;
+      padding: 22px 10px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, .15);
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+      backdrop-filter: blur(2px);
+    }
 
-header::after{
-content:"";
-position:absolute;
-top:0;
-left:-120%;
-width:240%;
-height:100%;
-background:linear-gradient(
-120deg,
-rgba(255,255,255,0) 0%,
-rgba(255,255,255,.25) 40%,
-rgba(255,255,255,.35) 50%,
-rgba(255,255,255,.25) 60%,
-rgba(255,255,255,0) 100%
-);
-filter:blur(28px);
-animation:shine 6s linear infinite;
-pointer-events:none;
-}
+    header::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 200%;
+      height: 100%;
+      background:
+        radial-gradient(rgba(255, 255, 255, .12) 2px, transparent 2px);
+      background-size: 40px 40px;
+      animation: dotsMove 30s linear infinite;
+      opacity: .35;
+      pointer-events: none;
+    }
 
-.system-name{font-size:13px;}
-.school-name{font-size:26px;font-weight:700;}
+    header::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -120%;
+      width: 240%;
+      height: 100%;
+      background: linear-gradient(120deg,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, .25) 40%,
+          rgba(255, 255, 255, .35) 50%,
+          rgba(255, 255, 255, .25) 60%,
+          rgba(255, 255, 255, 0) 100%);
+      filter: blur(28px);
+      animation: shine 6s linear infinite;
+      pointer-events: none;
+    }
 
-@keyframes gradientMove{
-0%{background-position:0% 50%}
-50%{background-position:100% 50%}
-100%{background-position:0% 50%}
-}
+    .system-name {
+      font-size: 13px;
+    }
 
-@keyframes dotsMove{
-0%{transform:translateX(0)}
-100%{transform:translateX(-400px)}
-}
+    .school-name {
+      font-size: 26px;
+      font-weight: 700;
+    }
 
-@keyframes shine{
-0%{transform:translateX(-100%)}
-100%{transform:translateX(100%)}
-}
+    @keyframes gradientMove {
+      0% {
+        background-position: 0% 50%
+      }
 
-.back{
-position:absolute;
-left:12px;
-top:12px;
-color:white;
-text-decoration:none;
-font-size:13px;
-background:rgba(255,255,255,.2);
-padding:6px 10px;
-border-radius:8px;
-cursor:pointer;
-}
+      50% {
+        background-position: 100% 50%
+      }
 
-.term{
-font-size:16px;
-margin-top:3px;
-}
+      100% {
+        background-position: 0% 50%
+      }
+    }
 
-.time{
-font-size:14px;
-margin-top:2px;
-}
+    @keyframes dotsMove {
+      0% {
+        transform: translateX(0)
+      }
 
-main{
-flex:1;
-max-width:1000px;
-margin:auto;
-padding:20px;
-width:100%;
-}
+      100% {
+        transform: translateX(-400px)
+      }
+    }
 
-.card{
-background:white;
-padding:22px;
-border-radius:18px;
-box-shadow:0 10px 25px rgba(0,0,0,.08);
-transition:.2s;
-}
+    @keyframes shine {
+      0% {
+        transform: translateX(-100%)
+      }
 
-.card:hover{
-transform:translateY(-4px);
-box-shadow:0 18px 35px rgba(0,0,0,.12);
-}
+      100% {
+        transform: translateX(100%)
+      }
+    }
 
-.title{
-text-align:center;
-margin-bottom:10px;
-}
+    .back {
+      position: absolute;
+      left: 12px;
+      top: 12px;
+      color: white;
+      text-decoration: none;
+      font-size: 13px;
+      background: rgba(255, 255, 255, .2);
+      padding: 6px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
 
-.room{
-font-size:clamp(15px,4vw,18px);
-font-weight:600;
-line-height:1.3;
-word-break:break-word;
-}
+    .term {
+      font-size: 16px;
+      margin-top: 3px;
+    }
 
-.datebox{
-margin-top:6px;
-font-size:13px;
-color:#555;
-}
+    .time {
+      font-size: 14px;
+      margin-top: 2px;
+    }
 
-input[type=date]{
-padding:6px;
-border-radius:8px;
-border:1px solid #ddd;
-margin-left:6px;
-}
+    main {
+      flex: 1;
+      max-width: 1000px;
+      margin: auto;
+      padding: 20px;
+      width: 100%;
+    }
 
-.section{
-font-size:14px;
-font-weight:600;
-color:#c1121f;
-margin-top:16px;
-margin-bottom:8px;
-}
+    .card {
+      background: white;
+      padding: 22px;
+      border-radius: 18px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, .08);
+      transition: .2s;
+    }
 
-.field{
-margin-bottom:10px;
-}
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 18px 35px rgba(0, 0, 0, .12);
+    }
 
-label{
-font-size:13px;
-}
+    .title {
+      text-align: center;
+      margin-bottom: 10px;
+    }
 
-input[type=number]{
-width:100%;
-padding:10px;
-border-radius:10px;
-border:1px solid #ddd;
-margin-top:4px;
-transition:.15s;
-}
+    .room {
+      font-size: clamp(15px, 4vw, 18px);
+      font-weight: 600;
+      line-height: 1.3;
+      word-break: break-word;
+    }
 
-input[type=number]:focus{
-border:1px solid #e63946;
-box-shadow:0 0 0 2px rgba(230,57,70,.15);
-outline:none;
-}
+    .datebox {
+      margin-top: 6px;
+      font-size: 13px;
+      color: #555;
+    }
 
-.totalbox{
-background:#f3f5fa;
-padding:10px;
-border-radius:10px;
-margin-bottom:10px;
-font-size:13px;
-}
+    input[type=date] {
+      padding: 6px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      margin-left: 6px;
+    }
 
-.totalbox b{
-font-size:16px;
-color:#c1121f;
-}
+    .section {
+      font-size: 14px;
+      font-weight: 600;
+      color: #c1121f;
+      margin-top: 16px;
+      margin-bottom: 8px;
+    }
 
-.error{
-border:2px solid #e63946;
-}
+    .field {
+      margin-bottom: 10px;
+    }
 
-.msg{
-color:#e63946;
-font-size:12px;
-display:none;
-margin-top:6px;
-}
+    label {
+      font-size: 13px;
+    }
 
-button{
-width:100%;
-padding:12px;
-border:none;
-border-radius:12px;
-background:#e63946;
-color:white;
-font-size:15px;
-margin-top:12px;
-cursor:pointer;
-}
+    input[type=number] {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      margin-top: 4px;
+      transition: .15s;
+    }
 
-button:disabled{
-background:#ccc;
-}
+    input[type=number]:focus {
+      border: 1px solid #e63946;
+      box-shadow: 0 0 0 2px rgba(230, 57, 70, .15);
+      outline: none;
+    }
 
-footer{
-background:linear-gradient(135deg,#c1121f,#e63946,#ff6b6b);
-color:white;
-text-align:center;
-font-size:10px;
-padding:8px;
-}
+    .totalbox {
+      background: #f3f5fa;
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      font-size: 13px;
+    }
 
-#loading{
-position:fixed;
-inset:0;
-background:white;
-display:none;
-align-items:center;
-justify-content:center;
-flex-direction:column;
-z-index:999;
-transition:opacity .3s ease;
-overflow:hidden;
-touch-action:none;
-}
+    .totalbox b {
+      font-size: 16px;
+      color: #c1121f;
+    }
 
-.loader{
-width:48px;
-height:48px;
-border:4px solid #eee;
-border-top:4px solid #c1121f;
-border-radius:50%;
-animation:spin .8s linear infinite;
-}
+    .error {
+      border: 2px solid #e63946;
+    }
 
-@keyframes spin{
-to{transform:rotate(360deg)}
-}
+    .msg {
+      color: #e63946;
+      font-size: 12px;
+      display: none;
+      margin-top: 6px;
+    }
 
-.card-grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-gap:16px;
-}
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      background: #e63946;
+      color: white;
+      font-size: 15px;
+      margin-top: 12px;
+      cursor: pointer;
+    }
 
-@media (max-width:900px){
+    button:disabled {
+      background: #ccc;
+    }
 
-.card-grid{
-grid-template-columns:1fr;
-}
+    footer {
+      background: linear-gradient(135deg, #c1121f, #e63946, #ff6b6b);
+      color: white;
+      text-align: center;
+      font-size: 10px;
+      padding: 8px;
+    }
 
-}
+    #loading {
+      position: fixed;
+      inset: 0;
+      background: white;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      z-index: 999;
+      transition: opacity .3s ease;
+      overflow: hidden;
+      touch-action: none;
+    }
 
-#toastOverlay{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,.2);
-backdrop-filter: blur(2px);
-opacity:0;
-pointer-events:none;
-transition:.3s ease;
-z-index:9998;
-}
+    .loader {
+      width: 48px;
+      height: 48px;
+      border: 4px solid #eee;
+      border-top: 4px solid #c1121f;
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
 
-#toastOverlay.show{
-opacity:1;
-}
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
 
-#toast{
-position:fixed;
-top:50%;
-left:50%;
-transform:translate(-50%, -50%) scale(.8);
-padding:18px 22px;
-border-radius:16px;
-font-size:14px;
-font-weight:500;
-text-align:center;
-color:#fff;
-opacity:0;
-pointer-events:none;
-z-index:9999;
-min-width:220px;
-max-width:85%;
-box-shadow:
-0 20px 50px rgba(0,0,0,.25),
-0 8px 18px rgba(0,0,0,.15);
-transition: all .4s cubic-bezier(.22,1,.36,1);
-}
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
 
-#toast.show{
-opacity:1;
-transform:translate(-50%, -50%) scale(1);
-}
+    @media (max-width:900px) {
 
-#toast.success{
-background:linear-gradient(135deg,#4ade80,#22c55e);
-}
+      .card-grid {
+        grid-template-columns: 1fr;
+      }
 
-#toast.error{
-background:linear-gradient(135deg,#ff6b6b,#ef4444);
-}
+    }
 
-#toast.info{
-background:linear-gradient(135deg,#60a5fa,#3b82f6);
-}
+    #toastOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .2);
+      backdrop-filter: blur(2px);
+      opacity: 0;
+      pointer-events: none;
+      transition: .3s ease;
+      z-index: 9998;
+    }
 
-#toast::after{
-content:"";
-position:absolute;
-left:0;
-bottom:0;
-height:4px;
-width:100%;
-background:rgba(255,255,255,.5);
-transform-origin:left;
-transform:scaleX(1);
-transition: transform linear var(--duration, 6s);
-border-radius:0 0 20px 20px;
-}
+    #toastOverlay.show {
+      opacity: 1;
+    }
 
-#toast.hide::after{
-transform:scaleX(0);
-}
+    #toast {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(.8);
+      padding: 18px 22px;
+      border-radius: 16px;
+      font-size: 14px;
+      font-weight: 500;
+      text-align: center;
+      color: #fff;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 9999;
+      min-width: 220px;
+      max-width: 85%;
+      box-shadow:
+        0 20px 50px rgba(0, 0, 0, .25),
+        0 8px 18px rgba(0, 0, 0, .15);
+      transition: all .4s cubic-bezier(.22, 1, .36, 1);
+    }
 
-</style>
+    #toast.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    #toast.success {
+      background: linear-gradient(135deg, #4ade80, #22c55e);
+    }
+
+    #toast.error {
+      background: linear-gradient(135deg, #ff6b6b, #ef4444);
+    }
+
+    #toast.info {
+      background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    }
+
+    #toast::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      height: 4px;
+      width: 100%;
+      background: rgba(255, 255, 255, .5);
+      transform-origin: left;
+      transform: scaleX(1);
+      transition: transform linear var(--duration, 6s);
+      border-radius: 0 0 20px 20px;
+    }
+
+    #toast.hide::after {
+      transform: scaleX(0);
+    }
+  </style>
 </head>
 
 <body>
 
-<script src="ui-effects.js"></script>
-<script src="session.js"></script>
+  <script src="ui-effects.js"></script>
+  <script src="session.js"></script>
 
-<div id="loading">
-<div class="loader"></div>
-<div style="margin-top:12px;font-size:14px;color:#555">
-โปรดรอสักครู่...
-</div>
-</div>
+  <div id="loading">
+    <div class="loader"></div>
+    <div style="margin-top:12px;font-size:14px;color:#555">
+      โปรดรอสักครู่...
+    </div>
+  </div>
 
-<header>
+  <header>
 
 
-<a class="back" onclick="goBack()">← กลับ Dashboard</a>
+    <a class="back" onclick="goBack()">← กลับ Dashboard</a>
 
-<img src="burapa-logo.png" class="logo">
+    <img src="burapa-logo.png" class="logo">
 
-<div class="system-name">ระบบบริหารจัดการสถิตินักเรียน</div>
-<div class="school-name">โรงเรียนเทศบาลบูรพาอุบล</div>
+    <div class="system-name">ระบบบริหารจัดการสถิตินักเรียน</div>
+    <div class="school-name">โรงเรียนเทศบาลบูรพาอุบล</div>
 
-<div id="headerDateTime">
-<div class="term" id="termDisplay" style="display:none;"></div>
-<div class="time" id="clock"></div>
-</div>
+    <div id="headerDateTime">
+      <div class="term" id="termDisplay" style="display:none;"></div>
+      <div class="time" id="clock"></div>
+    </div>
 
-</header>
+  </header>
 
-<main>
+  <main>
 
-<div class="title">
+    <div class="title">
 
-<div class="room" id="roomName"></div>
+      <div class="room" id="roomName"></div>
 
-<div class="datebox">
-วันที่บันทึก
-<input type="date" id="record_date">
-<div id="sourceInfo" style="font-size:12px;color:#666;margin-top:4px"></div>
-</div>
+      <div class="datebox">
+        วันที่บันทึก
+        <input type="date" id="record_date">
+        <div id="sourceInfo" style="font-size:12px;color:#666;margin-top:4px"></div>
+      </div>
 
-</div>
+    </div>
 
-<div class="card-grid">
+    <div class="card-grid">
 
-<div class="card">
+      <div class="card">
 
-<div class="section">👨‍🎓 นักเรียนทั้งหมด</div>
+        <div class="section">👨‍🎓 นักเรียนทั้งหมด</div>
 
-<div class="field">
-<label>นักเรียนชายทั้งหมด</label>
-<input type="number" id="all_boys" min="0" max="100" step="1">
-</div>
+        <div class="field">
+          <label>นักเรียนชายทั้งหมด</label>
+          <input type="number" id="all_boys" min="0" max="100" step="1">
+        </div>
 
-<div class="field">
-<label>นักเรียนหญิงทั้งหมด</label>
-<input type="number" id="all_girls" min="0" max="100" step="1">
-</div>
+        <div class="field">
+          <label>นักเรียนหญิงทั้งหมด</label>
+          <input type="number" id="all_girls" min="0" max="100" step="1">
+        </div>
 
-<div class="totalbox">
-✅ รวมนักเรียนทั้งหมด : <b id="all_total">0</b>
-</div>
+        <div class="totalbox">
+          ✅ รวมนักเรียนทั้งหมด : <b id="all_total">0</b>
+        </div>
 
-</div>
+      </div>
 
-<div class="card">
+      <div class="card">
 
-<div class="section">📅 มาเรียนวันนี้</div>
+        <div class="section">📅 มาเรียนวันนี้</div>
 
-<div class="field">
-<label>ชายมาเรียน</label>
-<input type="number" inputmode="numeric" id="boys_today" min="0" max="100" step="1">
-</div>
+        <div class="field">
+          <label>ชายมาเรียน</label>
+          <input type="number" inputmode="numeric" id="boys_today" min="0" max="100" step="1">
+        </div>
 
-<div class="field">
-<label>หญิงมาเรียน</label>
-<input type="number" inputmode="numeric" id="girls_today" min="0" max="100" step="1">
-</div>
+        <div class="field">
+          <label>หญิงมาเรียน</label>
+          <input type="number" inputmode="numeric" id="girls_today" min="0" max="100" step="1">
+        </div>
 
-<div class="totalbox">
-✅ มาเรียนรวม : <b id="today_total">0</b>
-</div>
+        <div class="totalbox">
+          ✅ มาเรียนรวม : <b id="today_total">0</b>
+        </div>
 
-</div>
+      </div>
 
-<div class="card">
+      <div class="card">
 
-<div class="section">📊 สถานะอื่นๆ</div>
+        <div class="section">📊 สถานะอื่นๆ</div>
 
-<div class="field">
-<label>🤒ป่วย</label>
-<input type="number" inputmode="numeric" id="sick" min="0" max="100" step="1">
-</div>
+        <div class="field">
+          <label>🤒ป่วย</label>
+          <input type="number" inputmode="numeric" id="sick" min="0" max="100" step="1">
+        </div>
 
-<div class="field">
-<label>📝ลา</label>
-<input type="number" inputmode="numeric" id="leave" min="0" max="100" step="1">
-</div>
+        <div class="field">
+          <label>📝ลา</label>
+          <input type="number" inputmode="numeric" id="leave" min="0" max="100" step="1">
+        </div>
 
-<div class="field">
-<label>❌ ขาด</label>
-<input type="number" inputmode="numeric" id="absent" min="0" max="100" step="1">
-</div>
+        <div class="field">
+          <label>❌ ขาด</label>
+          <input type="number" inputmode="numeric" id="absent" min="0" max="100" step="1">
+        </div>
 
-<div class="msg" id="errorMsg">
-⚠ จำนวนที่กรอกไม่สัมพันธ์กับจำนวนนักเรียนทั้งหมด
-</div>
+        <div class="msg" id="errorMsg">
+          ⚠ จำนวนที่กรอกไม่สัมพันธ์กับจำนวนนักเรียนทั้งหมด
+        </div>
 
-<button id="saveBtn" disabled onclick="save()">
-💾 บันทึกข้อมูลสถิติ
-</button>
+        <button id="saveBtn" disabled onclick="save()">
+          💾 บันทึกข้อมูลสถิติ
+        </button>
 
-</div>
-</div>
-</main>
+      </div>
+    </div>
+  </main>
 
-<footer>
-ระบบบริหารจัดการสถิตินักเรียน (BURAPA STUDENT SYSTEM)
-<br>
-โรงเรียนเทศบาลบูรพาอุบล
-<br>
-สำนักการศึกษา เทศบาลนครอุบลราชธานี
-</footer>
+  <footer>
+    ระบบบริหารจัดการสถิตินักเรียน (BURAPA STUDENT SYSTEM)
+    <br>
+    โรงเรียนเทศบาลบูรพาอุบล
+    <br>
+    สำนักการศึกษา เทศบาลนครอุบลราชธานี
+  </footer>
 
-<div id="toast"></div>
-<div id="toastOverlay"></div>
+  <div id="toast"></div>
+  <div id="toastOverlay"></div>
 
-<script>
+  <script>
 
-const API="https://script.google.com/macros/s/AKfycbyV4PNjlFskTfF0Ol6xrZdWpSCJm54bi33l0M66QpluNo8X6B7Js8LZRtuY7T05KsShoQ/exec"
+    const API = "https://script.google.com/macros/s/AKfycbyV4PNjlFskTfF0Ol6xrZdWpSCJm54bi33l0M66QpluNo8X6B7Js8LZRtuY7T05KsShoQ/exec"
 
-let inputs = null
-let isUserTyping = false
-let hasLoadedOnce = false
+    let inputs = null
+    let isUserTyping = false
+    let hasLoadedOnce = false
 
-function showLoading(text){
+    function showLoading(text) {
 
-const loading=document.getElementById("loading")
+      const loading = document.getElementById("loading")
 
-loading.style.display="flex"
-loading.style.opacity="1"
+      loading.style.display = "flex"
+      loading.style.opacity = "1"
 
-if(text){
-loading.querySelector("div:last-child").innerText=text
-}
+      if (text) {
+        loading.querySelector("div:last-child").innerText = text
+      }
 
-}
+    }
 
-function hideLoading(){
+    function hideLoading() {
 
-const loading=document.getElementById("loading")
+      const loading = document.getElementById("loading")
 
-loading.style.opacity="0"
+      loading.style.opacity = "0"
 
-setTimeout(()=>{
-loading.style.display="none"
-},300)
+      setTimeout(() => {
+        loading.style.display = "none"
+      }, 300)
 
-}
+    }
 
-async function loadTerm(){
+    async function loadTerm() {
 
-let el = document.getElementById("termDisplay")
+      let el = document.getElementById("termDisplay")
 
-try{
+      try {
 
-const res = await fetchWithTimeout(API + "?mode=getterm&t=" + Date.now())
-const data = await res.json()
+        const res = await fetchWithTimeout(API + "?mode=getterm&t=" + Date.now())
+        const data = await res.json()
 
-if(data.term != null && data.year != null){
+        if (data.term != null && data.year != null) {
 
-el.innerHTML =
-"ภาคเรียนที่ " + data.term + " ปีการศึกษา " + data.year
+          el.innerHTML =
+            "ภาคเรียนที่ " + data.term + " ปีการศึกษา " + data.year
 
-el.style.display = "block"
+          el.style.display = "block"
 
-localStorage.setItem("term", data.term)
-localStorage.setItem("year", data.year)
+          localStorage.setItem("term", data.term)
+          localStorage.setItem("year", data.year)
 
-return
-}
+          return
+        }
 
-}catch(e){
-console.warn("โหลดเทอมไม่สำเร็จ")
-}
+      } catch (e) {
+        console.warn("โหลดเทอมไม่สำเร็จ")
+      }
 
-let term = localStorage.getItem("term")
-let year = localStorage.getItem("year")
+      let term = localStorage.getItem("term")
+      let year = localStorage.getItem("year")
 
-if(term && year){
+      if (term && year) {
 
-el.innerHTML =
-"ภาคเรียนที่ " + term + " ปีการศึกษา " + year
+        el.innerHTML =
+          "ภาคเรียนที่ " + term + " ปีการศึกษา " + year
 
-el.style.display = "block"
+        el.style.display = "block"
 
-}else{
+      } else {
 
-el.style.display = "none"
+        el.style.display = "none"
 
-}
+      }
 
-}
+    }
 
-function updateClock(){
+    function updateClock() {
 
-let now=new Date()
+      let now = new Date()
 
-let days=["วันอาทิตย์","วันจันทร์","วันอังคาร","วันพุธ","วันพฤหัสบดี","วันศุกร์","วันเสาร์"]
-let months=["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"]
+      let days = ["วันอาทิตย์", "วันจันทร์", "วันอังคาร", "วันพุธ", "วันพฤหัสบดี", "วันศุกร์", "วันเสาร์"]
+      let months = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"]
 
-let day=days[now.getDay()]
-let date=now.getDate()
-let month=months[now.getMonth()]
-let year=now.getFullYear()+543
+      let day = days[now.getDay()]
+      let date = now.getDate()
+      let month = months[now.getMonth()]
+      let year = now.getFullYear() + 543
 
-let h=String(now.getHours()).padStart(2,"0")
-let m=String(now.getMinutes()).padStart(2,"0")
-let s=String(now.getSeconds()).padStart(2,"0")
+      let h = String(now.getHours()).padStart(2, "0")
+      let m = String(now.getMinutes()).padStart(2, "0")
+      let s = String(now.getSeconds()).padStart(2, "0")
 
-document.getElementById("clock").innerHTML=
-day+"ที่ "+date+" "+month+" พ.ศ."+year+" เวลา "+h+":"+m+":"+s+" น."
+      document.getElementById("clock").innerHTML =
+        day + "ที่ " + date + " " + month + " พ.ศ." + year + " เวลา " + h + ":" + m + ":" + s + " น."
 
-}
+    }
 
-setInterval(updateClock,1000)
-updateClock()
+    setInterval(updateClock, 1000)
+    updateClock()
 
-const params=new URLSearchParams(location.search)
+    const params = new URLSearchParams(location.search)
 
-const room=params.get("room")
+    const room = params.get("room")
 
-const from = params.get("from")
+    const from = params.get("from")
 
-function goBack(){
-if(from === "admin"){
-  location.href = "admin-dashboard.html"
-} else {
-  location.href = "teacher-dashboard.html"
-}
-}
+    function goBack() {
+      if (from === "admin") {
+        location.href = "admin-dashboard.html"
+      } else {
+        location.href = "teacher-dashboard.html"
+      }
+    }
 
-if(!room){
-if(from === "admin"){
-location.href = "admin-dashboard.html"
-} else {
-location.href = "teacher-dashboard.html"
-}
-throw new Error("room not found")
-}
+    if (!room) {
+      if (from === "admin") {
+        location.href = "admin-dashboard.html"
+      } else {
+        location.href = "teacher-dashboard.html"
+      }
+      throw new Error("room not found")
+    }
 
-const edit=params.get("edit")
+    const edit = params.get("edit")
 
-const backdate=params.get("backdate")
+    const backdate = params.get("backdate")
 
-function todayLocal(){
+    function todayLocal() {
 
-let d=new Date()
+      let d = new Date()
 
-d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
+      d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
 
-return d.toISOString().split('T')[0]
+      return d.toISOString().split('T')[0]
 
-}
+    }
 
-const today=todayLocal()
+    const today = todayLocal()
 
-const dateInput=document.getElementById("record_date")
-document.getElementById("sourceInfo").innerText=""
-if(backdate){
+    const dateInput = document.getElementById("record_date")
+    document.getElementById("sourceInfo").innerText = ""
+    if (backdate) {
 
-document.getElementById("headerDateTime").style.display="none"
+      document.getElementById("headerDateTime").style.display = "none"
 
-dateInput.disabled=false
+      dateInput.disabled = false
 
-let yesterday=new Date()
-yesterday.setHours(0,0,0,0)
-yesterday.setDate(yesterday.getDate()-1)
+      let yesterday = new Date()
+      yesterday.setHours(0, 0, 0, 0)
+      yesterday.setDate(yesterday.getDate() - 1)
 
-function formatDate(d){
-let year=d.getFullYear()
-let month=String(d.getMonth()+1).padStart(2,"0")
-let day=String(d.getDate()).padStart(2,"0")
-return `${year}-${month}-${day}`
-}
+      function formatDate(d) {
+        let year = d.getFullYear()
+        let month = String(d.getMonth() + 1).padStart(2, "0")
+        let day = String(d.getDate()).padStart(2, "0")
+        return `${year}-${month}-${day}`
+      }
 
-dateInput.max=formatDate(yesterday)
-dateInput.min="2024-01-01"
-dateInput.value=""
+      dateInput.max = formatDate(yesterday)
+      dateInput.min = "2024-01-01"
+      dateInput.value = ""
 
-document.getElementById("roomName").innerHTML=
-"⏳ แบบบันทึกสถิตินักเรียนย้อนหลัง<br>"+room
+      document.getElementById("roomName").innerHTML =
+        "⏳ แบบบันทึกสถิตินักเรียนย้อนหลัง<br>" + room
 
-}else{
+    } else {
 
-dateInput.value=today
-dateInput.disabled=true
-dateInput.min=today
-dateInput.max=today
+      dateInput.value = today
+      dateInput.disabled = true
+      dateInput.min = today
+      dateInput.max = today
 
-document.getElementById("roomName").innerHTML=
-"📋 แบบบันทึกสถิตินักเรียน<br>"+room
+      document.getElementById("roomName").innerHTML =
+        "📋 แบบบันทึกสถิตินักเรียน<br>" + room
 
-}
-dateInput.addEventListener("change",loadDateData)
+    }
+    dateInput.addEventListener("change", loadDateData)
 
-function clearInputs(){
+    function clearInputs() {
 
-document.getElementById("all_boys").value=""
-document.getElementById("all_girls").value=""
-document.getElementById("boys_today").value=""
-document.getElementById("girls_today").value=""
-document.getElementById("sick").value=""
-document.getElementById("leave").value=""
-document.getElementById("absent").value=""
+      document.getElementById("all_boys").value = ""
+      document.getElementById("all_girls").value = ""
+      document.getElementById("boys_today").value = ""
+      document.getElementById("girls_today").value = ""
+      document.getElementById("sick").value = ""
+      document.getElementById("leave").value = ""
+      document.getElementById("absent").value = ""
 
-document.getElementById("all_total").innerText="0"
-document.getElementById("today_total").innerText="0"
+      document.getElementById("all_total").innerText = "0"
+      document.getElementById("today_total").innerText = "0"
 
-}
+    }
 
-async function fetchWithTimeout(url, options={}, timeout=8000){
-return Promise.race([
-fetch(url, options),
-new Promise((_, reject)=>
-setTimeout(()=>reject(new Error("timeout")), timeout)
-)
-])
-}
+    async function fetchWithTimeout(url, options = {}, timeout = 8000) {
+      return Promise.race([
+        fetch(url, options),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("timeout")), timeout)
+        )
+      ])
+    }
 
-async function loadDateData(){
+    async function loadDateData() {
 
-showLoading("กำลังซิงค์ข้อมูล...")
-clearInputs()
+      showLoading("กำลังซิงค์ข้อมูล...")
+      clearInputs()
 
-let date=dateInput.value
+      let date = dateInput.value
 
-if(!date){
-hideLoading()
-return
-}
+      if (!date) {
+        hideLoading()
+        return
+      }
 
-try{
+      try {
 
-const res = await fetchWithTimeout(
-API+"?mode=getbydate&room="+encodeURIComponent(room)+"&date="+date+"&t="+Date.now()
-)
+        const res = await fetchWithTimeout(
+          API + "?mode=getbydate&room=" + encodeURIComponent(room) + "&date=" + date + "&t=" + Date.now()
+        )
 
-let data = await res.json()
+        let data = await res.json()
 
-if(!data || Object.keys(data).length===0){
+        if (!data || Object.keys(data).length === 0) {
 
-calculate()
+          calculate()
 
-const check = await fetch(
-API+"?mode=hasdata&date="+date+"&t="+Date.now()
-)
-const hasDataText = await check.text()
-let hasData = false
+          const check = await fetch(
+            API + "?mode=hasdata&date=" + date + "&t=" + Date.now()
+          )
+          const hasDataText = await check.text()
+          let hasData = false
 
-try{
-hasData = JSON.parse(hasDataText)
-}catch{
-hasData = hasDataText.includes("true")
-}
+          try {
+            hasData = JSON.parse(hasDataText)
+          } catch {
+            hasData = hasDataText.includes("true")
+          }
 
-if(hasData){
+          if (hasData) {
 
-document.getElementById("sourceInfo").innerText =
-"ที่มาของข้อมูล : ยังไม่ได้บันทึกข้อมูลของห้องนี้"
+            document.getElementById("sourceInfo").innerText =
+              "ที่มาของข้อมูล : ยังไม่ได้บันทึกข้อมูลของห้องนี้"
 
-}else{
+          } else {
 
-document.getElementById("sourceInfo").innerText =
-"ที่มาของข้อมูล : ไม่มีข้อมูลในวันนี้"
+            document.getElementById("sourceInfo").innerText =
+              "ที่มาของข้อมูล : ไม่มีข้อมูลในวันนี้"
 
-}
+          }
 
-hideLoading()
-return
-}
+          hideLoading()
+          return
+        }
 
-document.getElementById("all_boys").value=data.all_boys ?? ""
-document.getElementById("all_girls").value=data.all_girls ?? ""
-document.getElementById("boys_today").value=data.boys_today ?? ""
-document.getElementById("girls_today").value=data.girls_today ?? ""
-document.getElementById("sick").value=data.sick ?? ""
-document.getElementById("leave").value=data.leave ?? ""
-document.getElementById("absent").value=data.absent ?? ""
+        document.getElementById("all_boys").value = data.all_boys ?? ""
+        document.getElementById("all_girls").value = data.all_girls ?? ""
+        document.getElementById("boys_today").value = data.boys_today ?? ""
+        document.getElementById("girls_today").value = data.girls_today ?? ""
+        document.getElementById("sick").value = data.sick ?? ""
+        document.getElementById("leave").value = data.leave ?? ""
+        document.getElementById("absent").value = data.absent ?? ""
 
-document.getElementById("sourceInfo").innerText =
-"ที่มาของข้อมูล : " + (data.source || "-")
+        document.getElementById("sourceInfo").innerText =
+          "ที่มาของข้อมูล : " + (data.source || "-")
 
-calculate()
+        calculate()
 
-if(inputs){
-inputs.forEach(i=>i.classList.remove("error"))
-}
+        if (inputs) {
+          inputs.forEach(i => i.classList.remove("error"))
+        }
 
-let all_total = num("all_boys") + num("all_girls")
+        let all_total = num("all_boys") + num("all_girls")
 
-if(all_total === 0){
-document.getElementById("errorMsg").style.display="none"
-document.getElementById("saveBtn").disabled=true
-return
-}
+        if (all_total === 0) {
+          document.getElementById("errorMsg").style.display = "none"
+          document.getElementById("saveBtn").disabled = true
+          return
+        }
 
-} catch(e){
-console.error(e)
-showToast("โหลดข้อมูลไม่สำเร็จ กรุณาลองใหม่","error",5000)
-}
+      } catch (e) {
+        console.error(e)
+        showToast("โหลดข้อมูลไม่สำเร็จ กรุณาลองใหม่", "error", 5000)
+      }
 
-finally{
-hideLoading()
-}
+      finally {
+        hideLoading()
+      }
 
-}
+    }
 
-if(edit && !backdate){
-loadLatest()
-}
+    if (edit && !backdate) {
+      loadLatest()
+    }
 
-window.addEventListener("DOMContentLoaded",()=>{
+    window.addEventListener("DOMContentLoaded", () => {
 
-inputs = document.querySelectorAll("input[type=number]")
+      inputs = document.querySelectorAll("input[type=number]")
 
-inputs.forEach(i=>{
-i.addEventListener("input",()=>{
-isUserTyping = true
-calculate()
-})
-})
+      inputs.forEach(i => {
+        i.addEventListener("input", () => {
+          isUserTyping = true
+          calculate()
+        })
+      })
 
-if(!backdate){
-loadLastRoomData()
-}
+      if (!backdate) {
+        loadLastRoomData()
+      }
 
-})
+    })
 
-function num(id){
-let v = Number(document.getElementById(id).value) || 0
-return v < 0 ? 0 : v
-}
+    function num(id) {
+      let v = Number(document.getElementById(id).value) || 0
+      return v < 0 ? 0 : v
+    }
 
-function calculate(){
+    function calculate() {
 
-if(!inputs || inputs.length === 0) return
+      if (!inputs || inputs.length === 0) return
 
-inputs.forEach(i=>{
+      inputs.forEach(i => {
 
-if(Number(i.value) < 0) i.value = 0
+        if (Number(i.value) < 0) i.value = 0
 
-i.value = Math.floor(i.value)
+        i.value = Math.floor(i.value)
 
-const max = Number(i.max)
-if(i.max && Number(i.value) > max){
-i.value = max
-}
+        const max = Number(i.max)
+        if (i.max && Number(i.value) > max) {
+          i.value = max
+        }
 
-})
+      })
 
-let all_total = num("all_boys") + num("all_girls")
-document.getElementById("all_total").innerText = all_total
+      let all_total = num("all_boys") + num("all_girls")
+      document.getElementById("all_total").innerText = all_total
 
-if(all_total === 0){
+      if (all_total === 0) {
 
-document.getElementById("errorMsg").innerText =
-"⚠ กรุณากรอกจำนวนนักเรียนทั้งหมดก่อน"
+        document.getElementById("errorMsg").innerText =
+          "⚠ กรุณากรอกจำนวนนักเรียนทั้งหมดก่อน"
 
-document.getElementById("errorMsg").style.display="block"
-document.getElementById("saveBtn").disabled=true
+        document.getElementById("errorMsg").style.display = "block"
+        document.getElementById("saveBtn").disabled = true
 
-return
-}
+        return
+      }
 
-let maxStudents = all_total
+      let maxStudents = all_total
 
-document.getElementById("boys_today").max = num("all_boys")
-document.getElementById("girls_today").max = num("all_girls")
-document.getElementById("sick").max = maxStudents
-document.getElementById("leave").max = maxStudents
-document.getElementById("absent").max = maxStudents
+      document.getElementById("boys_today").max = num("all_boys")
+      document.getElementById("girls_today").max = num("all_girls")
+      document.getElementById("sick").max = maxStudents
+      document.getElementById("leave").max = maxStudents
+      document.getElementById("absent").max = maxStudents
 
-let today_total = num("boys_today") + num("girls_today")
-let sum = today_total + num("sick") + num("leave") + num("absent")
+      let today_total = num("boys_today") + num("girls_today")
+      let sum = today_total + num("sick") + num("leave") + num("absent")
 
-document.getElementById("today_total").innerText = today_total
+      document.getElementById("today_total").innerText = today_total
 
-if(sum > all_total){
+      if (sum > all_total) {
 
-document.getElementById("errorMsg").innerText =
-"⚠ คุณกรอกจำนวนนักเรียนเกิน " + (sum-all_total) + " คน"
+        document.getElementById("errorMsg").innerText =
+          "⚠ คุณกรอกจำนวนนักเรียนเกิน " + (sum - all_total) + " คน"
 
-document.getElementById("errorMsg").style.display="block"
-document.getElementById("saveBtn").disabled=true
+        document.getElementById("errorMsg").style.display = "block"
+        document.getElementById("saveBtn").disabled = true
 
-inputs.forEach(i=>i.classList.add("error"))
+        inputs.forEach(i => i.classList.add("error"))
 
-}
-else if(sum < all_total){
+      }
+      else if (sum < all_total) {
 
-document.getElementById("errorMsg").innerText =
-"ℹ️ จำนวนนักเรียนที่ยังไม่ได้กรอกเหลือ " + (all_total-sum) + " คน"
+        document.getElementById("errorMsg").innerText =
+          "ℹ️ จำนวนนักเรียนที่ยังไม่ได้กรอกเหลือ " + (all_total - sum) + " คน"
 
-document.getElementById("errorMsg").style.display="block"
-document.getElementById("saveBtn").disabled=true
+        document.getElementById("errorMsg").style.display = "block"
+        document.getElementById("saveBtn").disabled = true
 
-inputs.forEach(i=>i.classList.add("error"))
+        inputs.forEach(i => i.classList.add("error"))
 
-}
+      }
 
-else{
+      else {
 
-document.getElementById("errorMsg").style.display="none"
-document.getElementById("saveBtn").disabled=false
+        document.getElementById("errorMsg").style.display = "none"
+        document.getElementById("saveBtn").disabled = false
 
-inputs.forEach(i=>i.classList.remove("error"))
+        inputs.forEach(i => i.classList.remove("error"))
 
-}
+      }
 
-}
+    }
 
-let saving=false
+    let saving = false
 
-async function save(){
+    async function save() {
 
-if(saving) return
-saving=true
+      if (saving) return
+      saving = true
 
-let date=document.getElementById("record_date").value
+      let date = document.getElementById("record_date").value
 
-if(!date){
-showToast("⚠ กรุณาเลือกวันที่ก่อนบันทึก","error",4000)
-saving=false
-return
+      if (!date) {
+        showToast("⚠ กรุณาเลือกวันที่ก่อนบันทึก", "error", 4000)
+        saving = false
+        return
 
-}
+      }
 
-showLoading("กำลังบันทึกสถิติ โปรดรอสักครู่...")
+      showLoading("กำลังบันทึกสถิติ โปรดรอสักครู่...")
 
-const btn=document.getElementById("saveBtn")
-btn.disabled=true
-btn.innerText="กำลังบันทึกสถิติ..."
+      const btn = document.getElementById("saveBtn")
+      btn.disabled = true
+      btn.innerText = "กำลังบันทึกสถิติ..."
 
-let data={
-mode:"save",
-room:room,
-record_date:date,
-all_boys:num("all_boys"),
-all_girls:num("all_girls"),
-boys_today:num("boys_today"),
-girls_today:num("girls_today"),
-sick:num("sick"),
-leave:num("leave"),
-absent:num("absent"),
-source:"บันทึกโดยคุณครู"
-}
+      let data = {
+        mode: "save",
+        room: room,
+        record_date: date,
+        all_boys: num("all_boys"),
+        all_girls: num("all_girls"),
+        boys_today: num("boys_today"),
+        girls_today: num("girls_today"),
+        sick: num("sick"),
+        leave: num("leave"),
+        absent: num("absent"),
+        source: "บันทึกโดยคุณครู"
+      }
 
-try{
+      try {
 
-let res = await fetch(API,{
-method:"POST",
-body:new URLSearchParams(data)
-})
+        let res = await fetch(API, {
+          method: "POST",
+          body: new URLSearchParams(data)
+        })
 
-if(!res.ok){
-throw new Error("save failed")
-}
+        if (!res.ok) {
+          throw new Error("save failed")
+        }
 
-showToast("บันทึกข้อมูลเรียบร้อยแล้ว","success",2000)
+        const result = await res.json()
 
-setTimeout(()=>{
-window.onbeforeunload=null
-if(from === "admin"){
-location.href = "admin-dashboard.html"
-} else {
-location.href = "teacher-dashboard.html"
-}
-},1500)
+        if (!result || result.status !== "success") {
+          throw new Error(result?.message || "บันทึกข้อมูลไม่สำเร็จ")
+        }
 
-}catch(e){
+        showToast("บันทึกข้อมูลเรียบร้อยแล้ว", "success", 2000)
 
-console.error(e)
+        setTimeout(() => {
+          window.onbeforeunload = null
+          if (from === "admin") {
+            location.href = "admin-dashboard.html"
+          } else {
+            location.href = "teacher-dashboard.html"
+          }
+        }, 1500)
 
-saving=false
+      } catch (e) {
 
-btn.disabled=false
-btn.innerText="บันทึกข้อมูลสถิติ"
+        console.error(e)
 
-showToast("เกิดข้อผิดพลาด ลองใหม่อีกครั้ง","error",5000)
+        saving = false
 
-}
-finally{
-hideLoading()
-}
+        btn.disabled = false
+        btn.innerText = "บันทึกข้อมูลสถิติ"
 
-}
+        showToast("เกิดข้อผิดพลาด ลองใหม่อีกครั้ง", "error", 5000)
 
-async function loadLatest(){
+      }
+      finally {
+        hideLoading()
+      }
 
-showLoading("กำลังซิงค์ข้อมูล...")
+    }
 
-let date=dateInput.value
+    async function loadLatest() {
 
-try{
+      showLoading("กำลังซิงค์ข้อมูล...")
 
-const res = await fetchWithTimeout(
-API+"?mode=getbydate&room="+encodeURIComponent(room)+"&date="+date+"&t="+Date.now()
-)
+      let date = dateInput.value
 
-let data = {}
+      try {
 
-try{
-data = await res.json()
-}catch{
-data = {}
-}
+        const res = await fetchWithTimeout(
+          API + "?mode=getbydate&room=" + encodeURIComponent(room) + "&date=" + date + "&t=" + Date.now()
+        )
 
-if(!data || Object.keys(data).length === 0){
-hideLoading()
-return
-}
+        let data = {}
 
-document.getElementById("all_boys").value=data.all_boys ?? ""
-document.getElementById("all_girls").value=data.all_girls ?? ""
-document.getElementById("boys_today").value=data.boys_today ?? ""
-document.getElementById("girls_today").value=data.girls_today ?? ""
-document.getElementById("sick").value=data.sick ?? ""
-document.getElementById("leave").value=data.leave ?? ""
-document.getElementById("absent").value=data.absent ?? ""
+        try {
+          data = await res.json()
+        } catch {
+          data = {}
+        }
 
-calculate()
+        if (!data || Object.keys(data).length === 0) {
+          hideLoading()
+          return
+        }
 
-}catch(e){
-console.error(e)
-showToast("❌ โหลดข้อมูลไม่สำเร็จ","error",5000)
-}
-finally{
-hideLoading()
-}
+        document.getElementById("all_boys").value = data.all_boys ?? ""
+        document.getElementById("all_girls").value = data.all_girls ?? ""
+        document.getElementById("boys_today").value = data.boys_today ?? ""
+        document.getElementById("girls_today").value = data.girls_today ?? ""
+        document.getElementById("sick").value = data.sick ?? ""
+        document.getElementById("leave").value = data.leave ?? ""
+        document.getElementById("absent").value = data.absent ?? ""
 
-}
+        calculate()
 
-async function loadLastRoomData(){
+      } catch (e) {
+        console.error(e)
+        showToast("❌ โหลดข้อมูลไม่สำเร็จ", "error", 5000)
+      }
+      finally {
+        hideLoading()
+      }
 
-if(hasLoadedOnce) return
-hasLoadedOnce = true
+    }
 
-showLoading("รอสักครู่...")
+    async function loadLastRoomData() {
 
-try{
+      if (hasLoadedOnce) return
+      hasLoadedOnce = true
 
-const res = await fetchWithTimeout(
-API+"?mode=getlatestroom&room="+encodeURIComponent(room)+"&t="+Date.now()
-)
+      showLoading("รอสักครู่...")
 
-let data = {}
+      try {
 
-try{
+        const res = await fetchWithTimeout(
+          API + "?mode=getlatestroom&room=" + encodeURIComponent(room) + "&t=" + Date.now()
+        )
 
-data = await res.json()
+        let data = {}
 
-}catch{
+        try {
 
-data = {}
+          data = await res.json()
 
-}
+        } catch {
 
-if(!data || Object.keys(data).length === 0) return
+          data = {}
 
-if(isUserTyping) return
+        }
 
-document.getElementById("all_boys").value = data.all_boys ?? ""
-document.getElementById("all_girls").value = data.all_girls ?? ""
+        if (!data || Object.keys(data).length === 0) return
 
-calculate()
-}catch(e){
+        if (isUserTyping) return
 
-console.error(e)
+        document.getElementById("all_boys").value = data.all_boys ?? ""
+        document.getElementById("all_girls").value = data.all_girls ?? ""
 
-} finally {
-hideLoading()
-}
+        calculate()
+      } catch (e) {
 
-}
+        console.error(e)
 
-window.onbeforeunload=function(){
+      } finally {
+        hideLoading()
+      }
 
-const btn=document.getElementById("saveBtn")
+    }
 
-if(!btn.disabled){
-return "⚠ ข้อมูลยังไม่ได้ทำการบันทึก"
+    window.onbeforeunload = function () {
 
-}
+      const btn = document.getElementById("saveBtn")
 
-}
+      if (!btn.disabled) {
+        return "⚠ ข้อมูลยังไม่ได้ทำการบันทึก"
 
-document.addEventListener("DOMContentLoaded",function(){
+      }
 
-loadTerm()
+    }
 
-})
+    document.addEventListener("DOMContentLoaded", function () {
 
-let toastTimeout
+      loadTerm()
 
-function showToast(message, type="info", duration=5000){
+    })
 
-const toast = document.getElementById("toast")
-const overlay = document.getElementById("toastOverlay")
+    let toastTimeout
 
-let icon = "ℹ️"
-if(type==="success") icon="✅"
-if(type==="error") icon="❌"
+    function showToast(message, type = "info", duration = 5000) {
 
-toast.innerHTML = `
+      const toast = document.getElementById("toast")
+      const overlay = document.getElementById("toastOverlay")
+
+      let icon = "ℹ️"
+      if (type === "success") icon = "✅"
+      if (type === "error") icon = "❌"
+
+      toast.innerHTML = `
 <div style="font-size:24px;margin-bottom:6px">${icon}</div>
 <div>${message}</div>
 `
 
-toast.className = ""
-toast.classList.add(type)
+      toast.className = ""
+      toast.classList.add(type)
 
-toast.classList.remove("hide")
+      toast.classList.remove("hide")
 
-void toast.offsetWidth
+      void toast.offsetWidth
 
-toast.style.setProperty("--duration", duration + "ms")
+      toast.style.setProperty("--duration", duration + "ms")
 
-overlay.classList.add("show")
-toast.classList.add("show")
+      overlay.classList.add("show")
+      toast.classList.add("show")
 
-setTimeout(()=>{
-toast.classList.add("hide")
-}, 50)
+      setTimeout(() => {
+        toast.classList.add("hide")
+      }, 50)
 
-clearTimeout(toastTimeout)
+      clearTimeout(toastTimeout)
 
-toastTimeout = setTimeout(()=>{
-toast.classList.remove("show")
-overlay.classList.remove("show")
-}, duration)
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove("show")
+        overlay.classList.remove("show")
+      }, duration)
 
-}
+    }
 
-</script>
+  </script>
 </body>
+
 </html>
