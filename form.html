@@ -2,6 +2,7 @@
 <html lang="th">
 
 <head>
+  <script src="performance.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ระบบบันทึกสถิตินักเรียน</title>
@@ -723,16 +724,13 @@
 
     }
 
-    async function fetchWithTimeout(url, options = {}, timeout = 8000) {
-      return Promise.race([
-        fetch(url, options),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("timeout")), timeout)
-        )
-      ])
+    function fetchWithTimeout(url, options = {}, timeout = 8000) {
+      return window.BurapaNet.fetch(url, options, timeout);
     }
 
+    let dateLoadVersion = 0;
     async function loadDateData() {
+      const version = ++dateLoadVersion;
 
       showLoading("กำลังซิงค์ข้อมูล...")
       clearInputs()
@@ -747,26 +745,19 @@
       try {
 
         const res = await fetchWithTimeout(
-          API + "?mode=getbydate&room=" + encodeURIComponent(room) + "&date=" + date + "&t=" + Date.now()
+          API + "?mode=formdata&room=" + encodeURIComponent(room) + "&date=" + date + "&t=" + Date.now()
         )
 
-        let data = await res.json()
+        const payload = await res.json()
+        if (version !== dateLoadVersion || dateInput.value !== date) return
+        if (!payload || typeof payload.hasData !== 'boolean') throw Error('กรุณาอัปเดต GAS ให้ตรงกับเว็บ')
+        let data = payload.data
 
         if (!data || Object.keys(data).length === 0) {
 
           calculate()
 
-          const check = await fetch(
-            API + "?mode=hasdata&date=" + date + "&t=" + Date.now()
-          )
-          const hasDataText = await check.text()
-          let hasData = false
-
-          try {
-            hasData = JSON.parse(hasDataText)
-          } catch {
-            hasData = hasDataText.includes("true")
-          }
+          const hasData = payload.hasData
 
           if (hasData) {
 
@@ -811,11 +802,11 @@
 
       } catch (e) {
         console.error(e)
-        showToast("โหลดข้อมูลไม่สำเร็จ กรุณาลองใหม่", "error", 5000)
+        if (version === dateLoadVersion) showToast("โหลดข้อมูลไม่สำเร็จ กรุณาลองใหม่", "error", 5000)
       }
 
       finally {
-        hideLoading()
+        if (version === dateLoadVersion) hideLoading()
       }
 
     }
@@ -835,7 +826,7 @@
         })
       })
 
-      if (!backdate) {
+      if (!backdate && !edit) {
         loadLastRoomData()
       }
 
@@ -1008,6 +999,8 @@
 
     async function loadLatest() {
 
+      const initialVersion = dateLoadVersion;
+      const initialDate = dateInput.value;
       showLoading("กำลังซิงค์ข้อมูล...")
 
       let date = dateInput.value
@@ -1025,6 +1018,8 @@
         } catch {
           data = {}
         }
+
+        if (initialVersion !== dateLoadVersion || initialDate !== dateInput.value || isUserTyping) return
 
         if (!data || Object.keys(data).length === 0) {
           hideLoading()
@@ -1046,7 +1041,7 @@
         showToast("❌ โหลดข้อมูลไม่สำเร็จ", "error", 5000)
       }
       finally {
-        hideLoading()
+        if (initialVersion === dateLoadVersion) hideLoading()
       }
 
     }
@@ -1056,6 +1051,8 @@
       if (hasLoadedOnce) return
       hasLoadedOnce = true
 
+      const initialVersion = dateLoadVersion;
+      const initialDate = dateInput.value;
       showLoading("รอสักครู่...")
 
       try {
@@ -1076,6 +1073,8 @@
 
         }
 
+        if (initialVersion !== dateLoadVersion || initialDate !== dateInput.value || isUserTyping) return
+
         if (!data || Object.keys(data).length === 0) return
 
         if (isUserTyping) return
@@ -1089,7 +1088,7 @@
         console.error(e)
 
       } finally {
-        hideLoading()
+        if (initialVersion === dateLoadVersion) hideLoading()
       }
 
     }

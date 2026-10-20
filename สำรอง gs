@@ -1,0 +1,2092 @@
+const SPREADSHEET_ID = "1hAl_KIkDX7_DnX_VIBSNxyA2MZqJLa_sy_WBlxTgvrs"
+
+function doGet(e) {
+  const writes = ["resetroom", "resettodayall", "resetrange", "resetall", "updateroomorder", "addroom", "deleteroom", "editroom", "updateterm", "updatesigconfig", "autofill", "backuprecords"];
+  if (writes.includes(String(e.parameter.mode || "").toLowerCase())) {
+    try { return withBurapaWrite_(() => burapaGet_(e)); }
+    catch (err) { return output({ status: "error", message: String(err.message || err) }); }
+  }
+  return burapaGet_(e);
+}
+function burapaGet_(e) {
+
+  try {
+
+    const page = e.parameter.page
+
+    if (page === "report_page") {
+      return HtmlService
+        .createHtmlOutputFromFile("report")
+        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+    }
+
+    const mode = (e.parameter.mode || "").toLowerCase()
+
+    let result = {}
+
+    if (mode === "getdashboard") {
+      result = getDashboard()
+    }
+    else if (mode === "getlatest") {
+      result = getLatest(e)
+    }
+    else if (mode === "getbydate") {
+      result = getByDate(e)
+    }
+    else if (mode === "formdata") {
+      result = getFormData_(e)
+    }
+    else if (mode === "hasdata") {
+      result = hasData(e)
+    }
+    else if (mode === "getlatestroom") {
+      result = getLatestRoom(e)
+    }
+    else if (mode === "resetroom") {
+      result = resetRoom(e)
+    }
+    else if (mode === "resettodayall") {
+      result = resetTodayAll()
+    }
+    else if (mode === "resetrange") {
+      result = resetRange(e)
+    }
+    else if (mode === "resetall") {
+      result = resetAll()
+    }
+    else if (mode === "statuscheck") {
+      result = statusCheck()
+    }
+    else if (mode === "updateroomorder") {
+      result = updateRoomOrder(e)
+    }
+    else if (mode === "getterm") {
+      result = getTerm()
+    }
+    else if (mode === "addroom") {
+      result = addRoom(e.parameter.room)
+    }
+    else if (mode === "deleteroom") {
+      result = deleteRoom(e.parameter.room)
+    }
+    else if (mode === "editroom") {
+      result = renameRoom(e.parameter.old, e.parameter.new)
+    }
+    else if (mode === "updateterm") {
+      result = updateTerm(e)
+    }
+    else if (mode === "report") {
+      result = getReport(e)
+    }
+    else if (mode === "getsigconfig") {
+      result = getSignatureConfig()
+    }
+    else if (mode === "updatesigconfig") {
+      result = updateSignatureConfig(e)
+    }
+    else if (mode === "getprevious") {
+      result = getPreviousData(e.parameter.room, e.parameter.date)
+    }
+    else if (mode === "autofill") {
+      result = autoFillToday()
+    }
+    else if (mode === "backuprecords") {
+      return backupRecords(e)
+    }
+    else {
+      result = {
+        status: "API Running",
+        mode: mode || null
+      }
+    }
+
+    return ContentService
+      .createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON)
+
+  } catch (err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({
+        status: "error",
+        message: err.toString()
+      }))
+      .setMimeType(ContentService.MimeType.JSON)
+  }
+
+}
+
+function doPost(e) {
+
+  if (e.postData && e.postData.contents) {
+    try {
+      const json = JSON.parse(e.postData.contents);
+
+      if (json.events) {
+        Logger.log(JSON.stringify(json));
+        return ContentService.createTextOutput("ok");
+      }
+
+    } catch (err) { }
+  }
+
+  const data = e.parameter
+
+  if (data.mode === "updatesigconfig") {
+    return ContentService
+      .createTextOutput(JSON.stringify(withBurapaWrite_(() => updateSignatureConfig(e))))
+      .setMimeType(ContentService.MimeType.JSON)
+  }
+
+  if (data.mode === "login") {
+    return ContentService
+      .createTextOutput(JSON.stringify(adminLogin(data)))
+      .setMimeType(ContentService.MimeType.JSON)
+  }
+
+  const lock = LockService.getScriptLock()
+  lock.waitLock(30000)
+
+  try {
+
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+    const sheet = ss.getSheetByName("record_stu")
+
+    const now = new Date()
+
+    let dateShort
+
+    if (data.record_date) {
+
+      dateShort = data.record_date
+
+    } else {
+
+      dateShort = Utilities.formatDate(
+        now,
+        "Asia/Bangkok",
+        "yyyy-MM-dd"
+      )
+
+    }
+
+    const timestamp = Utilities.formatDate(
+      now,
+      "Asia/Bangkok",
+      "dd-MM-yyyy HH:mm:ss"
+    )
+
+    const all_boys = Number(data.all_boys) || 0
+    const all_girls = Number(data.all_girls) || 0
+    const boys_today = Number(data.boys_today) || 0
+    const girls_today = Number(data.girls_today) || 0
+
+    const sick = Number(data.sick) || 0
+    const leave = Number(data.leave) || 0
+    const absent = Number(data.absent) || 0
+
+    const all_total = all_boys + all_girls
+    const total_today = boys_today + girls_today
+
+    const lastRow = sheet.getLastRow()
+
+    let rows = []
+    let foundRow = null
+
+    if (lastRow > 1) {
+
+      rows = sheet.getRange(2, 1, lastRow - 1, 2).getValues()
+
+    }
+
+    if (!data.room) {
+      return ContentService.createTextOutput(JSON.stringify({
+        status: "error",
+        message: "missing room"
+      }))
+    }
+
+    for (let i = 0; i < rows.length; i++) {
+
+      const rowDate = Utilities.formatDate(
+        new Date(rows[i][0]),
+        "Asia/Bangkok",
+        "yyyy-MM-dd"
+      )
+
+      if (rowDate === dateShort && rows[i][1] === data.room) {
+        foundRow = i + 2
+        break
+      }
+
+    }
+
+    const rowData = [
+
+      dateShort,
+      data.room,
+
+      all_boys,
+      all_girls,
+      all_total,
+
+      boys_today,
+      girls_today,
+      total_today,
+
+      sick,
+      leave,
+      absent,
+
+      timestamp,
+
+      data.source || "บันทึกโดยคุณครู"
+
+    ]
+
+    if (foundRow) {
+
+      sheet.getRange(foundRow, 1, 1, rowData.length)
+        .setValues([rowData])
+
+    } else {
+
+      sheet.getRange(sheet.getLastRow() + 1, 1, 1, rowData.length).setValues([rowData])
+
+    }
+
+    updateCurrentStatusRoom(rowData, ss);
+
+    SpreadsheetApp.flush();
+    clearDashboardCache();
+
+    return ContentService
+      .createTextOutput(JSON.stringify({ status: "success" }))
+      .setMimeType(ContentService.MimeType.JSON)
+
+  }
+
+  finally {
+
+    try { SpreadsheetApp.flush() } finally { lock.releaseLock() }
+  }
+
+}
+
+function getDashboard() {
+
+  const cache = CacheService.getScriptCache();
+  const dashboardKey = "dashboard_v3_" + (PropertiesService.getScriptProperties().getProperty("BURAPA_DASH_REV") || "0");
+  const cached = cache.get(dashboardKey);
+
+  if (cached) {
+    return JSON.parse(cached);
+  }
+
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+
+  const classSheet = ss.getSheetByName("classrooms")
+  const recordSheet = ss.getSheetByName("record_stu")
+  const statusSheet = ss.getSheetByName("current_status")
+
+  let classrooms = []
+
+  if (classSheet.getLastRow() > 1) {
+    classrooms = classSheet
+      .getRange(2, 1, classSheet.getLastRow() - 1, 1)
+      .getValues()
+      .flat()
+  }
+
+  let currentRecords = []
+
+  if (statusSheet && statusSheet.getLastRow() > 1) {
+    currentRecords = statusSheet
+      .getRange(2, 1, statusSheet.getLastRow() - 1, 15)
+      .getValues()
+  }
+
+  let records = []
+
+  if (recordSheet.getLastRow() > 1) {
+    records = recordSheet
+      .getRange(2, 1, recordSheet.getLastRow() - 1, 13)
+      .getValues()
+  }
+
+  const today = Utilities.formatDate(
+    new Date(),
+    "Asia/Bangkok",
+    "yyyy-MM-dd"
+  )
+
+  let present = 0
+  let sick = 0
+  let leave = 0
+  let absent = 0
+  let total = 0
+
+  const submitted = new Set()
+  let latestRoomTotals = {}
+  let latestRoomDates = {}
+  let latestRoomTime = {}
+  let latestRoomSource = {}
+
+  let latestTeacherDates = {}
+  let latestTeacherTime = {}
+
+  currentRecords.forEach(r => {
+
+    if (!r[0]) return
+
+    const room = String(r[0]).trim()
+    const rawDate = new Date(r[1])
+
+    let timeStampObj = null
+
+    if (r[11]) {
+
+      if (Object.prototype.toString.call(r[11]) === "[object Date]") {
+
+        timeStampObj = r[11]
+
+      } else if (typeof r[11] === "string") {
+
+        const parts = r[11].split(" ")
+
+        if (parts.length === 2) {
+
+          const [d, m, y] = parts[0].split("-")
+          const [hh, mm, ss] = parts[1].split(":")
+
+          timeStampObj = new Date(
+            y,
+            m - 1,
+            d,
+            hh,
+            mm,
+            ss
+          )
+        }
+      }
+    }
+
+    if (!timeStampObj) {
+      timeStampObj = rawDate
+    }
+
+    latestRoomDates[room] = timeStampObj
+    latestRoomTotals[room] = Number(r[4]) || 0
+    latestRoomTime[room] = r[11]
+    latestRoomSource[room] = r[12]
+
+    if (r[13]) {
+
+      const teacherDate = new Date(r[13])
+
+      if (!isNaN(teacherDate.getTime())) {
+        latestTeacherDates[room] = teacherDate
+      }
+
+    }
+
+    if (r[14]) {
+      latestTeacherTime[room] = r[14]
+    }
+
+    const rowDate = Utilities.formatDate(
+      rawDate,
+      "Asia/Bangkok",
+      "yyyy-MM-dd"
+    )
+
+    if (rowDate === today) {
+
+      present += Number(r[5]) || 0
+      present += Number(r[6]) || 0
+
+      sick += Number(r[8]) || 0
+      leave += Number(r[9]) || 0
+      absent += Number(r[10]) || 0
+
+      submitted.add(room)
+    }
+  })
+
+  total = classrooms.reduce((sum, room) => {
+    return sum + (latestRoomTotals[room] || 0)
+  }, 0)
+
+  const rooms = classrooms.map(room => {
+
+    const hasData = latestRoomTotals[room] != null
+
+    return {
+      room: room,
+      submitted: submitted.has(room),
+
+      total: hasData ? latestRoomTotals[room] : 0,
+
+      lastUpdateDate: latestRoomDates[room]
+        ? Utilities.formatDate(
+          latestRoomDates[room],
+          "Asia/Bangkok",
+          "yyyy-MM-dd"
+        )
+        : null,
+
+      lastUpdateTime: latestRoomTime[room]
+        ? formatTime(latestRoomTime[room])
+        : "-",
+
+      updatedBy: latestRoomSource[room] || "ยังไม่มีข้อมูล",
+
+      lastTeacherUpdateDate: latestTeacherDates[room]
+        ? Utilities.formatDate(
+          latestTeacherDates[room],
+          "Asia/Bangkok",
+          "yyyy-MM-dd"
+        )
+        : null,
+
+      lastTeacherUpdateTime: latestTeacherTime[room]
+        ? formatTime(latestTeacherTime[room])
+        : null,
+
+      status: hasData ? "มีข้อมูล" : "ไม่มีข้อมูล"
+    }
+
+  })
+
+  const unknown = Math.max(
+    0,
+    total - (present + sick + leave + absent)
+  )
+
+  let weeklyMap = {}
+
+  records.forEach(r => {
+    const date = Utilities.formatDate(new Date(r[0]), "Asia/Bangkok", "yyyy-MM-dd")
+
+    if (!weeklyMap[date]) {
+      weeklyMap[date] = { present: 0, absent: 0 }
+    }
+
+    weeklyMap[date].present += (Number(r[5]) || 0) + (Number(r[6]) || 0)
+    weeklyMap[date].absent += Number(r[10]) || 0
+  })
+
+  const weeklyDates = Object.keys(weeklyMap).sort().slice(-7)
+
+  const weekly = {
+    labels: weeklyDates,
+    present: weeklyDates.map(d => weeklyMap[d].present),
+    absent: weeklyDates.map(d => weeklyMap[d].absent)
+  }
+
+  let monthlyMap = {}
+
+  records.forEach(r => {
+    const month = Utilities.formatDate(new Date(r[0]), "Asia/Bangkok", "yyyy-MM")
+
+    if (!monthlyMap[month]) {
+      monthlyMap[month] = { present: 0, absent: 0 }
+    }
+
+    monthlyMap[month].present += (Number(r[5]) || 0) + (Number(r[6]) || 0)
+    monthlyMap[month].absent += Number(r[10]) || 0
+  })
+
+  const monthlyKeys = Object.keys(monthlyMap).sort().slice(-6)
+
+  const monthly = {
+    labels: monthlyKeys,
+    present: monthlyKeys.map(m => monthlyMap[m].present),
+    absent: monthlyKeys.map(m => monthlyMap[m].absent)
+  }
+
+  const result = {
+    total,
+    present,
+    sick,
+    leave,
+    absent,
+    unknown,
+    rooms,
+    weekly,
+    monthly
+  };
+
+  try {
+    const encoded = JSON.stringify(result);
+    if (Utilities.newBlob(encoded).getBytes().length < 95000) cache.put(dashboardKey, encoded, 60);
+  } catch (_) { }
+
+  return result;
+
+}
+
+function formatTime(ts) {
+
+  if (!ts) return "-"
+
+  try {
+
+    if (ts instanceof Date) {
+      return Utilities.formatDate(
+        ts,
+        "Asia/Bangkok",
+        "HH:mm"
+      ) + " น."
+    }
+
+    if (typeof ts === "string") {
+
+      const d = new Date(ts)
+
+      if (!isNaN(d.getTime())) {
+        return Utilities.formatDate(
+          d,
+          "Asia/Bangkok",
+          "HH:mm"
+        ) + " น."
+      }
+
+      const parts = ts.split(" ")
+
+      if (parts.length >= 2) {
+        return parts[1].substring(0, 5) + " น."
+      }
+    }
+
+    return "-"
+
+  } catch (err) {
+    return "-"
+  }
+
+}
+
+function getLatest(e) {
+
+  const room = e.parameter.room
+
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+  const sheet = ss.getSheetByName("record_stu")
+
+  if (sheet.getLastRow() <= 1) {
+    return {}
+  }
+
+  const data = sheet
+    .getRange(2, 1, sheet.getLastRow() - 1, 13)
+    .getValues()
+
+  for (let i = data.length - 1; i >= 0; i--) {
+
+    if (data[i][1] === room) {
+
+      return {
+        all_boys: data[i][2],
+        all_girls: data[i][3],
+        boys_today: data[i][5],
+        girls_today: data[i][6],
+        sick: data[i][8],
+        leave: data[i][9],
+        absent: data[i][10],
+        source: data[i][12]
+      }
+
+    }
+
+  }
+
+  return {}
+
+}
+
+function autoFillAttendance() {
+  return withBurapaWrite_(() => burapaAutoFill_());
+}
+function burapaAutoFill_() {
+
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+
+  const classSheet = ss.getSheetByName("classrooms")
+  const recordSheet = ss.getSheetByName("record_stu")
+
+  const today = Utilities.formatDate(
+    new Date(),
+    "Asia/Bangkok",
+    "yyyy-MM-dd"
+  )
+
+  const timestamp = Utilities.formatDate(
+    new Date(),
+    "Asia/Bangkok",
+    "dd-MM-yyyy HH:mm:ss"
+  )
+
+  let classrooms = classSheet
+    .getRange(2, 1, classSheet.getLastRow() - 1, 1)
+    .getValues()
+    .flat()
+
+  let records = []
+
+  if (recordSheet.getLastRow() > 1) {
+    records = recordSheet
+      .getRange(2, 1, recordSheet.getLastRow() - 1, 13)
+      .getValues()
+  }
+
+  let recordedRooms = new Set()
+
+  let autofilledRooms = []
+
+  let hasManualRecordToday = false
+  let hasAnyRecordToday = false
+
+  records.forEach(r => {
+
+    const rowDate = Utilities.formatDate(
+      new Date(r[0]),
+      "Asia/Bangkok",
+      "yyyy-MM-dd"
+    )
+
+    if (rowDate === today) {
+
+      hasAnyRecordToday = true
+
+      if (r[12] !== "บันทึกโดยระบบ Autofill") {
+        recordedRooms.add(r[1])
+        hasManualRecordToday = true
+      }
+
+    }
+
+  })
+
+  if (!hasManualRecordToday) {
+    Logger.log("ไม่พบข้อมูลที่สามารถ Autofill")
+    return
+  }
+
+  for (let i = records.length - 1; i >= 0; i--) {
+
+    const rowDate = Utilities.formatDate(
+      new Date(records[i][0]),
+      "Asia/Bangkok",
+      "yyyy-MM-dd"
+    )
+
+    if (rowDate === today && records[i][12] === "บันทึกโดยระบบ Autofill") {
+      recordSheet.deleteRow(i + 2)
+    }
+
+  }
+
+  classrooms.forEach(room => {
+
+    if (!recordedRooms.has(room)) {
+
+      let lastMale = 0
+      let lastFemale = 0
+      let totalStudents = 0
+
+      for (let i = records.length - 1; i >= 0; i--) {
+
+        if (
+
+          records[i][1] === room &&
+          records[i][12] !== "บันทึกโดยระบบ Autofill"
+
+        ) {
+
+          let m = Number(records[i][2]) || 0
+          let f = Number(records[i][3]) || 0
+          let t = Number(records[i][4]) || 0
+
+          if (t > 0 && (m + f === 0)) {
+            continue
+
+          }
+
+          lastMale = m
+          lastFemale = f
+          totalStudents = t
+
+          break
+
+        }
+
+      }
+
+      const rowData = [
+
+        today,
+        room,
+
+        lastMale,
+        lastFemale,
+        totalStudents,
+
+        lastMale,
+        lastFemale,
+        totalStudents,
+
+        0,
+        0,
+        0,
+
+        timestamp,
+
+        "บันทึกโดยระบบ Autofill"
+
+      ]
+
+      if (totalStudents > 0) {
+
+        recordSheet.appendRow(rowData)
+
+        updateCurrentStatusRoom(rowData, ss)
+
+
+
+        autofilledRooms.push(room)
+      }
+
+    }
+
+  })
+
+}
+
+function autoFillToday() {
+
+  try {
+
+    autoFillAttendance()
+
+    return {
+      status: "success"
+    }
+
+  } catch (err) {
+
+    return {
+      status: "error",
+      message: String(err)
+    }
+
+  }
+
+}
+
+function getByDate(e) {
+
+  const room = e.parameter.room
+  const date = e.parameter.date
+
+  if (!room || !date) {
+    return {}
+  }
+
+  const targetDate = date
+
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+  const sheet = ss.getSheetByName("record_stu")
+
+  if (sheet.getLastRow() <= 1) {
+    return {}
+  }
+
+  const data = sheet
+    .getRange(2, 1, sheet.getLastRow() - 1, 13)
+    .getValues()
+
+  for (let i = data.length - 1; i >= 0; i--) {
+
+    const rowDate = Utilities.formatDate(
+      new Date(data[i][0]),
+      "Asia/Bangkok",
+      "yyyy-MM-dd"
+    )
+
+    if (rowDate === targetDate && data[i][1] === room) {
+
+      return {
+        all_boys: data[i][2],
+        all_girls: data[i][3],
+        boys_today: data[i][5],
+        girls_today: data[i][6],
+        sick: data[i][8],
+        leave: data[i][9],
+        absent: data[i][10],
+        source: data[i][12]
+      }
+
+    }
+
+  }
+
+  return {}
+
+}
+
+function hasData(e) {
+
+  const date = e.parameter.date
+
+  if (!date) return false
+
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+  const sheet = ss.getSheetByName("record_stu")
+
+  if (sheet.getLastRow() <= 1) {
+    return false
+  }
+
+  const data = sheet
+    .getRange(2, 1, sheet.getLastRow() - 1, 13)
+    .getValues()
+
+  for (let i = 0; i < data.length; i++) {
+
+    const rowDate = Utilities.formatDate(
+      new Date(data[i][0]),
+      "Asia/Bangkok",
+      "yyyy-MM-dd"
+    )
+
+    if (rowDate === date) {
+      return true
+    }
+
+  }
+
+  return false
+
+}
+
+function getLatestRoom(e) {
+
+  const room = e.parameter.room
+
+  if (!room) {
+    return {}
+  }
+
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+  const sheet = ss.getSheetByName("record_stu")
+
+  if (sheet.getLastRow() <= 1) {
+    return {}
+  }
+
+  const data = sheet
+    .getRange(2, 1, sheet.getLastRow() - 1, 13)
+    .getValues()
+
+  for (let i = data.length - 1; i >= 0; i--) {
+
+    if (data[i][1] === room) {
+
+      return {
+        all_boys: data[i][2],
+        all_girls: data[i][3]
+      }
+
+    }
+
+  }
+
+  return {}
+
+}
+
+function doOptions() {
+  return ContentService
+    .createTextOutput("")
+    .setMimeType(ContentService.MimeType.TEXT)
+}
+
+function adminLogin(data) {
+
+  const username = (data.username || "").trim()
+  const password = (data.password || "").trim()
+
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+  const sheet = ss.getSheetByName("admin_login")
+
+  const lastRow = sheet.getLastRow()
+
+  const rows = lastRow > 1
+    ? sheet.getRange(2, 1, lastRow - 1, 2).getValues()
+    : []
+
+  for (let i = 0; i < rows.length; i++) {
+
+    if (
+      String(rows[i][0]).trim() === username &&
+      String(rows[i][1]).trim() === password
+    ) {
+
+      return {
+        status: "success",
+        token: "admin_" + new Date().getTime()
+      }
+
+    }
+
+  }
+
+  return {
+    status: "fail"
+  }
+
+}
+
+function resetRoom(e) {
+
+  const room = e.parameter.room
+  if (!room) {
+    return { status: "error", message: "no room" }
+  }
+
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+  const sheet = ss.getSheetByName("record_stu")
+
+  const today = Utilities.formatDate(
+    new Date(),
+    "Asia/Bangkok",
+    "yyyy-MM-dd"
+  )
+
+  const data = sheet.getDataRange().getValues()
+
+  let deleted = 0
+
+  for (let i = data.length - 1; i >= 1; i--) {
+
+    const rowDate = Utilities.formatDate(
+      new Date(data[i][0]),
+      "Asia/Bangkok",
+      "yyyy-MM-dd"
+    )
+
+    if (rowDate === today && data[i][1] === room) {
+      sheet.deleteRow(i + 1)
+      deleted++
+    }
+
+  }
+
+  rebuildCurrentStatus()
+
+  clearDashboardCache();
+
+  return {
+    status: "success",
+    deleted: deleted
+  }
+
+}
+
+function resetTodayAll() {
+
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+  const sheet = ss.getSheetByName("record_stu")
+
+  const today = Utilities.formatDate(
+    new Date(),
+    "Asia/Bangkok",
+    "yyyy-MM-dd"
+  )
+
+  const data = sheet.getDataRange().getValues()
+
+  let deleted = 0
+
+  for (let i = data.length - 1; i >= 1; i--) {
+
+    const rowDate = Utilities.formatDate(
+      new Date(data[i][0]),
+      "Asia/Bangkok",
+      "yyyy-MM-dd"
+    )
+
+    if (rowDate === today) {
+      sheet.deleteRow(i + 1)
+      deleted++
+    }
+
+  }
+
+  notifyAdminAction(
+    "🔄 พบการรีเซ็ตสถิติวันนี้ทั้งหมด\n\n" +
+    "📌 จำนวนที่ทำรายการ:\n" +
+    "- รวม: " + deleted + " ห้อง"
+  )
+
+  rebuildCurrentStatus()
+
+  clearDashboardCache();
+
+  return {
+    status: "success",
+    deleted: deleted
+  }
+
+}
+
+function resetRange(e) {
+
+  const start = e.parameter.start
+  const end = e.parameter.end
+
+  if (!start || !end) {
+    return { status: "error", message: "missing date" }
+  }
+
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+  const sheet = ss.getSheetByName("record_stu")
+
+  const data = sheet.getDataRange().getValues()
+
+  let deleted = 0
+
+  for (let i = data.length - 1; i >= 1; i--) {
+
+    const rowDate = Utilities.formatDate(
+      new Date(data[i][0]),
+      "Asia/Bangkok",
+      "yyyy-MM-dd"
+    )
+
+    if (rowDate >= start && rowDate <= end) {
+      sheet.deleteRow(i + 1)
+      deleted++
+    }
+
+  }
+
+  const formatDate = d => {
+    const date = new Date(d)
+    return Utilities.formatDate(date, "Asia/Bangkok", "dd/MM/yyyy")
+  }
+
+  notifyAdminAction(
+    "🔄 พบการรีเซ็ตข้อมูลแบบเลือกช่วงวัน\n\n" +
+    "📌 รายละเอียด:\n" +
+    "- ช่วงวันที่: " + formatDate(start) + " ถึง " + formatDate(end) + "\n" +
+    "- จำนวน: " + deleted + " รายการ"
+  )
+
+  rebuildCurrentStatus()
+
+  clearDashboardCache();
+
+  return {
+    status: "success",
+    deleted: deleted
+  }
+
+}
+
+function resetAll() {
+
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+  const sheet = ss.getSheetByName("record_stu")
+
+  const lastRow = sheet.getLastRow()
+  let deleted = 0
+
+  if (lastRow > 1) {
+    deleted = lastRow - 1
+    sheet.deleteRows(2, deleted)
+  }
+
+  notifyAdminAction(
+    "🚨 พบการล้างข้อมูลทั้งหมดในระบบ\n\n" +
+    "📌 จำนวนรายการสถิติ:\n" +
+    "- รวม: " + deleted + " รายการ\n\n" +
+    "⚠️ ทำการกู้คืนได้ใน Google Sheet"
+  )
+
+  rebuildCurrentStatus()
+
+  clearDashboardCache();
+
+  return {
+    status: "success",
+    deleted: deleted
+  }
+
+}
+
+function getRoomMissedCount() {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+  const recordSheet = ss.getSheetByName("record_stu")
+  const classSheet = ss.getSheetByName("classrooms")
+
+  if (recordSheet.getLastRow() <= 1) return []
+
+  const records = recordSheet.getRange(2, 1, recordSheet.getLastRow() - 1, 13).getValues()
+  const today = Utilities.formatDate(new Date(), "Asia/Bangkok", "yyyy-MM-dd")
+
+  let missedCount = {}
+
+  classSheet.getRange(2, 1, classSheet.getLastRow() - 1, 1).getValues().flat().forEach(room => {
+    missedCount[room] = 0
+  })
+
+  records.forEach(r => {
+    if (r[12] === "บันทึกโดยระบบ Autofill") {
+      missedCount[r[1]] = (missedCount[r[1]] || 0) + 1
+    }
+  })
+
+  return Object.entries(missedCount).map(([room, count]) => ({ room, count }))
+}
+
+function statusCheck() {
+
+  let apiOk = true
+  let dbOk = false
+  let totalRecords = 0
+
+  try {
+
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+    const sheet = ss.getSheetByName("record_stu")
+
+    if (ss && sheet) {
+      dbOk = true
+      totalRecords = sheet.getLastRow() - 1
+    }
+
+  } catch (e) {
+    dbOk = false
+  }
+
+  const lastNotify =
+    PropertiesService
+      .getScriptProperties()
+      .getProperty("lastNotifyMissingRoom")
+
+  const lastNotifyText =
+    PropertiesService
+      .getScriptProperties()
+      .getProperty("lastNotifyMissingRoomText")
+
+  return {
+    apiOk: true,
+    dbOk: dbOk,
+    totalRecords: totalRecords,
+    lastNotify: lastNotify || "",
+    lastNotifyText: lastNotifyText || ""
+  }
+}
+
+function addRoom(name) {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+  const sheet = ss.getSheetByName("classrooms")
+
+  sheet.appendRow([name])
+
+  return { status: "success" }
+}
+
+function deleteRoom(name) {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+  const sheet = ss.getSheetByName("classrooms")
+  const values = sheet.getRange(2, 1, sheet.getLastRow() - 1, 1).getValues()
+  values.forEach((r, i) => {
+    if (r[0] === name) sheet.deleteRow(i + 2)
+  })
+
+  return { status: "success" }
+}
+
+function renameRoom(oldName, newName) {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+  const sheet = ss.getSheetByName("classrooms")
+  const values = sheet.getRange(2, 1, sheet.getLastRow() - 1, 1).getValues()
+  values.forEach((r, i) => {
+    if (r[0] === oldName) sheet.getRange(i + 2, 1).setValue(newName)
+  })
+
+  return { status: "success" }
+}
+
+function updateTerm(e) {
+  const term = e.parameter.term
+  const year = e.parameter.year
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+  let sheet = ss.getSheetByName("settings")
+  if (!sheet) sheet = ss.insertSheet("settings")
+  sheet.getRange("A1").setValue("term")
+  sheet.getRange("B1").setValue(term)
+  sheet.getRange("A2").setValue("year")
+  sheet.getRange("B2").setValue(year)
+
+  return { status: "success" }
+}
+
+function updateRoomOrder(e) {
+  const newOrder = JSON.parse(e.parameter.order)
+
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+  const sheet = ss.getSheetByName("classrooms")
+
+  const lastRow = sheet.getLastRow()
+  if (lastRow > 1) {
+    sheet.getRange(2, 1, lastRow - 1, 1).clearContent()
+  }
+
+  const values = newOrder.map(r => [r])
+  sheet.getRange(2, 1, values.length, 1).setValues(values)
+
+  return { status: "success" }
+}
+
+function getTerm() {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+  const sheet = ss.getSheetByName("settings")
+
+  if (!sheet) {
+    return { term: "-", year: "-" }
+  }
+
+  const term = sheet.getRange("B1").getValue()
+  const year = sheet.getRange("B2").getValue()
+
+  return {
+    term: term || "-",
+    year: year || "-"
+  }
+}
+
+function getReport(e) {
+
+  const date = e.parameter.date
+  if (!date) return []
+
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+  const recordSheet = ss.getSheetByName("record_stu")
+  const classSheet = ss.getSheetByName("classrooms")
+
+  const records = recordSheet.getDataRange().getValues()
+  const classes = classSheet.getLastRow() > 1 ? classSheet.getRange(2, 1, classSheet.getLastRow() - 1, 1).getValues().flat() : []
+  const previous = previousRooms_(records, date)
+
+  let map = {}
+
+  classes.forEach(c => {
+    map[c] = {
+      room: c,
+      male: 0, female: 0, total: 0,
+      prev_male: Number((previous.get(c) || {}).all_boys) || 0,
+      prev_female: Number((previous.get(c) || {}).all_girls) || 0,
+      present_m: 0, present_f: 0, present: 0,
+      sick: 0, leave: 0, absent: 0,
+      _time: 0
+    }
+  })
+
+  records.slice(1).forEach(r => {
+
+    const rowDate = Utilities.formatDate(new Date(r[0]), "Asia/Bangkok", "yyyy-MM-dd")
+    if (rowDate !== date) return
+
+    const room = r[1]
+
+    if (!map[room]) return
+
+    const prevData = previous.get(room) || {}
+
+    map[room].prev_male = Number(prevData.all_boys) || 0
+    map[room].prev_female = Number(prevData.all_girls) || 0
+
+    if (!map[room]) return
+
+    let time = 0
+    if (r[11]) {
+      if (Object.prototype.toString.call(r[11]) === "[object Date]") {
+        time = r[11].getTime()
+      } else {
+        const parts = r[11].split(" ")
+        if (parts.length === 2) {
+          const [d, m, y] = parts[0].split("-")
+          const [hh, mm, ss] = parts[1].split(":")
+          time = new Date(y, m - 1, d, hh, mm, ss).getTime()
+        }
+      }
+    }
+
+    if (time < map[room]._time) return
+    map[room]._time = time
+
+    map[room].male = Number(r[2]) || 0
+    map[room].female = Number(r[3]) || 0
+    map[room].total = Number(r[4]) || 0
+
+    map[room].present_m = Number(r[5]) || 0
+    map[room].present_f = Number(r[6]) || 0
+    map[room].present = Number(r[7]) || 0
+
+    map[room].sick = Number(r[8]) || 0
+    map[room].leave = Number(r[9]) || 0
+    map[room].absent = Number(r[10]) || 0
+
+  })
+
+  return Object.values(map)
+}
+
+function getSignatureConfig() {
+
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+  let sheet = ss.getSheetByName("signature")
+
+  if (!sheet) {
+    sheet = ss.insertSheet("signature")
+    sheet.getRange(1, 1, 1, 8).setValues([[
+      "", "", "", "", "", "", "", ""
+    ]])
+  }
+
+  const v = sheet.getRange(1, 1, 1, 8).getValues()[0]
+
+  return {
+    mon: v[0],
+    tue: v[1],
+    wed: v[2],
+    thu: v[3],
+    fri: v[4],
+    assistant: v[5],
+    deputy: v[6],
+    director: v[7]
+  }
+
+}
+
+function updateSignatureConfig(e) {
+
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+  let sheet = ss.getSheetByName("signature")
+
+  if (!sheet) {
+    sheet = ss.insertSheet("signature")
+  }
+
+  sheet.getRange(1, 1, 1, 8).setValues([[
+    e.parameter.mon || "",
+    e.parameter.tue || "",
+    e.parameter.wed || "",
+    e.parameter.thu || "",
+    e.parameter.fri || "",
+    e.parameter.assistant || "",
+    e.parameter.deputy || "",
+    e.parameter.director || ""
+  ]])
+
+  return { status: "success" }
+
+}
+
+function notifyMissingRooms() {
+
+  const day = Number(
+    Utilities.formatDate(new Date(), "Asia/Bangkok", "u")
+  );
+
+  if (day !== 1 && day !== 4) {
+    return;
+  }
+
+  const token = PropertiesService.getScriptProperties().getProperty("LINE_TOKEN")
+
+  const groupIds = [
+    "Cc1aa912c44ae1bd927d50063da026cec" //กลุ่มสถิตินักเรียน
+  ];
+
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+
+  const classSheet = ss.getSheetByName("classrooms");
+  const recordSheet = ss.getSheetByName("record_stu");
+
+  const today = Utilities.formatDate(
+    new Date(),
+    "Asia/Bangkok",
+    "yyyy-MM-dd"
+  );
+
+  const classrooms = classSheet
+    .getRange(2, 1, classSheet.getLastRow() - 1, 1)
+    .getValues()
+    .flat();
+
+  const records = recordSheet
+    .getRange(2, 1, recordSheet.getLastRow() - 1, 13)
+    .getValues();
+
+  let submitted = new Set();
+
+  records.forEach(r => {
+    const rowDate = Utilities.formatDate(
+      new Date(r[0]),
+      "Asia/Bangkok",
+      "yyyy-MM-dd"
+    );
+
+    if (rowDate === today) {
+      submitted.add(r[1]);
+    }
+  });
+
+  const missing = classrooms.filter(r => !submitted.has(r));
+
+  if (submitted.size === 0) {
+    return;
+  }
+
+  if (missing.length > 0) {
+
+    let text = "📢 แจ้งเตือนอัตโนมัติจากระบบ\n";
+    text += `ยังไม่กรอกสถิติวันนี้จำนวน ${missing.length} ห้อง\n\n`;
+    text += "ห้องที่เหลือได้แก่:\n";
+
+    missing.forEach(r => {
+      text += "- " + r + "\n";
+    });
+
+    const formUrl = "https://burapaubon.github.io/burapa-student-system";
+
+    text += "\nกรุณากรอกข้อมูลภายใน 16:00 น.";
+    text += "\n\n📌 ลิ้งค์เข้าใช้งานระบบ:\n" + formUrl;
+
+    groupIds.forEach(groupId => {
+      UrlFetchApp.fetch(
+        "https://api.line.me/v2/bot/message/push",
+        {
+          method: "post",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+          },
+          payload: JSON.stringify({
+            to: groupId,
+            messages: [
+              {
+                type: "text",
+                text: text
+              }
+            ]
+          })
+        });
+    });
+
+    PropertiesService
+      .getScriptProperties()
+      .setProperty(
+        "lastNotifyMissingRoom",
+        new Date().toISOString()
+      );
+
+    PropertiesService
+      .getScriptProperties()
+      .setProperty(
+        "lastNotifyMissingRoomText",
+        text
+      );
+  }
+
+}
+
+function notifyAdminAction(actionText) {
+
+  const token = PropertiesService.getScriptProperties().getProperty("LINE_TOKEN")
+  const adminGroupId = "C9b24e53878a976cd18f72fa675a4d4f3";  //กลุ่มแอดมิน 
+
+  const message =
+    "⚙️ To ADM‼️\n\n" +
+    actionText;
+
+  UrlFetchApp.fetch(
+    "https://api.line.me/v2/bot/message/push",
+    {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
+      payload: JSON.stringify({
+        to: adminGroupId,
+        messages: [
+          {
+            type: "text",
+            text: message
+          }
+        ]
+      })
+    }
+  );
+
+}
+
+function getPreviousData(room, dateStr, existingRows) {
+
+  let data = existingRows
+
+  if (!data) {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+    const sheet = ss.getSheetByName("record_stu")
+    data = sheet.getDataRange().getValues()
+  }
+
+  let latest = null
+  let latestTime = 0
+
+  for (let i = 1; i < data.length; i++) {
+
+    const row = data[i]
+
+    if (row[1] !== room) continue
+
+    const rowDateStr = Utilities.formatDate(
+      new Date(row[0]),
+      "Asia/Bangkok",
+      "yyyy-MM-dd"
+    )
+
+    if (rowDateStr >= dateStr) continue
+
+    let time = 0
+
+    if (row[11]) {
+      if (Object.prototype.toString.call(row[11]) === "[object Date]") {
+        time = row[11].getTime()
+      } else if (typeof row[11] === "string") {
+        const parts = row[11].split(" ")
+        if (parts.length === 2) {
+          const [d, m, y] = parts[0].split("-")
+          const [hh, mm, ss] = parts[1].split(":")
+          time = new Date(y, m - 1, d, hh, mm, ss).getTime()
+        }
+      }
+    }
+
+    if (!time) {
+      time = new Date(row[0]).getTime()
+    }
+
+    if (time > latestTime) {
+      latestTime = time
+      latest = row
+    }
+
+  }
+
+  if (!latest) return {}
+
+  return {
+    all_boys: latest[2],
+    all_girls: latest[3]
+  }
+}
+
+function notifyStudentChange(room, prev, curr) {
+
+  const diffMale = curr.male - prev.male
+  const diffFemale = curr.female - prev.female
+
+  if (diffMale === 0 && diffFemale === 0) {
+    return
+  }
+
+  if (prev.male === 0 && prev.female === 0) {
+    return
+  }
+
+  let msg = "📊 แจ้งเตือนการเปลี่ยนแปลงจำนวนนักเรียน\n\n"
+  msg += "🏫 ห้อง: " + room + "\n\n"
+
+  let hasAdd = (diffMale > 0 || diffFemale > 0)
+  let hasRemove = (diffMale < 0 || diffFemale < 0)
+  let hasChange = false
+
+  if (hasAdd) {
+    msg += "➕ เข้าใหม่:\n"
+    msg += "- ชาย: " + Math.max(diffMale, 0) + "\n"
+    msg += "- หญิง: " + Math.max(diffFemale, 0) + "\n"
+    msg += "- รวม: " + (Math.max(diffMale, 0) + Math.max(diffFemale, 0))
+    hasChange = true
+  }
+
+  if (hasRemove) {
+    if (hasAdd) {
+      msg += "\n\n"
+    }
+
+    msg += "➖ จำหน่ายออก:\n"
+    msg += "- ชาย: " + Math.abs(Math.min(diffMale, 0)) + "\n"
+    msg += "- หญิง: " + Math.abs(Math.min(diffFemale, 0)) + "\n"
+    msg += "- รวม: " + (Math.abs(Math.min(diffMale, 0)) + Math.abs(Math.min(diffFemale, 0)))
+    hasChange = true
+  }
+
+  if (hasChange) {
+    const total = curr.male + curr.female
+
+    msg += "\n\n👥 จำนวนนักเรียนปัจจุบัน:\n"
+    msg += "- ชาย: " + curr.male + "\n"
+    msg += "- หญิง: " + curr.female + "\n"
+    msg += "- รวม: " + total
+  }
+
+  sendLineToStudentGroup(msg)
+}
+
+function sendLineToStudentGroup(text) {
+
+  const token = PropertiesService.getScriptProperties().getProperty("LINE_TOKEN")
+
+  const groupId = "Cc1aa912c44ae1bd927d50063da026cec";
+
+  UrlFetchApp.fetch("https://api.line.me/v2/bot/message/push", {
+    method: "post",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    },
+    payload: JSON.stringify({
+      to: groupId,
+      messages: [
+        {
+          type: "text",
+          text: text
+        }
+      ]
+    })
+  });
+
+}
+
+function backupRecords(e) {
+
+  try {
+
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
+
+    const sourceSheet = ss.getSheetByName("record_stu")
+    const configSheet = ss.getSheetByName("settings")
+
+    if (!sourceSheet) {
+      return output({
+        status: "error",
+        message: "record_stu not found"
+      })
+    }
+
+    if (!configSheet) {
+      return output({
+        status: "error",
+        message: "settings not found"
+      })
+    }
+
+    let term = String(
+      configSheet.getRange("B1").getValue() || ""
+    ).trim()
+
+    let year = String(
+      configSheet.getRange("B2").getValue() || ""
+    ).trim()
+
+    if (!term) term = "term"
+    if (!year) year = "year"
+
+    let sheetName = `${term}-${year}`
+
+    let count = 2
+
+    while (ss.getSheetByName(sheetName)) {
+      sheetName = `${term}-${year}(${count})`
+      count++
+    }
+
+    const copied = sourceSheet.copyTo(ss)
+
+    copied.setName(sheetName)
+
+    ss.setActiveSheet(copied)
+    ss.moveActiveSheet(ss.getSheets().length)
+
+    return output({
+      status: "success",
+      sheetName: sheetName
+    })
+
+  } catch (err) {
+
+    Logger.log(err)
+
+    return output({
+      status: "error",
+      message: err.toString()
+    })
+
+  }
+
+}
+
+function output(obj) {
+  return ContentService
+    .createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON)
+}
+
+function rebuildCurrentStatus() {
+
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const recordSheet = ss.getSheetByName("record_stu");
+
+  let statusSheet = ss.getSheetByName("current_status");
+
+  if (!statusSheet) {
+    statusSheet = ss.insertSheet("current_status");
+  }
+
+  statusSheet.clearContents();
+
+  const headers = [
+    "room",
+    "record_date",
+    "all_boys",
+    "all_girls",
+    "all_total",
+    "boys_today",
+    "girls_today",
+    "total_today",
+    "sick",
+    "leave",
+    "absent",
+    "timestamp",
+    "source",
+    "last_teacher_date",
+    "last_teacher_timestamp"
+  ];
+
+  statusSheet
+    .getRange(1, 1, 1, headers.length)
+    .setValues([headers]);
+
+  const lastRow = recordSheet.getLastRow();
+
+  if (lastRow <= 1) {
+    return {
+      status: "success",
+      rooms: 0,
+      message: "ไม่พบข้อมูลใน record_stu"
+    };
+  }
+
+  const records = recordSheet
+    .getRange(2, 1, lastRow - 1, 13)
+    .getValues();
+
+  const latestByRoom = {};
+
+  const latestTeacherByRoom = {};
+
+  records.forEach(row => {
+
+    if (!row[0] || !row[1]) return;
+
+    const room = String(row[1]).trim();
+
+    const recordDate = new Date(row[0]);
+
+    let timestampValue = 0;
+
+    if (row[11] instanceof Date) {
+
+      timestampValue = row[11].getTime();
+
+    } else if (row[11]) {
+
+      const text = String(row[11]).trim();
+      const parts = text.split(" ");
+
+      if (parts.length === 2) {
+
+        const dateParts = parts[0].split("-");
+        const timeParts = parts[1].split(":");
+
+        if (dateParts.length === 3 && timeParts.length >= 2) {
+
+          const d = Number(dateParts[0]);
+          const m = Number(dateParts[1]);
+          const y = Number(dateParts[2]);
+
+          const hh = Number(timeParts[0]) || 0;
+          const mm = Number(timeParts[1]) || 0;
+          const ss = Number(timeParts[2]) || 0;
+
+          const parsed = new Date(
+            y,
+            m - 1,
+            d,
+            hh,
+            mm,
+            ss
+          );
+
+          if (!isNaN(parsed.getTime())) {
+            timestampValue = parsed.getTime();
+          }
+        }
+      }
+    }
+
+    if (!timestampValue && !isNaN(recordDate.getTime())) {
+      timestampValue = recordDate.getTime();
+    }
+
+    if (
+      !latestByRoom[room] ||
+      timestampValue > latestByRoom[room].time
+    ) {
+
+      latestByRoom[room] = {
+        time: timestampValue,
+        row: row
+      };
+
+    }
+
+    const source = String(row[12] || "").trim().toLowerCase();
+    const isAuto = source.includes("autofill");
+
+    if (!isAuto) {
+
+      if (
+        !latestTeacherByRoom[room] ||
+        timestampValue > latestTeacherByRoom[room].time
+      ) {
+
+        latestTeacherByRoom[room] = {
+          time: timestampValue,
+          row: row
+        };
+
+      }
+    }
+
+  });
+
+  const classSheet = ss.getSheetByName("classrooms");
+
+  let classroomOrder = [];
+
+  if (classSheet && classSheet.getLastRow() > 1) {
+    classroomOrder = classSheet
+      .getRange(2, 1, classSheet.getLastRow() - 1, 1)
+      .getValues()
+      .flat()
+      .map(room => String(room).trim())
+      .filter(room => room);
+  }
+
+  const outputRows = classroomOrder
+    .filter(room => latestByRoom[room])
+    .map(room => {
+
+      const r = latestByRoom[room].row;
+
+      const teacher = latestTeacherByRoom[room]
+        ? latestTeacherByRoom[room].row
+        : null;
+
+      return [
+        room,
+        r[0],
+        r[2],
+        r[3],
+        r[4],
+        r[5],
+        r[6],
+        r[7],
+        r[8],
+        r[9],
+        r[10],
+        r[11],
+        r[12],
+        teacher ? teacher[0] : "",
+        teacher ? teacher[11] : ""
+      ];
+
+    });
+
+  if (outputRows.length > 0) {
+
+    statusSheet
+      .getRange(2, 1, outputRows.length, 15)
+      .setValues(outputRows);
+
+  }
+
+  statusSheet.setFrozenRows(1);
+  statusSheet.autoResizeColumns(1, 15);
+
+  SpreadsheetApp.flush();
+
+  return {
+    status: "success",
+    rooms: outputRows.length,
+    recordsScanned: records.length,
+    message: "สร้าง current_status เรียบร้อยแล้ว"
+  };
+}
+
+function updateCurrentStatusRoom(rowData, existingBook) {
+
+  const ss = existingBook || SpreadsheetApp.openById(SPREADSHEET_ID);
+  const statusSheet = ss.getSheetByName("current_status");
+
+  if (!statusSheet || !rowData || !rowData[1]) return;
+
+  const room = String(rowData[1]).trim();
+
+  const lastRow = statusSheet.getLastRow();
+  let targetRow = null;
+
+  if (lastRow > 1) {
+
+    const rooms = statusSheet
+      .getRange(2, 1, lastRow - 1, 1)
+      .getValues()
+      .flat();
+
+    const index = rooms.findIndex(r =>
+      String(r).trim() === room
+    );
+
+    if (index !== -1) {
+      targetRow = index + 2;
+    }
+  }
+
+  let lastTeacherDate = "";
+  let lastTeacherTimestamp = "";
+
+  if (targetRow) {
+
+    const teacherData = statusSheet
+      .getRange(targetRow, 14, 1, 2)
+      .getValues()[0];
+
+    lastTeacherDate = teacherData[0] || "";
+    lastTeacherTimestamp = teacherData[1] || "";
+  }
+
+  const source = String(rowData[12] || "")
+    .trim()
+    .toLowerCase();
+
+  const isAuto = source.includes("autofill");
+
+  if (!isAuto) {
+    lastTeacherDate = rowData[0] || "";
+    lastTeacherTimestamp = rowData[11] || "";
+  }
+
+  const statusRow = [
+    room,
+    rowData[0],
+    rowData[2],
+    rowData[3],
+    rowData[4],
+    rowData[5],
+    rowData[6],
+    rowData[7],
+    rowData[8],
+    rowData[9],
+    rowData[10],
+    rowData[11],
+    rowData[12],
+    lastTeacherDate,
+    lastTeacherTimestamp
+  ];
+
+  if (targetRow) {
+
+    statusSheet
+      .getRange(targetRow, 1, 1, 15)
+      .setValues([statusRow]);
+
+  } else {
+
+    statusSheet.appendRow(statusRow);
+
+  }
+}
+
+function clearDashboardCache() {
+  PropertiesService.getScriptProperties().setProperty("BURAPA_DASH_REV", Utilities.getUuid());
+  CacheService
+    .getScriptCache()
+    .remove("dashboard_v2");
+}
+
+function getFormData_(e) {
+  const room = e.parameter.room, date = e.parameter.date;
+  if (!room || !date) return { data: {}, hasData: false };
+  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName("record_stu");
+  const n = sheet.getLastRow() - 1;
+  if (n <= 0) return { data: {}, hasData: false };
+  const rows = sheet.getRange(2, 1, n, 13).getValues();
+  let hasData = false, data = {};
+  for (let i = rows.length - 1; i >= 0; i--) {
+    const r = rows[i];
+    if (Utilities.formatDate(new Date(r[0]), "Asia/Bangkok", "yyyy-MM-dd") !== date) continue;
+    hasData = true;
+    if (r[1] === room) {
+      data = { all_boys: r[2], all_girls: r[3], boys_today: r[5], girls_today: r[6], sick: r[8], leave: r[9], absent: r[10], source: r[12] };
+      break;
+    }
+  }
+  return { data, hasData };
+}
+
+function previousRooms_(records, date) {
+  const result = new Map(), times = new Map();
+  for (let i = 1; i < records.length; i++) {
+    const row = records[i];
+    if (Utilities.formatDate(new Date(row[0]), "Asia/Bangkok", "yyyy-MM-dd") >= date) continue;
+    let time = 0;
+    if (Object.prototype.toString.call(row[11]) === "[object Date]") time = row[11].getTime();
+    else if (typeof row[11] === "string") {
+      const parts = row[11].split(" ");
+      if (parts.length === 2) { const [d, m, y] = parts[0].split("-"); const [hh, mm, ss] = parts[1].split(":"); time = new Date(y, m - 1, d, hh, mm, ss).getTime(); }
+    }
+    if (!time) time = new Date(row[0]).getTime();
+    if (time > (times.get(row[1]) || 0)) { times.set(row[1], time); result.set(row[1], { all_boys: row[2], all_girls: row[3] }); }
+  }
+  return result;
+}
+
+let BURAPA_WRITE_ACTIVE_ = false;
+function withBurapaWrite_(work) {
+  if (BURAPA_WRITE_ACTIVE_) return work();
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(15000)) throw Error("ระบบกำลังบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง");
+  BURAPA_WRITE_ACTIVE_ = true;
+  try { return work(); }
+  finally {
+    try { SpreadsheetApp.flush(); clearDashboardCache(); }
+    finally { BURAPA_WRITE_ACTIVE_ = false; lock.releaseLock(); }
+  }
+}

@@ -1,871 +1,945 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
-<script src="session.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-<style>
-
-*{
-box-sizing:border-box;
-margin:0;
-padding:0;
-font-family:'Prompt',sans-serif;
-}
-
-body{
-min-height:100vh;
-display:flex;
-flex-direction:column;
-background:linear-gradient(180deg,#f6f7fb,#eef1f8);
-overflow-y: scroll;
-}
-
-header{
-background:linear-gradient(135deg,#c1121f,#e63946,#ff6b6b);
-background-size:200% 200%;
-animation:gradientMove 6s ease infinite;
-border-bottom:4px solid rgba(255,255,255,0.25);
-color:white;
-text-align:center;
-padding:22px 10px;
-box-shadow:0 10px 25px rgba(0,0,0,.15);
-position:relative;
-overflow:hidden;
-z-index:1;
-backdrop-filter: blur(2px);
-}
-
-header::before{
-content:"";
-position:absolute;
-top:0;
-left:0;
-width:200%;
-height:100%;
-background:
-radial-gradient(rgba(255,255,255,.12) 2px, transparent 2px);
-background-size:40px 40px;
-animation:dotsMove 30s linear infinite;
-opacity:.35;
-pointer-events:none;
-}
-
-header::after{
-content:"";
-position:absolute;
-top:0;
-left:-120%;
-width:240%;
-height:100%;
-
-background:linear-gradient(
-120deg,
-rgba(255,255,255,0) 0%,
-rgba(255,255,255,.25) 40%,
-rgba(255,255,255,.35) 50%,
-rgba(255,255,255,.25) 60%,
-rgba(255,255,255,0) 100%
-);
-
-filter:blur(28px);
-animation:shine 6s linear infinite;
-pointer-events:none;
-}
-
-@keyframes gradientMove{
-0%{background-position:0% 50%}
-50%{background-position:100% 50%}
-100%{background-position:0% 50%}
-}
-
-@keyframes dotsMove{
-0%{transform:translateX(0)}
-100%{transform:translateX(-400px)}
-}
-
-@keyframes shine{
-0%{transform:translateX(-100%)}
-100%{transform:translateX(100%)}
-}
-
-.logo{
-width:clamp(80px,16vw,110px);
-margin-bottom:4px;
-animation:float 4s ease-in-out infinite;
-filter:
-drop-shadow(0 8px 14px rgba(0,0,0,.3))
-drop-shadow(0 0 25px rgba(255,255,255,.35));
-}
-
-@keyframes float{
-0%{transform:translateY(0)}
-50%{transform:translateY(-6px)}
-100%{transform:translateY(0)}
-}
-
-.system-name{font-size:13px;}
-.school-name{font-size:26px;font-weight:700;}
-
-.back{
-position:absolute;
-left:12px;
-top:12px;
-color:white;
-text-decoration:none;
-font-size:13px;
-background:rgba(255,255,255,.2);
-padding:6px 10px;
-border-radius:8px;
-cursor:pointer;
-}
-
-.term{
-font-size:16px;
-margin-top:3px;
-}
-
-.time{
-font-size:14px;
-margin-top:2px;
-}
-
-main{
-flex:1;
-max-width:1100px;
-margin:auto;
-padding:16px;
-width:100%;
-}
-
-.stats{
-display:grid;
-grid-template-columns:repeat(5,1fr);
-gap:12px;
-margin-bottom:16px;
-}
-
-.stat{
-background:white;
-padding:14px;
-border-radius:16px;
-text-align:center;
-box-shadow:0 8px 20px rgba(0,0,0,.08);
-}
-
-.stat h3{font-size:12px;color:#666;}
-
-.num{
-font-size:26px;
-font-weight:700;
-margin-top:4px;
-transition:transform .3s;
-}
-
-.header-actions{
-display:flex;
-gap:8px;
-margin-left:auto;
-flex-wrap:wrap;
-}
-
-.num:hover{
-transform:scale(1.1);
-}
-
-.present{color:#6BCB77}
-.sick{color:#ff8fab}
-.leave{color:#ffd166}
-.absent{color:#f28482}
-
-.grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:16px;
-align-items:stretch;
-}
-
-.card{
-background:white;
-border-radius:18px;
-padding:16px;
-box-shadow:0 10px 25px rgba(0,0,0,.08);
-display:flex;
-flex-direction:column;
-gap:12px;
-transition:.25s ease;
-height:420px;
-justify-content:space-between;
-}
-
-.card-center {
-justify-content: center;
-align-items: center;
-text-align: center;
-}
-
-.card-center .card-scroll{
-justify-content:center;
-display:flex;
-flex-direction:column;
-}
-
-.card-header{
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:0 4px;
-margin-bottom:6px;
-flex-shrink:0;
-flex-wrap:wrap;
-gap:8px;
-}
-
-.card-header button{
-padding:6px 10px;
-font-size:11px;
-border-radius:8px;
-white-space:nowrap;
-}
-
-.card-header span:first-child{
-font-size:16px;
-font-weight:600;
-}
-
-.card:hover{
-transform:translateY(-2px);
-box-shadow:0 14px 30px rgba(0,0,0,.12);
-}
-
-.card h3{
-text-align:center;
-margin-bottom:12px;
-flex-shrink:0;
-}
-
-.chartBox{
-flex:1;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-padding:16px 0 12px;
-position:relative;
-min-height:0;
-}
-
-.chartBox canvas{
-width:100% !important;
-height:100% !important;
-max-width:260px;
-max-height:260px;
-aspect-ratio: 1 / 1;
-}
-
-.noData{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-text-align:center;
-font-size:15px;
-color:#9ca3af;
-font-weight:500;
-}
-
-#classList{
-flex:1;
-overflow-y:auto;
-margin-top:8px;
-padding-right:4px;
-scroll-behavior:smooth;
--webkit-overflow-scrolling:touch;
-}
-
-#classList::-webkit-scrollbar{
-width:6px;
-}
-
-#classList::-webkit-scrollbar-thumb{
-background:#e5e7eb;
-border-radius:10px;
-}
-
-.class{
-padding:14px 10px;
-border-bottom:1px solid #f1f5f9;
-border-radius:14px;
-transition:.2s ease;
-}
-
-.class:hover{
-background:#f9fafb;
-}
-
-.class-top{
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:10px;
-}
-
-.class-top div{
-font-size:18px;
-font-weight:700;
-color:#333;
-}
-
-.btn-reset{
-background:#f87171;
-color:white;
-}
-
-.status{
-font-size:13px;
-font-weight:700;
-}
-
-.green{
-color:#6BCB77;
-}
-
-.red{
-color:#e63946;
-animation:blink 1.4s infinite;
-}
-
-.p {
-align-items: center;
-}
-
-.buttons{
-margin-top:12px;
-display:flex;
-flex-wrap: wrap;
-gap:8px;
-justify-content: center;
-}
-
-button {
-border: none; 
-outline: none;
-border-radius: 12px;
-cursor: pointer;
-transition: all 0.3s ease;
-display: flex;
-align-items: center;
-justify-content: center;
-gap: 6px;
-font-weight: 500;
-}
-
-.buttons button {
-flex: 0 1 calc(33.33% - 8px);
-min-width: 110px;
-padding: 12px 8px;
-margin-bottom: 0;
-border: none;
-border-radius: 12px;
-font-size: 12px;
-cursor: pointer;
-font-weight: 500;
-transition: .2s;
-}
-
-button:hover{
-transform:translateY(-1px);
-box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-}
-
-.btn-edit{
-background:#fbbf24;
-color:#78350f;
-font-weight:600;
-box-shadow:0 4px 10px rgba(251,191,36,.3);
-}
-
-.btn-edit:hover{
-background:#f59e0b;
-box-shadow:0 6px 14px rgba(245,158,11,.4);
-}
-
-.btn-main{
-background:linear-gradient(135deg,#F15F79,#fd746c);
-color:white;
-}
-
-.btn-start{
-background: linear-gradient(135deg,#f46b45,#eea849);
-color:white;
-}
-
-.btn-sub{background:#e5e7eb; color:#374151;}
-
-button:disabled{
-opacity:.6;
-cursor:not-allowed;
-}
-
-.reset-card{
-gap:14px;
-}
-
-.control-section{
-background:#f8fafc;
-padding:8px;
-border-radius:12px;
-display:flex;
-flex-direction:column;
-gap:6px;
-border:1px solid #e5e7eb;
-}
-
-.control-section:hover{
-background:#f1f5f9;
-}
-
-.control-title{
-font-size:13px;
-font-weight:600;
-color:#374151;
-}
-
-.date-row{
-display:flex;
-gap:8px;
-}
-
-.date-row input{
-flex:1;
-padding:6px;
-border-radius:8px;
-border:1px solid #ddd;
-}
-
-.btn-control{
-border:none;
-padding:10px;
-border-radius:10px;
-font-size:13px;
-cursor:pointer;
-font-weight:600;
-transition:.2s;
-}
-
-.btn-control.warn{
-background:#fde68a;
-color:#92400e;
-}
-
-.btn-control.warn:hover{
-background:#fcd34d;
-}
-
-.btn-control.danger{
-background:#ef4444;
-color:white;
-}
-
-.btn-control.danger:hover{
-background:#dc2626;
-}
-
-.danger-box{
-border:1px solid #fecaca;
-background:#fff1f2;
-}
-
-.btn-reset-soft{
-background:#ff4b1f;
-color:white;
-}
-
-.btn-reset-danger{
-background:#ef4444;
-color:white;
-}
-
-.date-range{
-display:flex;
-gap:8px;
-flex-wrap:wrap;
-justify-content:center;
-}
-
-.date-range input{
-padding:6px;
-border-radius:8px;
-border:1px solid #ddd;
-}
-
-.field{
-display:flex;
-flex-direction:column;
-gap:4px;
-margin-bottom:10px;
-}
-
-.field label{
-font-size:13px;
-color:#555;
-font-weight:500;
-}
-
-.export-section{
-display:flex;
-flex-direction:column;
-gap:12px;
-}
-
-.export-group{
-background:#f8fafc;
-padding:12px;
-border-radius:12px;
-border:1px solid #e5e7eb;
-display:flex;
-flex-direction:column;
-gap:10px;
-}
-
-.export-group-title{
-font-size:13px;
-font-weight:600;
-color:#374151;
-}
-
-.export-actions{
-display:flex;
-flex-direction:column;
-gap:8px;
-}
-
-.export-actions button{
-width:100%;
-padding:12px;
-font-size:13px;
-}
-
-input[type="date"].select-modern {
-width: 100% !important;
-display: block;
-box-sizing: border-box;
-padding: 12px;
-font-size: 16px;
--webkit-appearance: none;
-appearance: none;
-}
-
-.field input[type="date"] {
-width: 100% !important;
-}
-
-.select-modern{
-padding:10px 12px;
-border-radius:12px;
-border:1px solid #e5e7eb;
-font-size:14px;
-background:#fff;
-cursor:pointer;
-transition:.25s;
-outline:none;
-}
-
-.select-modern:hover{
-border-color:#e63946;
-}
-
-.select-modern:focus{
-border-color:#e63946;
-box-shadow:0 0 0 3px rgba(230,57,70,0.15);
-}
-
-footer{
-background:linear-gradient(135deg,#c1121f,#e63946,#ff6b6b);
-color:white;
-text-align:center;
-font-size:10px;
-padding:8px;
-}
-
-#loading{
-position:fixed;
-inset:0;
-background:white;
-display:flex;
-align-items:center;
-justify-content:center;
-flex-direction:column;
-z-index:999;
-opacity:1;
-transition:opacity .6s ease;
-overflow:hidden;
-touch-action:none;
-}
-
-.loader{
-width:45px;
-height:45px;
-border:4px solid #eee;
-border-top:4px solid #e63946;
-border-radius:50%;
-animation:spin 1s linear infinite;
-}
-
-@keyframes spin{
-to{transform:rotate(360deg)}
-}
-
-.status-badge{
-font-size:12px;
-padding:6px 12px;
-border-radius:999px;
-font-weight:600;
-white-space:nowrap;
-display:inline-flex;
-align-items:center;
-gap:4px;
-}
-
-.status-badge.ok{
-background:#dcfce7;
-color:#166534;
-border:1px solid #86efac;
-}
-
-.status-badge.pending{
-background:#fee2e2;
-color:#991b1b;
-border:1px solid #fecaca;
-animation: blink 1.4s infinite;
-}
-
-.updateBy{
-display:inline;
-margin-left:4px;
-}
-
-.card-scroll{
-overflow-y:auto;
-flex:1;
-padding-right:6px;
-display:flex;
-flex-direction:column;
-justify-content:flex-start;
-}
-
-.card button{
-flex-shrink:0;
-}
-
-.card-scroll::-webkit-scrollbar{
-width:6px;
-}
-
-.card-scroll::-webkit-scrollbar-thumb{
-background:#e5e7eb;
-border-radius:10px;
-}
-
-#sigForm{
-transition: all .3s ease;
-}
-
-@media (max-width:768px){
-
-.stats{
-grid-template-columns:1fr 1fr;
-}
-
-.stat:first-child{
-grid-column:1/3;
-}
-
-.grid{
-grid-template-columns:1fr;
-}
-
-.card{
-height:auto;
-}
-
-.card-header{
-flex-direction:column;
-align-items:flex-start;
-}
-
-.updateText{
-display:block;
-text-align:center;
-width:100%;
-}
-
-.chartBox canvas{
-width:100% !important;
-max-width:320px;
-max-height:320px;
-}
-
-.class-top{
-flex-direction:column;
-gap:4px;
-align-items:center;
-text-align:center;
-}
-
-.buttons{
-flex-direction:column;
-}
-
-.buttons button {
-flex: 1 1 100%;
-width: 100%;
-}
-
-}
-
-@keyframes blink{
-0%{opacity:1}
-50%{opacity:.4}
-100%{opacity:1}
-}
-
-.status-box{
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:12px 14px;
-border-radius:12px;
-font-size:14px;
-background:#f8fafc;
-box-shadow:0 2px 6px rgba(0,0,0,.05);
-transition:.2s;
-}
-
-.ok{ border-left:5px solid #22c55e; }
-.warn{ border-left:5px solid #f59e0b; }
-.err{ border-left:5px solid #ef4444; }
-
-.system-status{
-display:flex;
-flex-direction:column;
-gap:10px;
-}
-
-.status-box:hover{
-transform:translateY(-1px);
-}
-
-.system-status div{
-margin:6px 0;
-font-size:15px;
-}
-
-#toastContainer{
-position:fixed;
-top:20px;
-right:20px;
-z-index:99999;
-display:flex;
-flex-direction:column;
-gap:12px;
-}
-
-.toast{
-min-width:280px;
-max-width:420px;
-background:#fff;
-border-radius:14px;
-padding:14px 16px;
-box-shadow:0 12px 30px rgba(0,0,0,.12);
-border-left:5px solid #22c55e;
-animation:toastSlide .35s ease;
-}
-
-.toast.success{border-left-color:#22c55e;}
-.toast.error{border-left-color:#ef4444;}
-.toast.warn{border-left-color:#f59e0b;}
-
-.toast-title{
-font-size:14px;
-font-weight:700;
-}
-
-.toast-text{
-font-size:13px;
-margin-top:4px;
-color:#555;
-}
-
-.toast.hide{
-opacity:0;
-transform:translateX(40px);
-transition:.35s;
-}
-
-@keyframes toastSlide{
-from{
-opacity:0;
-transform:translateX(40px);
-}
-to{
-opacity:1;
-transform:translateX(0);
-}
-}
-
-.card-title-fixed{
-flex-shrink:0;
-margin-bottom:10px;
-text-align:center;
-font-size:18px;
-font-weight:700;
-}
-
-.reset-card .card-scroll{
-display:flex;
-flex-direction:column;
-gap:16px;
-overflow-y:auto;
-padding-right:6px;
-}
-</style>
+  <script src="performance.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+  <script src="session.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Prompt', sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(180deg, #f6f7fb, #eef1f8);
+      overflow-y: scroll;
+    }
+
+    header {
+      background: linear-gradient(135deg, #c1121f, #e63946, #ff6b6b);
+      background-size: 200% 200%;
+      animation: gradientMove 6s ease infinite;
+      border-bottom: 4px solid rgba(255, 255, 255, 0.25);
+      color: white;
+      text-align: center;
+      padding: 22px 10px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, .15);
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+      backdrop-filter: blur(2px);
+    }
+
+    header::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 200%;
+      height: 100%;
+      background:
+        radial-gradient(rgba(255, 255, 255, .12) 2px, transparent 2px);
+      background-size: 40px 40px;
+      animation: dotsMove 30s linear infinite;
+      opacity: .35;
+      pointer-events: none;
+    }
+
+    header::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -120%;
+      width: 240%;
+      height: 100%;
+
+      background: linear-gradient(120deg,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, .25) 40%,
+          rgba(255, 255, 255, .35) 50%,
+          rgba(255, 255, 255, .25) 60%,
+          rgba(255, 255, 255, 0) 100%);
+
+      filter: blur(28px);
+      animation: shine 6s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes gradientMove {
+      0% {
+        background-position: 0% 50%
+      }
+
+      50% {
+        background-position: 100% 50%
+      }
+
+      100% {
+        background-position: 0% 50%
+      }
+    }
+
+    @keyframes dotsMove {
+      0% {
+        transform: translateX(0)
+      }
+
+      100% {
+        transform: translateX(-400px)
+      }
+    }
+
+    @keyframes shine {
+      0% {
+        transform: translateX(-100%)
+      }
+
+      100% {
+        transform: translateX(100%)
+      }
+    }
+
+    .logo {
+      width: clamp(80px, 16vw, 110px);
+      margin-bottom: 4px;
+      animation: float 4s ease-in-out infinite;
+      filter:
+        drop-shadow(0 8px 14px rgba(0, 0, 0, .3)) drop-shadow(0 0 25px rgba(255, 255, 255, .35));
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(0)
+      }
+
+      50% {
+        transform: translateY(-6px)
+      }
+
+      100% {
+        transform: translateY(0)
+      }
+    }
+
+    .system-name {
+      font-size: 13px;
+    }
+
+    .school-name {
+      font-size: 26px;
+      font-weight: 700;
+    }
+
+    .back {
+      position: absolute;
+      left: 12px;
+      top: 12px;
+      color: white;
+      text-decoration: none;
+      font-size: 13px;
+      background: rgba(255, 255, 255, .2);
+      padding: 6px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .term {
+      font-size: 16px;
+      margin-top: 3px;
+    }
+
+    .time {
+      font-size: 14px;
+      margin-top: 2px;
+    }
+
+    main {
+      flex: 1;
+      max-width: 1100px;
+      margin: auto;
+      padding: 16px;
+      width: 100%;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .stat {
+      background: white;
+      padding: 14px;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, .08);
+    }
+
+    .stat h3 {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .num {
+      font-size: 26px;
+      font-weight: 700;
+      margin-top: 4px;
+      transition: transform .3s;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+      margin-left: auto;
+      flex-wrap: wrap;
+    }
+
+    .num:hover {
+      transform: scale(1.1);
+    }
+
+    .present {
+      color: #6BCB77
+    }
+
+    .sick {
+      color: #ff8fab
+    }
+
+    .leave {
+      color: #ffd166
+    }
+
+    .absent {
+      color: #f28482
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .card {
+      background: white;
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, .08);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: .25s ease;
+      height: 420px;
+      justify-content: space-between;
+    }
+
+    .card-center {
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .card-center .card-scroll {
+      justify-content: center;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 4px;
+      margin-bottom: 6px;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .card-header button {
+      padding: 6px 10px;
+      font-size: 11px;
+      border-radius: 8px;
+      white-space: nowrap;
+    }
+
+    .card-header span:first-child {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, .12);
+    }
+
+    .card h3 {
+      text-align: center;
+      margin-bottom: 12px;
+      flex-shrink: 0;
+    }
+
+    .chartBox {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 0 12px;
+      position: relative;
+      min-height: 0;
+    }
+
+    .chartBox canvas {
+      width: 100% !important;
+      height: 100% !important;
+      max-width: 260px;
+      max-height: 260px;
+      aspect-ratio: 1 / 1;
+    }
+
+    .noData {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      font-size: 15px;
+      color: #9ca3af;
+      font-weight: 500;
+    }
+
+    #classList {
+      flex: 1;
+      overflow-y: auto;
+      margin-top: 8px;
+      padding-right: 4px;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    #classList::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    #classList::-webkit-scrollbar-thumb {
+      background: #e5e7eb;
+      border-radius: 10px;
+    }
+
+    .class {
+      padding: 14px 10px;
+      border-bottom: 1px solid #f1f5f9;
+      border-radius: 14px;
+      transition: .2s ease;
+    }
+
+    .class:hover {
+      background: #f9fafb;
+    }
+
+    .class-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .class-top div {
+      font-size: 18px;
+      font-weight: 700;
+      color: #333;
+    }
+
+    .btn-reset {
+      background: #f87171;
+      color: white;
+    }
+
+    .status {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .green {
+      color: #6BCB77;
+    }
+
+    .red {
+      color: #e63946;
+      animation: blink 1.4s infinite;
+    }
+
+    .p {
+      align-items: center;
+    }
+
+    .buttons {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    button {
+      border: none;
+      outline: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-weight: 500;
+    }
+
+    .buttons button {
+      flex: 0 1 calc(33.33% - 8px);
+      min-width: 110px;
+      padding: 12px 8px;
+      margin-bottom: 0;
+      border: none;
+      border-radius: 12px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: .2s;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-edit {
+      background: #fbbf24;
+      color: #78350f;
+      font-weight: 600;
+      box-shadow: 0 4px 10px rgba(251, 191, 36, .3);
+    }
+
+    .btn-edit:hover {
+      background: #f59e0b;
+      box-shadow: 0 6px 14px rgba(245, 158, 11, .4);
+    }
+
+    .btn-main {
+      background: linear-gradient(135deg, #F15F79, #fd746c);
+      color: white;
+    }
+
+    .btn-start {
+      background: linear-gradient(135deg, #f46b45, #eea849);
+      color: white;
+    }
+
+    .btn-sub {
+      background: #e5e7eb;
+      color: #374151;
+    }
+
+    button:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+
+    .reset-card {
+      gap: 14px;
+    }
+
+    .control-section {
+      background: #f8fafc;
+      padding: 8px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .control-section:hover {
+      background: #f1f5f9;
+    }
+
+    .control-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .date-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .date-row input {
+      flex: 1;
+      padding: 6px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+
+    .btn-control {
+      border: none;
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 13px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: .2s;
+    }
+
+    .btn-control.warn {
+      background: #fde68a;
+      color: #92400e;
+    }
+
+    .btn-control.warn:hover {
+      background: #fcd34d;
+    }
+
+    .btn-control.danger {
+      background: #ef4444;
+      color: white;
+    }
+
+    .btn-control.danger:hover {
+      background: #dc2626;
+    }
+
+    .danger-box {
+      border: 1px solid #fecaca;
+      background: #fff1f2;
+    }
+
+    .btn-reset-soft {
+      background: #ff4b1f;
+      color: white;
+    }
+
+    .btn-reset-danger {
+      background: #ef4444;
+      color: white;
+    }
+
+    .date-range {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .date-range input {
+      padding: 6px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 10px;
+    }
+
+    .field label {
+      font-size: 13px;
+      color: #555;
+      font-weight: 500;
+    }
+
+    .export-section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .export-group {
+      background: #f8fafc;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .export-group-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .export-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .export-actions button {
+      width: 100%;
+      padding: 12px;
+      font-size: 13px;
+    }
+
+    input[type="date"].select-modern {
+      width: 100% !important;
+      display: block;
+      box-sizing: border-box;
+      padding: 12px;
+      font-size: 16px;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .field input[type="date"] {
+      width: 100% !important;
+    }
+
+    .select-modern {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      font-size: 14px;
+      background: #fff;
+      cursor: pointer;
+      transition: .25s;
+      outline: none;
+    }
+
+    .select-modern:hover {
+      border-color: #e63946;
+    }
+
+    .select-modern:focus {
+      border-color: #e63946;
+      box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.15);
+    }
+
+    footer {
+      background: linear-gradient(135deg, #c1121f, #e63946, #ff6b6b);
+      color: white;
+      text-align: center;
+      font-size: 10px;
+      padding: 8px;
+    }
+
+    #loading {
+      position: fixed;
+      inset: 0;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      z-index: 999;
+      opacity: 1;
+      transition: opacity .6s ease;
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    .loader {
+      width: 45px;
+      height: 45px;
+      border: 4px solid #eee;
+      border-top: 4px solid #e63946;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    .status-badge {
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-weight: 600;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .status-badge.ok {
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #86efac;
+    }
+
+    .status-badge.pending {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+      animation: blink 1.4s infinite;
+    }
+
+    .updateBy {
+      display: inline;
+      margin-left: 4px;
+    }
+
+    .card-scroll {
+      overflow-y: auto;
+      flex: 1;
+      padding-right: 6px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    .card button {
+      flex-shrink: 0;
+    }
+
+    .card-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .card-scroll::-webkit-scrollbar-thumb {
+      background: #e5e7eb;
+      border-radius: 10px;
+    }
+
+    #sigForm {
+      transition: all .3s ease;
+    }
+
+    @media (max-width:768px) {
+
+      .stats {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .stat:first-child {
+        grid-column: 1/3;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        height: auto;
+      }
+
+      .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .updateText {
+        display: block;
+        text-align: center;
+        width: 100%;
+      }
+
+      .chartBox canvas {
+        width: 100% !important;
+        max-width: 320px;
+        max-height: 320px;
+      }
+
+      .class-top {
+        flex-direction: column;
+        gap: 4px;
+        align-items: center;
+        text-align: center;
+      }
+
+      .buttons {
+        flex-direction: column;
+      }
+
+      .buttons button {
+        flex: 1 1 100%;
+        width: 100%;
+      }
+
+    }
+
+    @keyframes blink {
+      0% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: .4
+      }
+
+      100% {
+        opacity: 1
+      }
+    }
+
+    .status-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      background: #f8fafc;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, .05);
+      transition: .2s;
+    }
+
+    .ok {
+      border-left: 5px solid #22c55e;
+    }
+
+    .warn {
+      border-left: 5px solid #f59e0b;
+    }
+
+    .err {
+      border-left: 5px solid #ef4444;
+    }
+
+    .system-status {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .status-box:hover {
+      transform: translateY(-1px);
+    }
+
+    .system-status div {
+      margin: 6px 0;
+      font-size: 15px;
+    }
+
+    #toastContainer {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .toast {
+      min-width: 280px;
+      max-width: 420px;
+      background: #fff;
+      border-radius: 14px;
+      padding: 14px 16px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, .12);
+      border-left: 5px solid #22c55e;
+      animation: toastSlide .35s ease;
+    }
+
+    .toast.success {
+      border-left-color: #22c55e;
+    }
+
+    .toast.error {
+      border-left-color: #ef4444;
+    }
+
+    .toast.warn {
+      border-left-color: #f59e0b;
+    }
+
+    .toast-title {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .toast-text {
+      font-size: 13px;
+      margin-top: 4px;
+      color: #555;
+    }
+
+    .toast.hide {
+      opacity: 0;
+      transform: translateX(40px);
+      transition: .35s;
+    }
+
+    @keyframes toastSlide {
+      from {
+        opacity: 0;
+        transform: translateX(40px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .card-title-fixed {
+      flex-shrink: 0;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .reset-card .card-scroll {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+  </style>
 </head>
 
-<body>                  
+<body>
 
-<script src="ui-effects.js"></script>
+  <script src="ui-effects.js"></script>
 
-<div id="loading">
-<div class="loader"></div>
-<div style="margin-top:12px;font-size:14px;color:#555">
-กำลังเปิดหน้าบริหารจัดการระบบ...
-</div>
-</div>
+  <div id="loading">
+    <div class="loader"></div>
+    <div style="margin-top:12px;font-size:14px;color:#555">
+      กำลังเปิดหน้าบริหารจัดการระบบ...
+    </div>
+  </div>
 
-<div id="toastContainer"></div>
+  <div id="toastContainer"></div>
 
-<header>
+  <header>
 
 
-<a class="back" onclick="logout()">← ออกจากระบบ</a>
+    <a class="back" onclick="logout()">← ออกจากระบบ</a>
 
-<img src="burapa-logo.png" class="logo">
+    <img src="burapa-logo.png" class="logo">
 
-<div class="system-name">ระบบบริหารจัดการสถิตินักเรียน</div>
-<div class="school-name">สำหรับผู้บริหารและผู้ดูแลระบบ</div>
+    <div class="system-name">ระบบบริหารจัดการสถิตินักเรียน</div>
+    <div class="school-name">สำหรับผู้บริหารและผู้ดูแลระบบ</div>
 
-<div class="term" id="termDisplay"></div>
-<div class="time" id="clock"></div>
-</header>
+    <div class="term" id="termDisplay"></div>
+    <div class="time" id="clock"></div>
+  </header>
 
-<div id="alertBar" style="
+  <div id="alertBar" style="
 background:#fff3cd;
 color:#856404;
 padding:10px;
@@ -874,785 +948,775 @@ font-size:14px;
 display:none;
 font-weight:600;
 ">
-</div>
+  </div>
 
-<main>
+  <main>
 
-<div class="stats">
+    <div class="stats">
 
-<div class="stat total">
-<h3>👨‍🎓 นักเรียนทั้งหมด</h3>
-<div class="num" id="total">0</div>
-</div>
+      <div class="stat total">
+        <h3>👨‍🎓 นักเรียนทั้งหมด</h3>
+        <div class="num" id="total">0</div>
+      </div>
 
-<div class="stat">
-<h3>✅ มาเรียนวันนี้</h3>
-<div class="num present" id="present">0</div>
-</div>
+      <div class="stat">
+        <h3>✅ มาเรียนวันนี้</h3>
+        <div class="num present" id="present">0</div>
+      </div>
 
-<div class="stat">
-<h3>🤒 ป่วย</h3>
-<div class="num sick" id="sick">0</div>
-</div>
+      <div class="stat">
+        <h3>🤒 ป่วย</h3>
+        <div class="num sick" id="sick">0</div>
+      </div>
 
-<div class="stat">
-<h3>📝 ลา</h3>
-<div class="num leave" id="leave">0</div>
-</div>
+      <div class="stat">
+        <h3>📝 ลา</h3>
+        <div class="num leave" id="leave">0</div>
+      </div>
 
-<div class="stat">
-<h3>❌ ขาด</h3>
-<div class="num absent" id="absent">0</div>
-</div>
-</div>
+      <div class="stat">
+        <h3>❌ ขาด</h3>
+        <div class="num absent" id="absent">0</div>
+      </div>
+    </div>
 
-<div class="grid">
+    <div class="grid">
 
-<div class="card">
-<div class="card-header">📊 แผนภูมิสรุปสถิติวันนี้</div>
-<div class="chartBox">
-<canvas id="chart"></canvas>
-<div id="noData" class="noData"></div>
-</div>
-</div>
+      <div class="card">
+        <div class="card-header">📊 แผนภูมิสรุปสถิติวันนี้</div>
+        <div class="chartBox">
+          <canvas id="chart"></canvas>
+          <div id="noData" class="noData"></div>
+        </div>
+      </div>
 
-<div class="card">
-<div class="card-header">📅 แผนภูมิสรุปสถิติรายสัปดาห์</div>
-<div class="chartBox">
-<canvas id="weeklyChart"></canvas>
-<div class="noData" id="noWeekly">ยังไม่มีข้อมูลในขณะนี้</div>
-</div>
-</div>
+      <div class="card">
+        <div class="card-header">📅 แผนภูมิสรุปสถิติรายสัปดาห์</div>
+        <div class="chartBox">
+          <canvas id="weeklyChart"></canvas>
+          <div class="noData" id="noWeekly">ยังไม่มีข้อมูลในขณะนี้</div>
+        </div>
+      </div>
 
-<div class="card">
-<div class="card-header">📆 แผนภูมิสรุปสถิติรายเดือน</div>
-<div class="chartBox">
-<canvas id="monthlyChart"></canvas>
-<div class="noData" id="noMonthly">ยังไม่มีข้อมูลในขณะนี้</div>
-</div>
-</div>
+      <div class="card">
+        <div class="card-header">📆 แผนภูมิสรุปสถิติรายเดือน</div>
+        <div class="chartBox">
+          <canvas id="monthlyChart"></canvas>
+          <div class="noData" id="noMonthly">ยังไม่มีข้อมูลในขณะนี้</div>
+        </div>
+      </div>
 
-<div class="card">
-<div class="card-header" style="justify-content:center; font-weight:700;">
-📄Export แบบรายงานสถิติ
-</div>
+      <div class="card">
+        <div class="card-header" style="justify-content:center; font-weight:700;">
+          📄Export แบบรายงานสถิติ
+        </div>
 
-<div class="card-scroll export-section">
-<div class="export-group">
-<div class="export-group-title">เลือกวันที่ต้องการรายงาน</div>
+        <div class="card-scroll export-section">
+          <div class="export-group">
+            <div class="export-group-title">เลือกวันที่ต้องการรายงาน</div>
 
-<input type="date" id="reportDate" class="select-modern">
-</div>
+            <input type="date" id="reportDate" class="select-modern">
+          </div>
 
-<div class="export-group export-actions">
-<button class="btn-main" onclick="printReport(event)">
-📤 Export รายงาน
-</button>
+          <div class="export-group export-actions">
+            <button class="btn-main" onclick="printReport(event)">
+              📤 Export รายงาน
+            </button>
 
-<button class="btn-sub" onclick="toggleSigForm()">
-✏️ แก้ไขรายชื่อผู้ลงนาม
-</button>
-</div>
+            <button class="btn-sub" onclick="toggleSigForm()">
+              ✏️ แก้ไขรายชื่อผู้ลงนาม
+            </button>
+          </div>
 
-<div id="sigForm" class="export-group" style="display:none;">
-<div class="export-group-title">🖊 ตั้งค่าชื่อผู้ลงนาม</div>
+          <div id="sigForm" class="export-group" style="display:none;">
+            <div class="export-group-title">🖊 ตั้งค่าชื่อผู้ลงนาม</div>
 
-<div class="field">
-<label>ครูเวรวันจันทร์</label>
-<input type="text" id="mon" class="select-modern">
-</div>
+            <div class="field">
+              <label>ครูเวรวันจันทร์</label>
+              <input type="text" id="mon" class="select-modern">
+            </div>
 
-<div class="field">
-<label>ครูเวรวันอังคาร</label>
-<input type="text" id="tue" class="select-modern">
-</div>
+            <div class="field">
+              <label>ครูเวรวันอังคาร</label>
+              <input type="text" id="tue" class="select-modern">
+            </div>
 
-<div class="field">
-<label>ครูเวรวันพุธ</label>
-<input type="text" id="wed" class="select-modern">
-</div>
+            <div class="field">
+              <label>ครูเวรวันพุธ</label>
+              <input type="text" id="wed" class="select-modern">
+            </div>
 
-<div class="field">
-<label>ครูเวรวันพฤหัสบดี</label>
-<input type="text" id="thu" class="select-modern">
-</div>
+            <div class="field">
+              <label>ครูเวรวันพฤหัสบดี</label>
+              <input type="text" id="thu" class="select-modern">
+            </div>
 
-<div class="field">
-<label>ครูเวรวันศุกร์</label>
-<input type="text" id="fri" class="select-modern">
-</div>
+            <div class="field">
+              <label>ครูเวรวันศุกร์</label>
+              <input type="text" id="fri" class="select-modern">
+            </div>
 
-<div class="field">
-<label>ผช.ผอ.ฝ่ายบริหารทั่วไป</label>
-<input type="text" id="assistant" class="select-modern">
-</div>
+            <div class="field">
+              <label>ผช.ผอ.ฝ่ายบริหารทั่วไป</label>
+              <input type="text" id="assistant" class="select-modern">
+            </div>
 
-<div class="field">
-<label>รองผู้อำนวยการ</label>
-<input type="text" id="deputy" class="select-modern">
-</div>
+            <div class="field">
+              <label>รองผู้อำนวยการ</label>
+              <input type="text" id="deputy" class="select-modern">
+            </div>
 
-<div class="field">
-<label>ผู้อำนวยการ</label>
-<input type="text" id="director" class="select-modern">
-</div>
+            <div class="field">
+              <label>ผู้อำนวยการ</label>
+              <input type="text" id="director" class="select-modern">
+            </div>
 
-<button class="btn-main" onclick="saveSignature(event)" style="width:100%; padding:12px;">
-💾 บันทึกข้อมูลผู้ลงนาม
-</button>
+            <button class="btn-main" onclick="saveSignature(event)" style="width:100%; padding:12px;">
+              💾 บันทึกข้อมูลผู้ลงนาม
+            </button>
 
-</div>
-</div>
-</div>
+          </div>
+        </div>
+      </div>
 
-<div class="card card-rooms">
-<div class="card-header">
-<span>🏫 รายการห้องเรียนทั้งหมด <span id="roomCount"></span></span>
+      <div class="card card-rooms">
+        <div class="card-header">
+          <span>🏫 รายการห้องเรียนทั้งหมด <span id="roomCount"></span></span>
 
-<div class="header-actions">
-<button onclick="addRoom()" class="btn-main">+ เพิ่มห้อง</button>
-<button onclick="toggleSort()" class="btn-sub" id="sortBtn">⇌ จัดลำดับห้อง</button>
-</div>
-</div>
-<div id="classList"></div>
-</div>
+          <div class="header-actions">
+            <button onclick="addRoom()" class="btn-main">+ เพิ่มห้อง</button>
+            <button onclick="toggleSort()" class="btn-sub" id="sortBtn">⇌ จัดลำดับห้อง</button>
+          </div>
+        </div>
+        <div id="classList"></div>
+      </div>
 
-<div class="card system-status">
-<h3>⚙️ สถานะระบบ</h3>
-<div id="sttAPI" class="status-box">🌐 API: -</div>
-<div id="sttDB" class="status-box">🗂️ Database: -</div>
-<div id="sttMSG" class="status-box">💬 Messaging API: -</div>
-<div id="sttREC" class="status-box">💾 Records: -</div>
-</div>
+      <div class="card system-status">
+        <h3>⚙️ สถานะระบบ</h3>
+        <div id="sttAPI" class="status-box">🌐 API: -</div>
+        <div id="sttDB" class="status-box">🗂️ Database: -</div>
+        <div id="sttMSG" class="status-box">💬 Messaging API: -</div>
+        <div id="sttREC" class="status-box">💾 Records: -</div>
+      </div>
 
-<div class="card reset-card">
-<h3 class="card-title-fixed">‼ จัดการข้อมูลสถิติ</h3>
-<div class="card-scroll">
+      <div class="card reset-card">
+        <h3 class="card-title-fixed">‼ จัดการข้อมูลสถิติ</h3>
+        <div class="card-scroll">
 
-<div class="control-section">
-<div class="control-title">รีเซ็ตสถิติวันนี้</div>
-<button class="btn-control warn" onclick="resetTodayAll(event)">
-🔄 รีเซ็ตสถิติวันนี้ทั้งหมด
-</button>
-</div>
+          <div class="control-section">
+            <div class="control-title">รีเซ็ตสถิติวันนี้</div>
+            <button class="btn-control warn" onclick="resetTodayAll(event)">
+              🔄 รีเซ็ตสถิติวันนี้ทั้งหมด
+            </button>
+          </div>
 
-<div class="control-section">
-<div class="control-title">รีเซ็ตสถิติตามช่วงวัน (ตั้งแต่-จนถึง)</div>
-<div class="date-row">
-<input type="date" id="startDate">
-<input type="date" id="endDate">
-</div>
-<button class="btn-control warn" onclick="resetRange()">
-📅 รีเซ็ตสถิติตามช่วงวัน
-</button>
-</div>
+          <div class="control-section">
+            <div class="control-title">รีเซ็ตสถิติตามช่วงวัน (ตั้งแต่-จนถึง)</div>
+            <div class="date-row">
+              <input type="date" id="startDate">
+              <input type="date" id="endDate">
+            </div>
+            <button class="btn-control warn" onclick="resetRange()">
+              📅 รีเซ็ตสถิติตามช่วงวัน
+            </button>
+          </div>
 
-<div class="control-section">
-<div class="control-title">เรียกใช้ Autofill ทันที</div>
+          <div class="control-section">
+            <div class="control-title">เรียกใช้ Autofill ทันที</div>
 
-<button
-class="btn-control warn"
-style="width:100%;"
-onclick="runAutofill(event)">
-📈 Autofill สถิติวันนี้
-</button>
-</div>
+            <button class="btn-control warn" style="width:100%;" onclick="runAutofill(event)">
+              📈 Autofill สถิติวันนี้
+            </button>
+          </div>
 
-<div class="control-section">
-<div class="control-title">สำรองข้อมูลสถิติ</div>
+          <div class="control-section">
+            <div class="control-title">สำรองข้อมูลสถิติ</div>
 
-<button class="btn-main"
-style="width:100%; padding:12px;"
-onclick="backupRecords(event)">
-🗃️ สำรองข้อมูลสถิติ
-</button>
+            <button class="btn-main" style="width:100%; padding:12px;" onclick="backupRecords(event)">
+              🗃️ สำรองข้อมูลสถิติ
+            </button>
 
-</div>
+          </div>
 
-<div class="control-section danger-box">
-<div class="control-title">ล้างข้อมูลทั้งหมด</div>
-<button class="btn-control danger" onclick="resetAll()">
-🚨 ล้างข้อมูลทั้งระบบ
-</button>
-</div>
-</div>
-</div>
+          <div class="control-section danger-box">
+            <div class="control-title">ล้างข้อมูลทั้งหมด</div>
+            <button class="btn-control danger" onclick="resetAll()">
+              🚨 ล้างข้อมูลทั้งระบบ
+            </button>
+          </div>
+        </div>
+      </div>
 
-<div class="card">
-<h3>🎓 ตั้งค่าภาคเรียน / ปีการศึกษา</h3>
+      <div class="card">
+        <h3>🎓 ตั้งค่าภาคเรียน / ปีการศึกษา</h3>
 
-<div class="field">
-<label>ภาคเรียน</label>
-<select id="termInput" class="select-modern">
-<option value="">-- เลือกภาคเรียน --</option>
-<option value="1">1</option>
-<option value="2">2</option>
-</select>
-</div>
+        <div class="field">
+          <label>ภาคเรียน</label>
+          <select id="termInput" class="select-modern">
+            <option value="">-- เลือกภาคเรียน --</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+          </select>
+        </div>
 
-<div class="field">
-<label>ปีการศึกษา (พ.ศ.)</label>
-<select id="yearInput" class="select-modern"></select>
-</div>
+        <div class="field">
+          <label>ปีการศึกษา (พ.ศ.)</label>
+          <select id="yearInput" class="select-modern"></select>
+        </div>
 
-<button class="btn-main" onclick="changeTermYear(event)" style="width:100%; padding:12px;">
-💾 บันทึกการตั้งค่า
-</button>
-</div>
+        <button class="btn-main" onclick="changeTermYear(event)" style="width:100%; padding:12px;">
+          💾 บันทึกการตั้งค่า
+        </button>
+      </div>
 
-</div>
-</main>
+    </div>
+  </main>
 
-<footer>
-ระบบบริหารจัดการสถิตินักเรียน (BURAPA STUDENT SYSTEM)
-<br>
-โรงเรียนเทศบาลบูรพาอุบล
-<br>
-สำนักการศึกษา เทศบาลนครอุบลราชธานี
-</footer>
+  <footer>
+    ระบบบริหารจัดการสถิตินักเรียน (BURAPA STUDENT SYSTEM)
+    <br>
+    โรงเรียนเทศบาลบูรพาอุบล
+    <br>
+    สำนักการศึกษา เทศบาลนครอุบลราชธานี
+  </footer>
 
-<script>
+  <script>
 
-const token = sessionStorage.getItem("adminToken")
+    const token = sessionStorage.getItem("adminToken")
 
-if(!token){
-alert("กรุณาเข้าสู่ระบบก่อน")
-location.replace("admin-login.html")
-}
+    if (!token) {
+      alert("กรุณาเข้าสู่ระบบก่อน")
+      location.replace("admin-login.html")
+    }
 
-function fetchWithTimeout(url, options = {}, timeout = 20000){
-return Promise.race([
-fetch(url, options),
-new Promise((_, reject) =>
-setTimeout(() => reject(new Error("timeout")), timeout)
-)
-])
-}
+    function fetchWithTimeout(url, options = {}, timeout = 20000) {
+      return window.BurapaNet.fetch(url, options, timeout);
+    }
 
-const API="https://script.google.com/macros/s/AKfycbyV4PNjlFskTfF0Ol6xrZdWpSCJm54bi33l0M66QpluNo8X6B7Js8LZRtuY7T05KsShoQ/exec"
+    const API = "https://script.google.com/macros/s/AKfycbyV4PNjlFskTfF0Ol6xrZdWpSCJm54bi33l0M66QpluNo8X6B7Js8LZRtuY7T05KsShoQ/exec"
 
-function showToast(type, title, message, autoReload = false) {
-const container = document.getElementById("toastContainer");
+    function showToast(type, title, message, autoReload = false) {
+      const container = document.getElementById("toastContainer");
 
-if (!container) {
-console.warn("toastContainer not found");
-return;
-}
+      if (!container) {
+        console.warn("toastContainer not found");
+        return;
+      }
 
-const toast = document.createElement("div");
-toast.className = `toast ${type}`;
+      const toast = document.createElement("div");
+      toast.className = `toast ${type}`;
 
-toast.innerHTML = `
+      toast.innerHTML = `
 <div class="toast-title">${title}</div>
 <div class="toast-text">${message}</div>
 `;
 
-container.appendChild(toast);
+      container.appendChild(toast);
 
-setTimeout(() => {
-toast.classList.add("hide");
+      setTimeout(() => {
+        toast.classList.add("hide");
 
-setTimeout(async () => {
-toast.remove();
+        setTimeout(async () => {
+          toast.remove();
 
-if (autoReload) {
-await load();
-}
-}, 400);
+          if (autoReload) {
+            await load();
+          }
+        }, 400);
 
-}, 2500);
-}
+      }, 2500);
+    }
 
-function logout(){
+    function logout() {
 
-if(!confirm("ⓘ คุณต้องการออกจากระบบหรือไม่")) return
+      if (!confirm("ⓘ คุณต้องการออกจากระบบหรือไม่")) return
 
-sessionStorage.removeItem("adminToken")
-sessionStorage.removeItem("loginTime")
+      sessionStorage.removeItem("adminToken")
+      sessionStorage.removeItem("loginTime")
 
-location.replace("index.html")
+      location.replace("index.html")
 
-}
+    }
 
-function escapeHTML(str){
-if (typeof str !== "string") {
-str = String(str || "");
-}
+    function escapeHTML(str) {
+      if (typeof str !== "string") {
+        str = String(str || "");
+      }
 
-return str.replace(/[&<>"']/g, m => ({
-"&":"&amp;",
-"<":"&lt;",
-">":"&gt;",
-'"':"&quot;",
-"'":"&#039;"
-}[m]));
-}
+      return str.replace(/[&<>"']/g, m => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      }[m]));
+    }
 
-async function loadTerm(){
+    async function loadTerm() {
 
-try{
+      try {
 
-const res = await fetchWithTimeout(API + "?mode=getterm&t=" + Date.now())
-let data
-try{
-data = await res.json()
-}catch{
-throw new Error("invalid json")
-}
+        const res = await fetchWithTimeout(API + "?mode=getterm&t=" + Date.now())
+        let data
+        try {
+          data = await res.json()
+        } catch {
+          throw new Error("invalid json")
+        }
 
-const term = data.term
-const year = data.year
+        const term = data.term
+        const year = data.year
 
-generateYearOptions()
+        generateYearOptions()
 
-const termEl = document.getElementById("termDisplay")
+        const termEl = document.getElementById("termDisplay")
 
-if(term && year){
+        if (term && year) {
 
-termEl.style.display = "block"
-termEl.innerHTML = "ภาคเรียนที่ " + term + " ปีการศึกษา " + year
+          termEl.style.display = "block"
+          termEl.innerHTML = "ภาคเรียนที่ " + term + " ปีการศึกษา " + year
 
-document.getElementById("termInput").value = term
-document.getElementById("yearInput").value = year
+          document.getElementById("termInput").value = term
+          document.getElementById("yearInput").value = year
 
-}else{
+        } else {
 
-termEl.style.display = "none"
+          termEl.style.display = "none"
 
-}
+        }
 
-}catch(e){
+      } catch (e) {
 
-document.getElementById("termDisplay").style.display = "none"
+        document.getElementById("termDisplay").style.display = "none"
 
-}
-}
+      }
+    }
 
-let chartInstance=null
-let controller;
-let loadingNow=false
-let firstLoad = true
-let sortableInstance;
-let sortMode = false;
+    let chartInstance = null
+    let controller;
+    let loadingNow = false
+    let firstLoad = true
+    let sortableInstance;
+    let sortMode = false;
 
-async function load(){
+    async function load() {
 
-if(loadingNow) return
-loadingNow = true
+      if (loadingNow) return
+      loadingNow = true
 
-controller = new AbortController()
+      controller = new AbortController()
 
-try{
+      try {
 
-const res = await fetchWithTimeout(
-API + "?mode=getdashboard&t=" + Date.now(),
-{
-cache: "no-store",
-signal: controller.signal
-},
-25000
-)
+        const res = await fetchWithTimeout(
+          API + "?mode=getdashboard&t=" + Date.now(),
+          {
+            cache: "no-store",
+            signal: controller.signal
+          },
+          25000
+        )
 
-if(!res.ok){
-throw new Error("api")
-}
+        if (!res.ok) {
+          throw new Error("api")
+        }
 
-const dash = await res.json()
+        const dash = await res.json()
 
-if(!dash || typeof dash !== "object"){
-throw new Error("invalid data")
-}
+        if (!dash || typeof dash !== "object") {
+          throw new Error("invalid data")
+        }
 
-renderDash(dash)
-renderRooms(dash.rooms || [])
-renderWeeklyChart(dash.weekly || {})
-renderMonthlyChart(dash.monthly || {})
+        renderDash(dash)
+        renderRooms(dash.rooms || [])
+        renderWeeklyChart(dash.weekly || {})
+        renderMonthlyChart(dash.monthly || {})
 
-}catch(e){
+      } catch (e) {
 
-console.error(e)
+        console.error(e)
 
-if(firstLoad){
+        if (firstLoad) {
 
-if(e.message === "timeout"){
+          if (e.message === "timeout") {
 
-showToast("error","เกิดข้อผิดพลาด","กรุณารีเฟรชใหม่อีกครั้ง")
+            showToast("error", "เกิดข้อผิดพลาด", "กรุณารีเฟรชใหม่อีกครั้ง")
 
-}else{
+          } else {
 
-showToast("error","โหลดข้อมูลไม่สำเร็จ","กรุณาลองใหม่อีกครั้ง")
+            showToast("error", "โหลดข้อมูลไม่สำเร็จ", "กรุณาลองใหม่อีกครั้ง")
 
-}
+          }
 
-}
+        }
 
-console.warn("โหลดข้อมูลไม่สำเร็จ ลองรีเฟรชอีกครั้ง");
+        console.warn("โหลดข้อมูลไม่สำเร็จ ลองรีเฟรชอีกครั้ง");
 
-}finally{
+      } finally {
 
-hideLoading()
-loadingNow = false
-firstLoad = false
+        hideLoading()
+        loadingNow = false
+        firstLoad = false
 
-}
+      }
 
-}
+    }
 
-function hideLoading(){
+    function hideLoading() {
 
-const loading=document.getElementById("loading")
+      const loading = document.getElementById("loading")
 
-if(!loading)return
+      if (!loading) return
 
-loading.style.opacity="0"
+      loading.style.opacity = "0"
 
-setTimeout(()=>{
-loading.style.display="none"
-},600)
+      setTimeout(() => {
+        loading.style.display = "none"
+      }, 600)
 
-}
+    }
 
-function animateNumber(id,value){
+    function animateNumber(id, value) {
 
-let el=document.getElementById(id)
-if(!el) return
+      let el = document.getElementById(id)
+      if (!el) return
 
-if(parseInt(el.innerText)===value) return
+      if (parseInt(el.innerText) === value) return
 
-let duration=800
-let startTime=null
+      let duration = 800
+      let startTime = null
 
-function step(timestamp){
+      function step(timestamp) {
 
-if(!startTime) startTime=timestamp
+        if (!startTime) startTime = timestamp
 
-let progress=timestamp-startTime
-let percent=Math.min(progress/duration,1)
+        let progress = timestamp - startTime
+        let percent = Math.min(progress / duration, 1)
 
-let current=Math.floor(percent*value)
+        let current = Math.floor(percent * value)
 
-el.innerText=current
+        el.innerText = current
 
-if(percent<1){
-requestAnimationFrame(step)
-}else{
-el.innerText=value
-}
+        if (percent < 1) {
+          requestAnimationFrame(step)
+        } else {
+          el.innerText = value
+        }
 
-}
+      }
 
-requestAnimationFrame(step)
+      requestAnimationFrame(step)
 
-}
+    }
 
-function renderDash(d){
+    function renderDash(d) {
 
-let total = d.total || 0
-let present = d.present || 0
-let sick = d.sick || 0
-let leave = d.leave || 0
-let absent = d.absent || 0
+      let total = d.total || 0
+      let present = d.present || 0
+      let sick = d.sick || 0
+      let leave = d.leave || 0
+      let absent = d.absent || 0
 
-let used = present + sick + leave + absent
-let unknown = Math.max(0, total - used)
+      let used = present + sick + leave + absent
+      let unknown = Math.max(0, total - used)
 
-let sum = present + sick + leave + absent + unknown
+      let sum = present + sick + leave + absent + unknown
 
-let noData = document.getElementById("noData")
-let canvas = document.getElementById("chart")
+      let noData = document.getElementById("noData")
+      let canvas = document.getElementById("chart")
 
-if(total === 0){
+      if (total === 0) {
 
-canvas.style.display = "none"
-noData.style.display = "block"
-noData.innerHTML = `
+        canvas.style.display = "none"
+        noData.style.display = "block"
+        noData.innerHTML = `
 ยังไม่มีข้อมูลในขณะนี้
 `
 
-return
-}
+        return
+      }
 
-canvas.style.display = "block"
-noData.style.display = "none"
+      canvas.style.display = "block"
+      noData.style.display = "none"
 
-animateNumber("total", total)
-animateNumber("present", present)
-animateNumber("sick", sick)
-animateNumber("leave", leave)
-animateNumber("absent", absent)
+      animateNumber("total", total)
+      animateNumber("present", present)
+      animateNumber("sick", sick)
+      animateNumber("leave", leave)
+      animateNumber("absent", absent)
 
-let labels
-let colors
-let data
+      let labels
+      let colors
+      let data
 
-if(sum === 0){
+      if (sum === 0) {
 
-labels = ["ยังไม่บันทึกสถิติในวันนี้"]
-colors = ["#d9d9d9"]
-data = [1]
+        labels = ["ยังไม่บันทึกสถิติในวันนี้"]
+        colors = ["#d9d9d9"]
+        data = [1]
 
-}else{
+      } else {
 
-labels = ["มาเรียน","ป่วย","ลา","ขาด","ยังไม่มีข้อมูล"]
-colors = ["#22c55e","#ff8fab","#ffd166","#f87171","#9ca3af"]
-data = [present, sick, leave, absent, unknown]
-}
+        labels = ["มาเรียน", "ป่วย", "ลา", "ขาด", "ยังไม่มีข้อมูล"]
+        colors = ["#22c55e", "#ff8fab", "#ffd166", "#f87171", "#9ca3af"]
+        data = [present, sick, leave, absent, unknown]
+      }
 
-let ctx = canvas.getContext("2d")
+      let ctx = canvas.getContext("2d")
 
-if(chartInstance){
+      if (chartInstance) {
 
-chartInstance.data.labels = labels
-chartInstance.data.datasets[0].data = data
-chartInstance.data.datasets[0].backgroundColor = colors
-chartInstance.update()
+        chartInstance.data.labels = labels
+        chartInstance.data.datasets[0].data = data
+        chartInstance.data.datasets[0].backgroundColor = colors
+        chartInstance.update()
 
-}else{
+      } else {
 
-chartInstance = new Chart(ctx,{
-type:"pie",
-data:{
-labels: labels,
-datasets:[{
-data: data,
-backgroundColor: colors,
-borderWidth: 2,
-borderColor: "#fff"
-}]
-},
-plugins:[ChartDataLabels],
-options:{
-animation:{
-animateRotate:true,
-animateScale:true,
-duration:900,
-easing:"easeOutQuart"
-},
-plugins:{
-legend:{
-position:"bottom",
-align:"center",
-labels:{
-padding:16,
-boxWidth:12,
-boxHeight:12
-}
-},
-datalabels:{
-color:"#fff",
-font:{weight:"bold"},
-formatter:(v,ctx)=>{
-let sum = ctx.chart.data.datasets[0].data.reduce((a,b)=>a+(b||0),0)
+        chartInstance = new Chart(ctx, {
+          type: "pie",
+          data: {
+            labels: labels,
+            datasets: [{
+              data: data,
+              backgroundColor: colors,
+              borderWidth: 2,
+              borderColor: "#fff"
+            }]
+          },
+          plugins: [ChartDataLabels],
+          options: {
+            animation: {
+              animateRotate: true,
+              animateScale: true,
+              duration: 900,
+              easing: "easeOutQuart"
+            },
+            plugins: {
+              legend: {
+                position: "bottom",
+                align: "center",
+                labels: {
+                  padding: 16,
+                  boxWidth: 12,
+                  boxHeight: 12
+                }
+              },
+              datalabels: {
+                color: "#fff",
+                font: { weight: "bold" },
+                formatter: (v, ctx) => {
+                  let sum = ctx.chart.data.datasets[0].data.reduce((a, b) => a + (b || 0), 0)
 
-if(sum === 0) return ""
-if(ctx.chart.data.labels.length === 1) return ""
+                  if (sum === 0) return ""
+                  if (ctx.chart.data.labels.length === 1) return ""
 
-let percent = (v/sum*100).toFixed(1)
+                  let percent = (v / sum * 100).toFixed(1)
 
-if(percent < 0.1 && v > 0){
-return "<0.1%"
-}
+                  if (percent < 0.1 && v > 0) {
+                    return "<0.1%"
+                  }
 
-return percent + "%"
-}
-}
-}
-}
-})
-}
+                  return percent + "%"
+                }
+              }
+            }
+          }
+        })
+      }
 
-}
+    }
 
-let weeklyChartInstance = null
-let monthlyChartInstance = null
+    let weeklyChartInstance = null
+    let monthlyChartInstance = null
 
-function renderWeeklyChart(data){
+    function renderWeeklyChart(data) {
 
-const canvas = document.getElementById("weeklyChart")
-const noData = document.getElementById("noWeekly")
+      const canvas = document.getElementById("weeklyChart")
+      const noData = document.getElementById("noWeekly")
 
-if(!data || !data.labels || data.labels.length === 0){
+      if (!data || !data.labels || data.labels.length === 0) {
 
-const hasData = data.present?.some(v => v > 0) || data.absent?.some(v => v > 0)
+        const hasData = data.present?.some(v => v > 0) || data.absent?.some(v => v > 0)
 
-if(!hasData){
-canvas.style.display = "none"
-noData.style.display = "block"
-return
-}
+        if (!hasData) {
+          canvas.style.display = "none"
+          noData.style.display = "block"
+          return
+        }
 
-if(weeklyChartInstance){
-weeklyChartInstance.destroy()
-}
+        if (weeklyChartInstance) {
+          weeklyChartInstance.destroy()
+        }
 
-canvas.style.display = "none"
-noData.style.display = "block"
+        canvas.style.display = "none"
+        noData.style.display = "block"
 
-return
-}
+        return
+      }
 
-canvas.style.display = "block"
-noData.style.display = "none"
+      canvas.style.display = "block"
+      noData.style.display = "none"
 
-const ctx = canvas.getContext("2d")
+      const ctx = canvas.getContext("2d")
 
-if(weeklyChartInstance){
-weeklyChartInstance.destroy()
-}
-weeklyChartInstance = new Chart(ctx,{
-type:"line",
-data:{
-labels:data.labels,
-datasets:[
-{
-label:"มาเรียน",
-data:data.present,
-tension:0.4
-},
-{
-label:"ขาด",
-data:data.absent,
-tension:0.4
-}
-]
-},
-options:{
-responsive:true,
-plugins:{
-legend:{position:"bottom"}
-}
-}
-})
-}
+      if (weeklyChartInstance) {
+        weeklyChartInstance.destroy()
+      }
+      weeklyChartInstance = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: data.labels,
+          datasets: [
+            {
+              label: "มาเรียน",
+              data: data.present,
+              tension: 0.4
+            },
+            {
+              label: "ขาด",
+              data: data.absent,
+              tension: 0.4
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: "bottom" }
+          }
+        }
+      })
+    }
 
-function renderMonthlyChart(data){
+    function renderMonthlyChart(data) {
 
-const canvas = document.getElementById("monthlyChart")
-const noData = document.getElementById("noMonthly")
+      const canvas = document.getElementById("monthlyChart")
+      const noData = document.getElementById("noMonthly")
 
-if(!data || !data.labels || data.labels.length === 0){
+      if (!data || !data.labels || data.labels.length === 0) {
 
-const hasData = data.present?.some(v => v > 0) || data.absent?.some(v => v > 0)
+        const hasData = data.present?.some(v => v > 0) || data.absent?.some(v => v > 0)
 
-if(!hasData){
-canvas.style.display = "none"
-noData.style.display = "block"
-return
-}
+        if (!hasData) {
+          canvas.style.display = "none"
+          noData.style.display = "block"
+          return
+        }
 
-if(monthlyChartInstance){
-monthlyChartInstance.destroy()
-}
+        if (monthlyChartInstance) {
+          monthlyChartInstance.destroy()
+        }
 
-canvas.style.display = "none"
-noData.style.display = "block"
-return
-}
+        canvas.style.display = "none"
+        noData.style.display = "block"
+        return
+      }
 
-canvas.style.display = "block"
-noData.style.display = "none"
+      canvas.style.display = "block"
+      noData.style.display = "none"
 
-const ctx = canvas.getContext("2d")
+      const ctx = canvas.getContext("2d")
 
-const percentPresent = data.present.map((v,i)=>{
-let total = (v || 0) + (data.absent?.[i] || 0)
-return total ? ((v / total) * 100).toFixed(1) : 0
-})
+      const percentPresent = data.present.map((v, i) => {
+        let total = (v || 0) + (data.absent?.[i] || 0)
+        return total ? ((v / total) * 100).toFixed(1) : 0
+      })
 
-const percentAbsent = data.absent.map((v,i)=>{
-let total = (v || 0) + (data.present?.[i] || 0)
-return total ? ((v / total) * 100).toFixed(1) : 0
-})
+      const percentAbsent = data.absent.map((v, i) => {
+        let total = (v || 0) + (data.present?.[i] || 0)
+        return total ? ((v / total) * 100).toFixed(1) : 0
+      })
 
-if(monthlyChartInstance){
-monthlyChartInstance.destroy()
-}
+      if (monthlyChartInstance) {
+        monthlyChartInstance.destroy()
+      }
 
-monthlyChartInstance = new Chart(ctx,{
-type:"bar",
-data:{
-labels:data.labels,
-datasets:[
-{
-label:"% มาเรียน",
-data: percentPresent
-},
-{
-label:"% ขาด",
-data: percentAbsent
-}
-]
-},
-options:{
-responsive:true,
-plugins:{
-legend:{position:"bottom"},
-tooltip:{
-callbacks:{
-label: function(context){
-return context.dataset.label + " " + context.raw + "%"
-}
-}
-}
-},
-scales:{
-y:{
-beginAtZero:true,
-max:100,
-ticks:{
-callback: value => value + "%"
-}
-}
-}
-}
-})
-}
+      monthlyChartInstance = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: data.labels,
+          datasets: [
+            {
+              label: "% มาเรียน",
+              data: percentPresent
+            },
+            {
+              label: "% ขาด",
+              data: percentAbsent
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: "bottom" },
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  return context.dataset.label + " " + context.raw + "%"
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              ticks: {
+                callback: value => value + "%"
+              }
+            }
+          }
+        }
+      })
+    }
 
-function renderRooms(rooms){
+    function renderRooms(rooms) {
 
-let html=""
+      let html = ""
 
-document.getElementById("roomCount").innerText="("+rooms.length+" ห้อง)"
+      document.getElementById("roomCount").innerText = "(" + rooms.length + " ห้อง)"
 
-if(rooms.length===0){
+      if (rooms.length === 0) {
 
-document.getElementById("classList").innerHTML =
-"<div style='text-align:center;padding:30px;color:#999'>ไม่พบข้อมูลห้องเรียน กรุณารีเฟรชใหม่</div>"
+        document.getElementById("classList").innerHTML =
+          "<div style='text-align:center;padding:30px;color:#999'>ไม่พบข้อมูลห้องเรียน กรุณารีเฟรชใหม่</div>"
 
-document.getElementById("alertBar").style.display="none"
+        document.getElementById("alertBar").style.display = "none"
 
-return
+        return
 
-}
+      }
 
-let done = rooms.filter(r => r.submitted).length
+      let done = rooms.filter(r => r.submitted).length
 
-let pending = rooms.filter(r => !r.submitted).length
-let alertBar = document.getElementById("alertBar")
+      let pending = rooms.filter(r => !r.submitted).length
+      let alertBar = document.getElementById("alertBar")
 
-if(done === 0){
+      if (done === 0) {
 
-alertBar.style.display="block"
-alertBar.innerHTML="⚠ ยังไม่มีการบันทึกสถิติในวันนี้"
+        alertBar.style.display = "block"
+        alertBar.innerHTML = "⚠ ยังไม่มีการบันทึกสถิติในวันนี้"
 
-}else if(pending > 0){
+      } else if (pending > 0) {
 
-alertBar.style.display="block"
-alertBar.innerHTML="⚠ เหลือ "+pending+" ห้องที่ยังไม่ได้บันทึกสถิติในวันนี้"
+        alertBar.style.display = "block"
+        alertBar.innerHTML = "⚠ เหลือ " + pending + " ห้องที่ยังไม่ได้บันทึกสถิติในวันนี้"
 
-}else{
+      } else {
 
-alertBar.style.display="none"
+        alertBar.style.display = "none"
 
-}
+      }
 
-rooms.forEach(r=>{
+      rooms.forEach(r => {
 
-let status = r.submitted
-?'<span class="status-badge ok">✅ บันทึกสถิติแล้ว</span>'
-:'<span class="status-badge pending">⚠ ยังไม่ได้บันทึกสถิติ</span>'
+        let status = r.submitted
+          ? '<span class="status-badge ok">✅ บันทึกสถิติแล้ว</span>'
+          : '<span class="status-badge pending">⚠ ยังไม่ได้บันทึกสถิติ</span>'
 
-html+=`
+        html += `
 <div class="class" data-room="${r.room}">
 
 <div class="class-top">
@@ -1675,13 +1739,13 @@ ${renderUpdateInfo(r)}
 
 <div class="buttons">
 ${r.submitted
-? `<button class="btn-edit" onclick="location.href='form.html?room=${encodeURIComponent(r.room)}&edit=1&from=admin'">
+            ? `<button class="btn-edit" onclick="location.href='form.html?room=${encodeURIComponent(r.room)}&edit=1&from=admin'">
 ✏️ แก้ไขสถิติวันนี้
 </button>`
-: `<button class="btn-start" onclick="location.href='form.html?room=${encodeURIComponent(r.room)}&from=admin'">
+            : `<button class="btn-start" onclick="location.href='form.html?room=${encodeURIComponent(r.room)}&from=admin'">
 📌 เริ่มบันทึกสถิติวันนี้
 </button>`
-}
+          }
 
 <button class="btn-sub" onclick="location.href='form.html?room=${encodeURIComponent(r.room)}&backdate=1&from=admin'">
 📅 แก้ไขย้อนหลัง
@@ -1705,154 +1769,154 @@ data-room="${escapeHTML(r.room)}" class="btn-edit">
 
 </div>
 `
-})
+      })
 
-document.getElementById("classList").innerHTML=html
+      document.getElementById("classList").innerHTML = html
 
-}
+    }
 
-let refreshTimer
+    let refreshTimer
 
-async function editRoom(oldRoom){
+    async function editRoom(oldRoom) {
 
-oldRoom = decodeURIComponent(oldRoom)
+      oldRoom = decodeURIComponent(oldRoom)
 
-let newName = prompt("แก้ไขชื่อห้อง", oldRoom)
+      let newName = prompt("แก้ไขชื่อห้อง", oldRoom)
 
-if(!newName || newName.trim() === "" || newName === oldRoom) return
+      if (!newName || newName.trim() === "" || newName === oldRoom) return
 
-newName = newName.trim()
+      newName = newName.trim()
 
-const existingRooms = Array.from(
-document.querySelectorAll("#classList .class")
-).map(el => (el.dataset.room || "").trim().toLowerCase())
+      const existingRooms = Array.from(
+        document.querySelectorAll("#classList .class")
+      ).map(el => (el.dataset.room || "").trim().toLowerCase())
 
-if(existingRooms.includes(newName.toLowerCase()) && newName.toLowerCase() !== oldRoom.toLowerCase()){
-showToast(
-"warn",
-"ชื่อห้องซ้ำกับที่มีในระบบ",
-"มีห้องที่ใช้ชื่อนี้อยู่แล้ว กรุณาใช้ชื่ออื่น"
-)
-return
-}
+      if (existingRooms.includes(newName.toLowerCase()) && newName.toLowerCase() !== oldRoom.toLowerCase()) {
+        showToast(
+          "warn",
+          "ชื่อห้องซ้ำกับที่มีในระบบ",
+          "มีห้องที่ใช้ชื่อนี้อยู่แล้ว กรุณาใช้ชื่ออื่น"
+        )
+        return
+      }
 
-const res = await fetch(API + `?mode=editRoom&old=${encodeURIComponent(oldRoom)}&new=${encodeURIComponent(newName)}&token=${token}`)
-const data = await res.json()
+      const res = await fetch(API + `?mode=editRoom&old=${encodeURIComponent(oldRoom)}&new=${encodeURIComponent(newName)}&token=${token}`)
+      const data = await res.json()
 
-if(data.status === "success"){
+      if (data.status === "success") {
 
-showToast(
-"success",
-"แก้ไขชื่อห้องสำเร็จ",
-"ระบบจะอัพเดทชื่อห้องในไม่ช้า",
-true
-)
+        showToast(
+          "success",
+          "แก้ไขชื่อห้องสำเร็จ",
+          "ระบบจะอัพเดทชื่อห้องในไม่ช้า",
+          true
+        )
 
-}else{
+      } else {
 
-showToast("error","แก้ไขชื่อห้องไม่สำเร็จ","ลองใหม่อีกครั้ง")
+        showToast("error", "แก้ไขชื่อห้องไม่สำเร็จ", "ลองใหม่อีกครั้ง")
 
-}
-}
+      }
+    }
 
-async function deleteRoom(room){
+    async function deleteRoom(room) {
 
-room = decodeURIComponent(room)
+      room = decodeURIComponent(room)
 
-if(!confirm("⚠ ต้องการลบ "+room+" ใช่หรือไม่?")) return
+      if (!confirm("⚠ ต้องการลบ " + room + " ใช่หรือไม่?")) return
 
-try{
+      try {
 
-const res = await fetch(API + "?mode=deleteRoom&room=" + encodeURIComponent(room) + "&token=" + token)
+        const res = await fetch(API + "?mode=deleteRoom&room=" + encodeURIComponent(room) + "&token=" + token)
 
-if(!res.ok) throw new Error("network")
+        if (!res.ok) throw new Error("network")
 
-const data = await res.json()
+        const data = await res.json()
 
-if(data.status === "success"){
+        if (data.status === "success") {
 
-showToast(
-"success",
-"ลบห้องสำเร็จ",
-"ระบบจะนำห้องออกในไม่ช้า",
-true
-)
+          showToast(
+            "success",
+            "ลบห้องสำเร็จ",
+            "ระบบจะนำห้องออกในไม่ช้า",
+            true
+          )
 
-}else{
+        } else {
 
-showToast("error","ทำการลบห้องไม่สำเร็จ"," ลองใหม่อีกครั้ง")
-}
+          showToast("error", "ทำการลบห้องไม่สำเร็จ", " ลองใหม่อีกครั้ง")
+        }
 
-}catch(e){
+      } catch (e) {
 
-showToast("error","เกิดข้อผิดพลาด","กรุณาลองใหม่อีกครั้ง")
+        showToast("error", "เกิดข้อผิดพลาด", "กรุณาลองใหม่อีกครั้ง")
 
-}
+      }
 
-}
+    }
 
-async function checkSystemStatusOnce(){
+    async function checkSystemStatusOnce() {
 
-try{
+      try {
 
-const start = performance.now()
+        const start = performance.now()
 
-const res = await fetchWithTimeout(
-API + "?mode=statuscheck&t=" + Date.now(),
-{ cache: "no-store" },
-20000
-)
+        const res = await fetchWithTimeout(
+          API + "?mode=statuscheck&t=" + Date.now(),
+          { cache: "no-store" },
+          20000
+        )
 
-if(!res.ok) throw new Error("api error")
+        if (!res.ok) throw new Error("api error")
 
-let data
+        let data
 
-try{
-data = await res.json()
-}catch{
-throw new Error("not json")
-}
+        try {
+          data = await res.json()
+        } catch {
+          throw new Error("not json")
+        }
 
-const ms = Math.round(performance.now() - start)
+        const ms = Math.round(performance.now() - start)
 
-const apiOk = data.apiOk ?? false
-const dbOk = data.dbOk ?? false
-const lastNotify = data.lastNotify || ""
-const lastNotifyText = data.lastNotifyText || ""
-const rec = data.totalRecords ?? 0
+        const apiOk = data.apiOk ?? false
+        const dbOk = data.dbOk ?? false
+        const lastNotify = data.lastNotify || ""
+        const lastNotifyText = data.lastNotifyText || ""
+        const rec = data.totalRecords ?? 0
 
-let apiEl = document.getElementById("sttAPI")
-let apiStatus = "ok"
-let apiText = ""
-const seconds = (ms / 1000).toFixed(2)
+        let apiEl = document.getElementById("sttAPI")
+        let apiStatus = "ok"
+        let apiText = ""
+        const seconds = (ms / 1000).toFixed(2)
 
-if (!apiOk) {
-  apiStatus = "err"
-  apiText = "🔴 ระบบมีปัญหา"
-}
-else if (ms < 1000) {
-  apiStatus = "ok"
-  apiText = "🟢 เร็วมาก"
-}
-else if (ms < 2000) {
-  apiStatus = "ok"
-  apiText = "🟢 ปกติ"
-}
-else if (ms < 4000) {
-  apiStatus = "warn"
-  apiText = "🟡 เริ่มช้า"
-}
-else if (ms < 8000) {
-  apiStatus = "warn"
-  apiText = "🟠 ช้า"
-}
-else {
-  apiStatus = "err"
-  apiText = "🔴 ช้ามาก"
-}
+        if (!apiOk) {
+          apiStatus = "err"
+          apiText = "🔴 ระบบมีปัญหา"
+        }
+        else if (ms < 1000) {
+          apiStatus = "ok"
+          apiText = "🟢 เร็วมาก"
+        }
+        else if (ms < 2000) {
+          apiStatus = "ok"
+          apiText = "🟢 ปกติ"
+        }
+        else if (ms < 4000) {
+          apiStatus = "warn"
+          apiText = "🟡 เริ่มช้า"
+        }
+        else if (ms < 8000) {
+          apiStatus = "warn"
+          apiText = "🟠 ช้า"
+        }
+        else {
+          apiStatus = "err"
+          apiText = "🔴 ช้ามาก"
+        }
 
-apiEl.className = "status-box " + apiStatus
-apiEl.innerHTML = `
+        apiEl.className = "status-box " + apiStatus
+        apiEl.innerHTML = `
   <span>🌐 API</span>
   <span>
     <b>${apiText}</b>
@@ -1862,103 +1926,103 @@ apiEl.innerHTML = `
   </span>
 `
 
-let dbEl = document.getElementById("sttDB")
-dbEl.className = "status-box " + (dbOk ? "ok" : "err")
-dbEl.innerHTML = `Database <b>${dbOk ? "Online" : "Error"}</b>`
+        let dbEl = document.getElementById("sttDB")
+        dbEl.className = "status-box " + (dbOk ? "ok" : "err")
+        dbEl.innerHTML = `Database <b>${dbOk ? "Online" : "Error"}</b>`
 
-let msgEl = document.getElementById("sttMSG")
+        let msgEl = document.getElementById("sttMSG")
 
-if (lastNotifyText) {
+        if (lastNotifyText) {
 
-  msgEl.style.cursor = "pointer"
-  msgEl.title = "คลิกเพื่อดูข้อความที่ส่งล่าสุด"
+          msgEl.style.cursor = "pointer"
+          msgEl.title = "คลิกเพื่อดูข้อความที่ส่งล่าสุด"
 
-  msgEl.onclick = function () {
-    showNotifyPopup(lastNotify, lastNotifyText)
-  }
+          msgEl.onclick = function () {
+            showNotifyPopup(lastNotify, lastNotifyText)
+          }
 
-} else {
+        } else {
 
-  msgEl.style.cursor = "default"
-  msgEl.removeAttribute("title")
-  msgEl.onclick = null
+          msgEl.style.cursor = "default"
+          msgEl.removeAttribute("title")
+          msgEl.onclick = null
 
-}
-  
-if(lastNotify){
+        }
 
-const d = new Date(lastNotify)
+        if (lastNotify) {
 
-const thaiDate =
-d.toLocaleDateString("th-TH") +
-" " +
-d.toLocaleTimeString("th-TH",{
-hour:"2-digit",
-minute:"2-digit"
-})
+          const d = new Date(lastNotify)
 
-msgEl.className = "status-box ok"
-msgEl.innerHTML =
-`NotifyMissingRoom <b>${thaiDate}</b>`
+          const thaiDate =
+            d.toLocaleDateString("th-TH") +
+            " " +
+            d.toLocaleTimeString("th-TH", {
+              hour: "2-digit",
+              minute: "2-digit"
+            })
 
-}else{
+          msgEl.className = "status-box ok"
+          msgEl.innerHTML =
+            `NotifyMissingRoom <b>${thaiDate}</b>`
 
-msgEl.className = "status-box warn"
-msgEl.innerHTML =
-`NotifyMissingRoom <b>N/A</b>`
+        } else {
 
-}
+          msgEl.className = "status-box warn"
+          msgEl.innerHTML =
+            `NotifyMissingRoom <b>N/A</b>`
 
-let recEl = document.getElementById("sttREC")
+        }
 
-let recStatus = "ok"
-if(rec < 10) recStatus = "warn"
+        let recEl = document.getElementById("sttREC")
 
-recEl.className = "status-box " + recStatus
-recEl.innerHTML = `Records <b>${rec}</b>`
+        let recStatus = "ok"
+        if (rec < 10) recStatus = "warn"
 
-}catch(e){
+        recEl.className = "status-box " + recStatus
+        recEl.innerHTML = `Records <b>${rec}</b>`
 
-console.error("STATUS ERROR:", e)
+      } catch (e) {
 
-document.getElementById("sttAPI").innerHTML = "API ERROR"
-document.getElementById("sttDB").innerHTML = "DB ERROR"
-document.getElementById("sttMSG").innerHTML = "MSG ERROR"
-document.getElementById("sttREC").innerHTML = "REC ERROR"
+        console.error("STATUS ERROR:", e)
 
-document.getElementById("sttAPI").className = "status-box err"
-document.getElementById("sttDB").className = "status-box err"
-document.getElementById("sttMSG").className = "status-box err"
-document.getElementById("sttREC").className = "status-box err"
+        document.getElementById("sttAPI").innerHTML = "API ERROR"
+        document.getElementById("sttDB").innerHTML = "DB ERROR"
+        document.getElementById("sttMSG").innerHTML = "MSG ERROR"
+        document.getElementById("sttREC").innerHTML = "REC ERROR"
 
-}
+        document.getElementById("sttAPI").className = "status-box err"
+        document.getElementById("sttDB").className = "status-box err"
+        document.getElementById("sttMSG").className = "status-box err"
+        document.getElementById("sttREC").className = "status-box err"
 
-}
+      }
 
-function showNotifyPopup(lastNotify, message){
+    }
 
-  let thaiDate = "-"
+    function showNotifyPopup(lastNotify, message) {
 
-  if(lastNotify){
-    const d = new Date(lastNotify)
+      let thaiDate = "-"
 
-    thaiDate =
-      d.toLocaleDateString("th-TH") +
-      " เวลา " +
-      d.toLocaleTimeString("th-TH",{
-        hour:"2-digit",
-        minute:"2-digit"
-      }) +
-      " น."
-  }
+      if (lastNotify) {
+        const d = new Date(lastNotify)
 
-  const oldPopup = document.getElementById("notifyPopup")
-  if(oldPopup) oldPopup.remove()
+        thaiDate =
+          d.toLocaleDateString("th-TH") +
+          " เวลา " +
+          d.toLocaleTimeString("th-TH", {
+            hour: "2-digit",
+            minute: "2-digit"
+          }) +
+          " น."
+      }
 
-  const popup = document.createElement("div")
-  popup.id = "notifyPopup"
+      const oldPopup = document.getElementById("notifyPopup")
+      if (oldPopup) oldPopup.remove()
 
-  popup.style.cssText = `
+      const popup = document.createElement("div")
+      popup.id = "notifyPopup"
+
+      popup.style.cssText = `
     position:fixed;
     inset:0;
     background:rgba(15,23,42,.55);
@@ -1970,7 +2034,7 @@ function showNotifyPopup(lastNotify, message){
     backdrop-filter:blur(4px);
   `
 
-  popup.innerHTML = `
+      popup.innerHTML = `
     <div style="
       width:100%;
       max-width:560px;
@@ -2037,87 +2101,87 @@ function showNotifyPopup(lastNotify, message){
     </div>
   `
 
-  document.body.appendChild(popup)
+      document.body.appendChild(popup)
 
-  document.getElementById("closeNotifyPopup").onclick = function(){
-    popup.remove()
-  }
+      document.getElementById("closeNotifyPopup").onclick = function () {
+        popup.remove()
+      }
 
-  popup.onclick = function(e){
-    if(e.target === popup){
-      popup.remove()
+      popup.onclick = function (e) {
+        if (e.target === popup) {
+          popup.remove()
+        }
+      }
     }
-  }
-}
-  
-function startAutoRefresh(){
 
-load()
+    function startAutoRefresh() {
 
-if(refreshTimer) clearInterval(refreshTimer)
+      load()
 
-refreshTimer = setInterval(()=>{
+      if (refreshTimer) clearInterval(refreshTimer)
 
-if(sortMode) return
+      refreshTimer = setInterval(() => {
 
-if(!loadingNow && document.visibilityState === "visible"){
+        if (sortMode) return
 
-load()
+        if (!loadingNow && document.visibilityState === "visible") {
 
-}
+          load()
 
-},45000)
+        }
 
-}
+      }, 45000 + Math.floor(Math.random() * 5000))
 
-function updateClock(){
+    }
 
-let now=new Date()
+    function updateClock() {
 
-let days=["วันอาทิตย์","วันจันทร์","วันอังคาร","วันพุธ","วันพฤหัสบดี","วันศุกร์","วันเสาร์"]
-let months=["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"]
+      let now = new Date()
 
-let day=days[now.getDay()]
-let date=now.getDate()
-let month=months[now.getMonth()]
-let year=now.getFullYear()+543
+      let days = ["วันอาทิตย์", "วันจันทร์", "วันอังคาร", "วันพุธ", "วันพฤหัสบดี", "วันศุกร์", "วันเสาร์"]
+      let months = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"]
 
-let h=String(now.getHours()).padStart(2,"0")
-let m=String(now.getMinutes()).padStart(2,"0")
-let s=String(now.getSeconds()).padStart(2,"0")
+      let day = days[now.getDay()]
+      let date = now.getDate()
+      let month = months[now.getMonth()]
+      let year = now.getFullYear() + 543
 
-document.getElementById("clock").innerHTML=
-day+"ที่ "+date+" "+month+" พ.ศ."+year+" เวลา "+h+":"+m+":"+s+" น."
+      let h = String(now.getHours()).padStart(2, "0")
+      let m = String(now.getMinutes()).padStart(2, "0")
+      let s = String(now.getSeconds()).padStart(2, "0")
 
-}
+      document.getElementById("clock").innerHTML =
+        day + "ที่ " + date + " " + month + " พ.ศ." + year + " เวลา " + h + ":" + m + ":" + s + " น."
 
-let clockTimer = setInterval(updateClock,1000)
-updateClock()
+    }
 
-function formatThaiDate(dateText){
-if(!dateText) return ""
+    let clockTimer = setInterval(updateClock, 1000)
+    updateClock()
 
-let parts = dateText.includes("-") 
-? dateText.split("-") 
-: dateText.split("/")
+    function formatThaiDate(dateText) {
+      if (!dateText) return ""
 
-if(parts.length !== 3) return dateText
+      let parts = dateText.includes("-")
+        ? dateText.split("-")
+        : dateText.split("/")
 
-let year = parseInt(parts[0])
-let month = parts[1]
-let day = parts[2]
+      if (parts.length !== 3) return dateText
 
-if(isNaN(year)) return dateText
+      let year = parseInt(parts[0])
+      let month = parts[1]
+      let day = parts[2]
 
-year += 543
+      if (isNaN(year)) return dateText
 
-return `${day.padStart(2,"0")}/${month.padStart(2,"0")}/${year}`
-}
+      year += 543
 
-function renderUpdateInfo(r) {
+      return `${day.padStart(2, "0")}/${month.padStart(2, "0")}/${year}`
+    }
 
-if (!r.lastTeacherUpdateDate) {
-return `
+    function renderUpdateInfo(r) {
+
+      if (!r.lastTeacherUpdateDate) {
+        return `
     <span
     class="updateText"
     style="color:#9ca3af;font-size:12px;font-weight:500"
@@ -2125,54 +2189,54 @@ return `
     อัพเดทข้อมูลล่าสุด : ไม่พบข้อมูล
     </span>
 `;
-}
+      }
 
-const parts = String(r.lastTeacherUpdateDate).split("-");
+      const parts = String(r.lastTeacherUpdateDate).split("-");
 
-const year = Number(parts[0]);
-const month = Number(parts[1]);
-const day = Number(parts[2]);
+      const year = Number(parts[0]);
+      const month = Number(parts[1]);
+      const day = Number(parts[2]);
 
-const dateText =
-`${String(day).padStart(2, "0")}/` +
-`${String(month).padStart(2, "0")}/` +
-`${year + 543}`;
+      const dateText =
+        `${String(day).padStart(2, "0")}/` +
+        `${String(month).padStart(2, "0")}/` +
+        `${year + 543}`;
 
-const today = new Date();
+      const today = new Date();
 
-const todayDate = new Date(
-today.getFullYear(),
-today.getMonth(),
-today.getDate()
-);
+      const todayDate = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate()
+      );
 
-const updateDate = new Date(
-year,
-month - 1,
-day
-);
+      const updateDate = new Date(
+        year,
+        month - 1,
+        day
+      );
 
-const diffMs = todayDate.getTime() - updateDate.getTime();
-const diffDays = Math.floor(
-diffMs / (1000 * 60 * 60 * 24)
-);
+      const diffMs = todayDate.getTime() - updateDate.getTime();
+      const diffDays = Math.floor(
+        diffMs / (1000 * 60 * 60 * 24)
+      );
 
-let relativeText = "";
+      let relativeText = "";
 
-if (diffDays === 0) {
-relativeText = "วันนี้";
-} 
-else if (diffDays === 1) {
-relativeText = "เมื่อวาน";
-} 
-else if (diffDays > 1) {
-relativeText = `${diffDays} วันที่ผ่านมา`;
-} 
-else {
-relativeText = "พบข้อมูลผิดปกติ";
-}
+      if (diffDays === 0) {
+        relativeText = "วันนี้";
+      }
+      else if (diffDays === 1) {
+        relativeText = "เมื่อวาน";
+      }
+      else if (diffDays > 1) {
+        relativeText = `${diffDays} วันที่ผ่านมา`;
+      }
+      else {
+        relativeText = "พบข้อมูลผิดปกติ";
+      }
 
-return `
+      return `
 <span
     class="updateText"
     style="color:#ea580c;font-size:12px;font-weight:500"
@@ -2180,570 +2244,570 @@ return `
     อัพเดทข้อมูลล่าสุด ${dateText} (${relativeText})
 </span>
 `;
-}
-
-document.addEventListener("DOMContentLoaded", function() {
-const el = document.getElementById("classList");
-if(el){
-sortableInstance = Sortable.create(el, {
-animation: 150,
-disabled:true,
-onEnd: function(evt){
-const newOrder = Array.from(el.children).map(c => c.dataset.room);
-fetch(API + "?mode=updateRoomOrder&order=" + encodeURIComponent(JSON.stringify(newOrder)) + "&token=" + token)
-.then(res => res.json())
-.then(d => {
-if(d.status !== "success"){
-showToast("error","บันทึกลำดับไม่สำเร็จ","กรุณาลองใหม่")
-}
-})
-.catch(()=>{
-showToast("warn","ระบบจัดเรียงห้องไม่ได้"," ลองใหม่อีกครั้ง")
-})
-}
-});
-}
-});
-
-function toggleSort(){
-
-sortMode = !sortMode
-
-if(sortableInstance){
-sortableInstance.option("disabled", !sortMode)
-}
-
-const btn = document.getElementById("sortBtn")
-
-if(sortMode){
-
-clearInterval(refreshTimer)
-
-btn.innerText = "💾 เสร็จสิ้นการจัดลำดับ"
-btn.classList.remove("btn-sub")
-btn.classList.add("btn-main")
-
-alert("🛠️ โหมดจัดลำดับ : ทำการเลื่อนเพื่อย้ายลำดับห้อง จากนั้นกดเสร็จสิ้นการจัดลำดับ")
-
-}else{
-
-startAutoRefresh()
-
-btn.innerText = "⇌ จัดลำดับห้อง"
-btn.classList.remove("btn-main")
-btn.classList.add("btn-sub")
-
-showToast(
-"success",
-"เสร็จสิ้นการจัดลำดับห้อง",
-"หากต้องการแก้ไข ให้ทำการจัดลำดับห้องใหม่",
-true
-)
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const el = document.getElementById("classList");
+      if (el) {
+        sortableInstance = Sortable.create(el, {
+          animation: 150,
+          disabled: true,
+          onEnd: function (evt) {
+            const newOrder = Array.from(el.children).map(c => c.dataset.room);
+            fetch(API + "?mode=updateRoomOrder&order=" + encodeURIComponent(JSON.stringify(newOrder)) + "&token=" + token)
+              .then(res => res.json())
+              .then(d => {
+                if (d.status !== "success") {
+                  showToast("error", "บันทึกลำดับไม่สำเร็จ", "กรุณาลองใหม่")
+                }
+              })
+              .catch(() => {
+                showToast("warn", "ระบบจัดเรียงห้องไม่ได้", " ลองใหม่อีกครั้ง")
+              })
+          }
+        });
+      }
+    });
+
+    function toggleSort() {
+
+      sortMode = !sortMode
+
+      if (sortableInstance) {
+        sortableInstance.option("disabled", !sortMode)
+      }
+
+      const btn = document.getElementById("sortBtn")
+
+      if (sortMode) {
+
+        clearInterval(refreshTimer)
+
+        btn.innerText = "💾 เสร็จสิ้นการจัดลำดับ"
+        btn.classList.remove("btn-sub")
+        btn.classList.add("btn-main")
+
+        alert("🛠️ โหมดจัดลำดับ : ทำการเลื่อนเพื่อย้ายลำดับห้อง จากนั้นกดเสร็จสิ้นการจัดลำดับ")
+
+      } else {
+
+        startAutoRefresh()
+
+        btn.innerText = "⇌ จัดลำดับห้อง"
+        btn.classList.remove("btn-main")
+        btn.classList.add("btn-sub")
+
+        showToast(
+          "success",
+          "เสร็จสิ้นการจัดลำดับห้อง",
+          "หากต้องการแก้ไข ให้ทำการจัดลำดับห้องใหม่",
+          true
+        )
 
-}
+      }
 
-}
+    }
 
-async function addRoom(){
+    async function addRoom() {
 
-if(loadingNow) return
+      if (loadingNow) return
 
-let name = prompt("📍 พิมพ์ชื่อห้อง เช่น ชั้นประถมศึกษาปีที่ 1 , ชั้นมัธยมศึกษาปีที่ 1/2")
+      let name = prompt("📍 พิมพ์ชื่อห้อง เช่น ชั้นประถมศึกษาปีที่ 1 , ชั้นมัธยมศึกษาปีที่ 1/2")
 
-if (!name || !name.trim()) return;
+      if (!name || !name.trim()) return;
 
-name = name.trim();
+      name = name.trim();
 
-const validRoomPattern = /^[ก-๙a-zA-Z0-9\s./()-]+$/;
+      const validRoomPattern = /^[ก-๙a-zA-Z0-9\s./()-]+$/;
 
-const blockedNames = [
-"0",
-"null",
-"undefined",
-"admin",
-"test",
-"default",
-"system",
-"none"
-];
+      const blockedNames = [
+        "0",
+        "null",
+        "undefined",
+        "admin",
+        "test",
+        "default",
+        "system",
+        "none"
+      ];
 
-if (
-!name ||
-!name.trim() ||
-!validRoomPattern.test(name) ||
-/^\d+$/.test(name) ||
-!/[ก-๙a-zA-Z]/.test(name) ||
-name.length > 50 ||
-blockedNames.includes(name.toLowerCase())
-) {
-showToast(
-"warn",
-"รูปแบบชื่อห้องไม่ถูกต้อง",
-"กรุณาตั้งชื่อห้อง เช่น ชั้นประถมศึกษาปีที่ 1 หรือ มัธยมศึกษาปีที่ 1/2"
-);
-return;
-}
+      if (
+        !name ||
+        !name.trim() ||
+        !validRoomPattern.test(name) ||
+        /^\d+$/.test(name) ||
+        !/[ก-๙a-zA-Z]/.test(name) ||
+        name.length > 50 ||
+        blockedNames.includes(name.toLowerCase())
+      ) {
+        showToast(
+          "warn",
+          "รูปแบบชื่อห้องไม่ถูกต้อง",
+          "กรุณาตั้งชื่อห้อง เช่น ชั้นประถมศึกษาปีที่ 1 หรือ มัธยมศึกษาปีที่ 1/2"
+        );
+        return;
+      }
 
-const existingRooms = Array.from(
-document.querySelectorAll("#classList .class")
-).map(el => {
-const roomName = el.dataset.room || "";
-return roomName.trim().toLowerCase();
-});
+      const existingRooms = Array.from(
+        document.querySelectorAll("#classList .class")
+      ).map(el => {
+        const roomName = el.dataset.room || "";
+        return roomName.trim().toLowerCase();
+      });
 
-if (existingRooms.includes(name.toLowerCase())) {
-showToast(
-"warn",
-"ชื่อห้องที่ตั้งซ้ำกับชื่อห้องที่มีอยู่",
-"ห้องนี้มีอยู่ในระบบแล้ว"
-);
-return;
-}
+      if (existingRooms.includes(name.toLowerCase())) {
+        showToast(
+          "warn",
+          "ชื่อห้องที่ตั้งซ้ำกับชื่อห้องที่มีอยู่",
+          "ห้องนี้มีอยู่ในระบบแล้ว"
+        );
+        return;
+      }
 
-loadingNow = true
+      loadingNow = true
 
-try{
-const res = await fetch(API + "?mode=addRoom&room=" + encodeURIComponent(name) + "&token=" + token)
+      try {
+        const res = await fetch(API + "?mode=addRoom&room=" + encodeURIComponent(name) + "&token=" + token)
 
-if(!res.ok) throw new Error()
+        if (!res.ok) throw new Error()
 
-const data = await res.json()
+        const data = await res.json()
 
-if(data.status === "success"){
+        if (data.status === "success") {
 
-showToast(
-"success",
-"เพิ่มห้องสำเร็จ",
-"ระบบจะเพิ่มห้องในไม่ช้า (ด้านล่างสุด)",
-true
-)
+          showToast(
+            "success",
+            "เพิ่มห้องสำเร็จ",
+            "ระบบจะเพิ่มห้องในไม่ช้า (ด้านล่างสุด)",
+            true
+          )
 
-}else{
+        } else {
 
-showToast(
-"error",
-"เพิ่มห้องไม่สำเร็จ",
-"กรุณาลองใหม่อีกครั้ง"
-)
+          showToast(
+            "error",
+            "เพิ่มห้องไม่สำเร็จ",
+            "กรุณาลองใหม่อีกครั้ง"
+          )
 
-}
+        }
 
-}catch(e){
+      } catch (e) {
 
-showToast("error","เกิดข้อผิดพลาด"," ลองใหม่อีกครั้ง")
+        showToast("error", "เกิดข้อผิดพลาด", " ลองใหม่อีกครั้ง")
 
-}
+      }
 
-loadingNow = false
+      loadingNow = false
 
-}
+    }
 
-async function resetRoom(e, room){
+    async function resetRoom(e, room) {
 
-room = decodeURIComponent(room)
+      room = decodeURIComponent(room)
 
-if(!confirm("⚠ คุณต้องการรีเซ็ตสถิติวันนี้ของ "+room+" ใช่ไหม?")) return
+      if (!confirm("⚠ คุณต้องการรีเซ็ตสถิติวันนี้ของ " + room + " ใช่ไหม?")) return
 
-if(loadingNow) return
-loadingNow = true
+      if (loadingNow) return
+      loadingNow = true
 
-const btn = e.currentTarget
-btn.disabled = true
-btn.innerText = "กำลังรีเซ็ต..."
+      const btn = e.currentTarget
+      btn.disabled = true
+      btn.innerText = "กำลังรีเซ็ต..."
 
-try{
+      try {
 
-const res = await fetch(API + "?mode=resetRoom&room=" + encodeURIComponent(room) + "&token=" + token)
+        const res = await fetch(API + "?mode=resetRoom&room=" + encodeURIComponent(room) + "&token=" + token)
 
-if(!res.ok){
+        if (!res.ok) {
 
-throw new Error()
+          throw new Error()
 
-}
+        }
 
-showToast(
-"success",
-"รีเซ็ตสถิติ "+room+" วันนี้สำเร็จ",
-"ระบบจะอัพเดทการเปลี่ยนแปลงในไม่ช้า",
-true
-)
+        showToast(
+          "success",
+          "รีเซ็ตสถิติ " + room + " วันนี้สำเร็จ",
+          "ระบบจะอัพเดทการเปลี่ยนแปลงในไม่ช้า",
+          true
+        )
 
-} catch(e){
+      } catch (e) {
 
-showToast("error","รีเซ็ตไม่สำเร็จ","กรุณาลองใหม่อีกครั้ง")
+        showToast("error", "รีเซ็ตไม่สำเร็จ", "กรุณาลองใหม่อีกครั้ง")
 
-}
+      }
 
-btn.innerText = "🔄 รีเซ็ตสถิติวันนี้"
-btn.disabled = false
+      btn.innerText = "🔄 รีเซ็ตสถิติวันนี้"
+      btn.disabled = false
 
-loadingNow = false
+      loadingNow = false
 
-}
+    }
 
-async function resetTodayAll(e){
+    async function resetTodayAll(e) {
 
-if(loadingNow) return
+      if (loadingNow) return
 
-const btn = e.currentTarget
-if(btn.disabled) return
+      const btn = e.currentTarget
+      if (btn.disabled) return
 
-if(!confirm("⚠ คุณต้องการรีเซ็ตสถิติทุกห้องในวันนี้ใช่ไหม?")) return
+      if (!confirm("⚠ คุณต้องการรีเซ็ตสถิติทุกห้องในวันนี้ใช่ไหม?")) return
 
-btn.disabled = true
-btn.innerText = "กำลังรีเซ็ต..."
+      btn.disabled = true
+      btn.innerText = "กำลังรีเซ็ต..."
 
-loadingNow = true
+      loadingNow = true
 
-try{
+      try {
 
-const res = await fetch(API + "?mode=resetTodayAll&token=" + token)
+        const res = await fetch(API + "?mode=resetTodayAll&token=" + token)
 
-if(!res.ok){
+        if (!res.ok) {
 
-throw new Error()
+          throw new Error()
 
-}
+        }
 
-showToast(
-"success",
-"รีเซ็ตสถิติวันนี้สำเร็จ",
-"ระบบจะอัพเดทการเปลี่ยนแปลงในไม่ช้า",
-true
-)
+        showToast(
+          "success",
+          "รีเซ็ตสถิติวันนี้สำเร็จ",
+          "ระบบจะอัพเดทการเปลี่ยนแปลงในไม่ช้า",
+          true
+        )
 
-}catch(e){
+      } catch (e) {
 
-showToast("error","เกิดข้อผิดพลาด" ,"ลองใหม่อีกครั้ง")
+        showToast("error", "เกิดข้อผิดพลาด", "ลองใหม่อีกครั้ง")
 
-}
+      }
 
-btn.disabled = false
-btn.innerText = "รีเซ็ตข้อมูลวันนี้ทั้งหมด"
+      btn.disabled = false
+      btn.innerText = "รีเซ็ตข้อมูลวันนี้ทั้งหมด"
 
-loadingNow = false
+      loadingNow = false
 
-}
+    }
 
-async function resetRange(){
+    async function resetRange() {
 
-if(loadingNow) return
+      if (loadingNow) return
 
-let start=document.getElementById("startDate").value
-let end=document.getElementById("endDate").value
+      let start = document.getElementById("startDate").value
+      let end = document.getElementById("endDate").value
 
-if(!start || !end){
+      if (!start || !end) {
 
-showToast("error","กรุณาเลือกวันที่ก่อน","โปรดเลือกวันที่เริ่มต้นและสิ้นสุด")
+        showToast("error", "กรุณาเลือกวันที่ก่อน", "โปรดเลือกวันที่เริ่มต้นและสิ้นสุด")
 
-return
+        return
 
-}
+      }
 
-if(!confirm("⚠ รีเซ็ตข้อมูลช่วง "+start+" ถึง "+end+" ใช่หรือไม่")) return
+      if (!confirm("⚠ รีเซ็ตข้อมูลช่วง " + start + " ถึง " + end + " ใช่หรือไม่")) return
 
-if(new Date(start) > new Date(end)){
+      if (new Date(start) > new Date(end)) {
 
-showToast("warn","วันที่ไม่ถูกต้อง","วันที่เริ่มต้องไม่มากกว่าวันที่สิ้นสุด")
+        showToast("warn", "วันที่ไม่ถูกต้อง", "วันที่เริ่มต้องไม่มากกว่าวันที่สิ้นสุด")
 
-return
+        return
 
-}
+      }
 
-loadingNow = true
+      loadingNow = true
 
-try{
+      try {
 
-const res = await fetch(API+`?mode=resetRange&start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}&token=${token}`)
+        const res = await fetch(API + `?mode=resetRange&start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}&token=${token}`)
 
-if(!res.ok){
+        if (!res.ok) {
 
-throw new Error()
+          throw new Error()
 
-}
+        }
 
-showToast(
-"success",
-"รีเซ็ตสถิติแบบเลือกช่วงวันสำเร็จ",
-"ระบบจะอัพเดทการเปลี่ยนแปลงในไม่ช้า",
-true
-)
+        showToast(
+          "success",
+          "รีเซ็ตสถิติแบบเลือกช่วงวันสำเร็จ",
+          "ระบบจะอัพเดทการเปลี่ยนแปลงในไม่ช้า",
+          true
+        )
 
-}catch(e){
+      } catch (e) {
 
-showToast("error","เกิดข้อผิดพลาด","ลองใหม่อีกครั้ง")
+        showToast("error", "เกิดข้อผิดพลาด", "ลองใหม่อีกครั้ง")
 
-}
+      }
 
-loadingNow = false
-}
+      loadingNow = false
+    }
 
-async function runAutofill(e){
+    async function runAutofill(e) {
 
-if(loadingNow) return
+      if (loadingNow) return
 
-const btn = e.currentTarget
+      const btn = e.currentTarget
 
-if(!confirm("ต้องการ Autofill ห้องที่ยังไม่กรอกสถิติวันนี้ใช่หรือไม่")){
-return
-}
+      if (!confirm("ต้องการ Autofill ห้องที่ยังไม่กรอกสถิติวันนี้ใช่หรือไม่")) {
+        return
+      }
 
-btn.disabled = true
-btn.innerText = "กำลัง Autofill..."
+      btn.disabled = true
+      btn.innerText = "กำลัง Autofill..."
 
-loadingNow = true
+      loadingNow = true
 
-try{
+      try {
 
-const res = await fetch(
-API + "?mode=autofill&token=" + token
-)
+        const res = await fetch(
+          API + "?mode=autofill&token=" + token
+        )
 
-const data = await res.json()
+        const data = await res.json()
 
-if(data.status === "success"){
+        if (data.status === "success") {
 
-showToast(
-"success",
-"Autofill สำเร็จ",
-"ระบบได้เติมข้อมูลห้องที่ยังไม่กรอกแล้ว",
-true
-)
+          showToast(
+            "success",
+            "Autofill สำเร็จ",
+            "ระบบได้เติมข้อมูลห้องที่ยังไม่กรอกแล้ว",
+            true
+          )
 
-}else{
+        } else {
 
-showToast(
-"error",
-"Autofill ไม่สำเร็จ",
-data.message || "กรุณาลองใหม่อีกครั้ง"
-)
+          showToast(
+            "error",
+            "Autofill ไม่สำเร็จ",
+            data.message || "กรุณาลองใหม่อีกครั้ง"
+          )
 
-}
+        }
 
-}catch(err){
+      } catch (err) {
 
-showToast(
-"error",
-"เกิดข้อผิดพลาด",
-"ไม่สามารถ Autofill ได้"
-)
+        showToast(
+          "error",
+          "เกิดข้อผิดพลาด",
+          "ไม่สามารถ Autofill ได้"
+        )
 
-}
+      }
 
-btn.disabled = false
-btn.innerText = "Autofill สถิติวันนี้"
+      btn.disabled = false
+      btn.innerText = "Autofill สถิติวันนี้"
 
-loadingNow = false
+      loadingNow = false
 
-}
+    }
 
-async function backupRecords(e){
+    async function backupRecords(e) {
 
-if(loadingNow) return
+      if (loadingNow) return
 
-const btn = e.currentTarget
+      const btn = e.currentTarget
 
-if(!confirm("📦 ต้องการสำรองข้อมูลสถิติในระบบใช่หรือไม่")) return
+      if (!confirm("📦 ต้องการสำรองข้อมูลสถิติในระบบใช่หรือไม่")) return
 
-btn.disabled = true
-btn.innerText = "กำลังสำรองข้อมูล..."
+      btn.disabled = true
+      btn.innerText = "กำลังสำรองข้อมูล..."
 
-loadingNow = true
+      loadingNow = true
 
-try{
+      try {
 
-const res = await fetch(
-API + "?mode=backupRecords&token=" + token
-)
+        const res = await fetch(
+          API + "?mode=backupRecords&token=" + token
+        )
 
-if(!res.ok){
-throw new Error()
-}
+        if (!res.ok) {
+          throw new Error()
+        }
 
-const data = await res.json()
+        const data = await res.json()
 
-if(data.status === "success"){
+        if (data.status === "success") {
 
-showToast(
-"success",
-"สำรองข้อมูลสำเร็จ",
-"สร้างชีท "+data.sheetName+" เรียบร้อยแล้ว"
-)
+          showToast(
+            "success",
+            "สำรองข้อมูลสำเร็จ",
+            "สร้างชีท " + data.sheetName + " เรียบร้อยแล้ว"
+          )
 
-}else{
+        } else {
 
-showToast(
-"error",
-"สำรองข้อมูลไม่สำเร็จ",
-"กรุณาลองใหม่อีกครั้ง"
-)
+          showToast(
+            "error",
+            "สำรองข้อมูลไม่สำเร็จ",
+            "กรุณาลองใหม่อีกครั้ง"
+          )
 
-}
+        }
 
-}catch(e){
+      } catch (e) {
 
-showToast(
-"error",
-"เกิดข้อผิดพลาด",
-"ไม่สามารถสำรองข้อมูลได้"
-)
+        showToast(
+          "error",
+          "เกิดข้อผิดพลาด",
+          "ไม่สามารถสำรองข้อมูลได้"
+        )
 
-}
+      }
 
-btn.disabled = false
-btn.innerText = "🗂️ สำรองข้อมูลสถิติ"
+      btn.disabled = false
+      btn.innerText = "🗂️ สำรองข้อมูลสถิติ"
 
-loadingNow = false
+      loadingNow = false
 
-}
+    }
 
-async function resetAll(){
+    async function resetAll() {
 
-if(loadingNow) return
+      if (loadingNow) return
 
-if(!confirm("⚠ คุณต้องการล้างข้อมูลสถิติในระบบทั้งหมดใช่หรือไม่")) return
-if(!confirm("❗ ข้อมูลสถิติจะหายทั้งหมด ยืนยันอีกครั้ง")) return
+      if (!confirm("⚠ คุณต้องการล้างข้อมูลสถิติในระบบทั้งหมดใช่หรือไม่")) return
+      if (!confirm("❗ ข้อมูลสถิติจะหายทั้งหมด ยืนยันอีกครั้ง")) return
 
-let confirmText = prompt("พิมพ์ 'RESET' เพื่อยืนยัน")
+      let confirmText = prompt("พิมพ์ 'RESET' เพื่อยืนยัน")
 
-if(confirmText !== "RESET"){
+      if (confirmText !== "RESET") {
 
-alert("❌ ล้างข้อมูลไม่สำเร็จ")
+        alert("❌ ล้างข้อมูลไม่สำเร็จ")
 
-return
+        return
 
-}
+      }
 
-loadingNow = true
+      loadingNow = true
 
-try{
+      try {
 
-const res = await fetch(API+"?mode=resetAll&token=" + token)
+        const res = await fetch(API + "?mode=resetAll&token=" + token)
 
-if(!res.ok){
-throw new Error()
-}
+        if (!res.ok) {
+          throw new Error()
+        }
 
-showToast(
-"success",
-"ล้างข้อมูลสถิติทั้งหมดสำเร็จ",
-"ระบบจะอัพเดทการเปลี่ยนแปลงในไม่ช้า",
-true
-)
+        showToast(
+          "success",
+          "ล้างข้อมูลสถิติทั้งหมดสำเร็จ",
+          "ระบบจะอัพเดทการเปลี่ยนแปลงในไม่ช้า",
+          true
+        )
 
-}catch(e){
-showToast("error","เกิดข้อผิดพลาด","ลองใหม่อีกครั้ง")
-}
+      } catch (e) {
+        showToast("error", "เกิดข้อผิดพลาด", "ลองใหม่อีกครั้ง")
+      }
 
-loadingNow = false
-}
+      loadingNow = false
+    }
 
-async function changeTermYear(e){
+    async function changeTermYear(e) {
 
-const btn = e.target
+      const btn = e.target
 
-btn.disabled = true
-btn.innerText = "กำลังบันทึก..."
+      btn.disabled = true
+      btn.innerText = "กำลังบันทึก..."
 
-const term = document.getElementById("termInput").value
-const year = document.getElementById("yearInput").value
+      const term = document.getElementById("termInput").value
+      const year = document.getElementById("yearInput").value
 
-if(!term || !year){
+      if (!term || !year) {
 
-showToast("warn","เลือกข้อมูลไม่ครบ","กรุณาเลือกให้ครบถ้วน")
+        showToast("warn", "เลือกข้อมูลไม่ครบ", "กรุณาเลือกให้ครบถ้วน")
 
-btn.disabled = false
-btn.innerText = "บันทึกการตั้งค่า"
+        btn.disabled = false
+        btn.innerText = "บันทึกการตั้งค่า"
 
-return
+        return
 
-}
+      }
 
-try{
+      try {
 
-const res = await fetch(API+`?mode=updateTerm&term=${encodeURIComponent(term)}&year=${encodeURIComponent(year)}&token=${token}`)
+        const res = await fetch(API + `?mode=updateTerm&term=${encodeURIComponent(term)}&year=${encodeURIComponent(year)}&token=${token}`)
 
-if(!res.ok) throw new Error()
+        if (!res.ok) throw new Error()
 
-const data = await res.json()
+        const data = await res.json()
 
-if(data.status !== "success"){
+        if (data.status !== "success") {
 
-throw new Error()
+          throw new Error()
 
-}
+        }
 
-showToast(
-"success",
-"บันทึกภาคเรียนสำเร็จ",
-"ระบบจะอัพเดทภาคเรียนในไม่ช้า",
-true
-)
+        showToast(
+          "success",
+          "บันทึกภาคเรียนสำเร็จ",
+          "ระบบจะอัพเดทภาคเรียนในไม่ช้า",
+          true
+        )
 
-loadTerm()
+        loadTerm()
 
-}catch(e){
+      } catch (e) {
 
-showToast("error","เกิดข้อผิดพลาดในการบันทึก","กรุณาลองใหม่อีกครั้ง")
+        showToast("error", "เกิดข้อผิดพลาดในการบันทึก", "กรุณาลองใหม่อีกครั้ง")
 
-}
+      }
 
-btn.disabled = false
-btn.innerText = "บันทึกการตั้งค่า"
+      btn.disabled = false
+      btn.innerText = "บันทึกการตั้งค่า"
 
-}
+    }
 
-function generateYearOptions(){
+    function generateYearOptions() {
 
-const select = document.getElementById("yearInput")
-const currentYear = new Date().getFullYear() + 543
+      const select = document.getElementById("yearInput")
+      const currentYear = new Date().getFullYear() + 543
 
-select.innerHTML = ""
+      select.innerHTML = ""
 
-for(let i = currentYear + 1; i >= currentYear - 5; i--){
-const opt = document.createElement("option")
-opt.value = i
-opt.textContent = i
-select.appendChild(opt)
-}
-}
+      for (let i = currentYear + 1; i >= currentYear - 5; i--) {
+        const opt = document.createElement("option")
+        opt.value = i
+        opt.textContent = i
+        select.appendChild(opt)
+      }
+    }
 
-async function loadSignature(){
+    async function loadSignature() {
 
-try{
+      try {
 
-const res = await fetch(API + "?mode=getsigconfig&t=" + Date.now())
+        const res = await fetch(API + "?mode=getsigconfig&t=" + Date.now())
 
-if(!res.ok) throw new Error()
+        if (!res.ok) throw new Error()
 
-const data = await res.json()
+        const data = await res.json()
 
-document.getElementById("mon").value = data.mon || ""
-document.getElementById("tue").value = data.tue || ""
-document.getElementById("wed").value = data.wed || ""
-document.getElementById("thu").value = data.thu || ""
-document.getElementById("fri").value = data.fri || ""
-document.getElementById("assistant").value = data.assistant || ""
-document.getElementById("deputy").value = data.deputy || ""
-document.getElementById("director").value = data.director || ""
+        document.getElementById("mon").value = data.mon || ""
+        document.getElementById("tue").value = data.tue || ""
+        document.getElementById("wed").value = data.wed || ""
+        document.getElementById("thu").value = data.thu || ""
+        document.getElementById("fri").value = data.fri || ""
+        document.getElementById("assistant").value = data.assistant || ""
+        document.getElementById("deputy").value = data.deputy || ""
+        document.getElementById("director").value = data.director || ""
 
-}catch(e){
+      } catch (e) {
 
-console.error("⚠ โหลดรายชื่อไม่สำเร็จ", e)
+        console.error("⚠ โหลดรายชื่อไม่สำเร็จ", e)
 
-}
-}
+      }
+    }
 
-async function saveSignature(e){
+    async function saveSignature(e) {
 
-const btn = e.target
-btn.disabled = true
-btn.innerText = "กำลังบันทึก..."
+      const btn = e.target
+      btn.disabled = true
+      btn.innerText = "กำลังบันทึก..."
 
-try{
+      try {
 
-const url = API +
-`?mode=updatesigconfig
+        const url = API +
+          `?mode=updatesigconfig
 &mon=${encodeURIComponent(document.getElementById("mon").value)}
 &tue=${encodeURIComponent(document.getElementById("tue").value)}
 &wed=${encodeURIComponent(document.getElementById("wed").value)}
@@ -2754,105 +2818,106 @@ const url = API +
 &director=${encodeURIComponent(document.getElementById("director").value)}
 &token=${token}`
 
-const res = await fetch(url)
+        const res = await fetch(url)
 
-if(!res.ok) throw new Error()
+        if (!res.ok) throw new Error()
 
-const data = await res.json()
+        const data = await res.json()
 
-if(data.status === "success"){
-showToast(
-"success",
-"บันทึกรายชื่อสำเร็จ",
-"ระบบจะอัพเดทรายชื่อในไม่ช้า",
-true
-)
-loadSignature()
-document.getElementById("sigForm").style.display = "none"
-}else{
-showToast("error","บันทึกไม่สำเร็จ","กรุณาลองใหม่อีกครั้ง")
-}
+        if (data.status === "success") {
+          showToast(
+            "success",
+            "บันทึกรายชื่อสำเร็จ",
+            "ระบบจะอัพเดทรายชื่อในไม่ช้า",
+            true
+          )
+          loadSignature()
+          document.getElementById("sigForm").style.display = "none"
+        } else {
+          showToast("error", "บันทึกไม่สำเร็จ", "กรุณาลองใหม่อีกครั้ง")
+        }
 
-}catch(e){
-console.error(e)
-showToast(
-"error",
-"เกิดข้อผิดพลาด",
-"กรุณาลองใหม่อีกครั้ง"
-)
-}
+      } catch (e) {
+        console.error(e)
+        showToast(
+          "error",
+          "เกิดข้อผิดพลาด",
+          "กรุณาลองใหม่อีกครั้ง"
+        )
+      }
 
-btn.disabled = false
-btn.innerText = "💾 บันทึกข้อมูลผู้ลงนาม"
-}
+      btn.disabled = false
+      btn.innerText = "💾 บันทึกข้อมูลผู้ลงนาม"
+    }
 
-function toggleSigForm(){
+    function toggleSigForm() {
 
-const form = document.getElementById("sigForm")
-const container = form.closest(".card-scroll")
+      const form = document.getElementById("sigForm")
+      const container = form.closest(".card-scroll")
 
-if(form.style.display === "none"){
-form.style.display = "block"
+      if (form.style.display === "none") {
+        form.style.display = "block"
 
-setTimeout(()=>{
-container.scrollTo({
-top: form.offsetTop - 10,
-behavior: "smooth"
-})
-},100)
+        setTimeout(() => {
+          container.scrollTo({
+            top: form.offsetTop - 10,
+            behavior: "smooth"
+          })
+        }, 100)
 
-}else{
+      } else {
 
-form.style.display = "none"
+        form.style.display = "none"
 
-}
+      }
 
-}
+    }
 
-function printReport(e){
-const btn = e.target
-const date = document.getElementById("reportDate").value
+    function printReport(e) {
+      const btn = e.target
+      const date = document.getElementById("reportDate").value
 
-if(!date){
+      if (!date) {
 
-showToast(
-"warn",
-"ยังไม่ได้เลือกวันที่",
-"โปรดเลือกวันที่ต้องการทำรายงาน"
-)
+        showToast(
+          "warn",
+          "ยังไม่ได้เลือกวันที่",
+          "โปรดเลือกวันที่ต้องการทำรายงาน"
+        )
 
-return
+        return
 
-}
+      }
 
-btn.disabled = true
-btn.innerText = "กำลังสร้างรายงาน..."
+      btn.disabled = true
+      btn.innerText = "กำลังสร้างรายงาน..."
 
-window.open(
-"report.html?date=" + date,
-"_blank"
-)
+      window.open(
+        "report.html?date=" + date,
+        "_blank"
+      )
 
-setTimeout(()=>{
+      setTimeout(() => {
 
-btn.disabled = false
-btn.innerText = "📤 Export รายงาน"
+        btn.disabled = false
+        btn.innerText = "📤 Export รายงาน"
 
-},1500)
+      }, 1500)
 
-}
+    }
 
-generateYearOptions()
+    generateYearOptions()
 
-loadTerm()
+    loadTerm()
 
-window.addEventListener("DOMContentLoaded", () => {
-startAutoRefresh()
-checkSystemStatusOnce()
-loadSignature()
-})
+    window.addEventListener("DOMContentLoaded", () => {
+      startAutoRefresh()
+      checkSystemStatusOnce()
+      loadSignature()
+    })
 
-document.getElementById("reportDate").valueAsDate = new Date()
-</script>
+    document.getElementById("reportDate").valueAsDate = new Date()
+  </script>
 </body>
+
 </html>

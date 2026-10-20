@@ -1,291 +1,300 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
-<meta charset="UTF-8">
-<title>แบบรายงานสถิตินักเรียนประจำวัน</title>
-<link href="https://fonts.googleapis.com/css2?family=Sarabun&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet">
+  <script src="performance.js"></script>
+  <meta charset="UTF-8">
+  <title>แบบรายงานสถิตินักเรียนประจำวัน</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet">
 
-<style>
-body{
-font-family:'Sarabun',Tahoma,sans-serif;
-background:#f9fafb;
-margin:0;
-padding:0;
--webkit-font-smoothing: antialiased;
-}
+  <style>
+    body {
+      font-family: 'Sarabun', Tahoma, sans-serif;
+      background: #f9fafb;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
 
-.report{
-width:210mm;
-max-width:100%;
-margin:20px auto;
-padding:10mm 10mm 15mm 10mm;
-background:white;
-box-sizing:border-box;
-box-shadow:none !important;
-page-break-inside:auto;
-font-family:'Sarabun',Tahoma,sans-serif;
-}
+    .report {
+      width: 210mm;
+      max-width: 100%;
+      margin: 20px auto;
+      padding: 10mm 10mm 15mm 10mm;
+      background: white;
+      box-sizing: border-box;
+      box-shadow: none !important;
+      page-break-inside: auto;
+      font-family: 'Sarabun', Tahoma, sans-serif;
+    }
 
-h2{
-text-align:center;
-margin-bottom:4px;
-}
+    h2 {
+      text-align: center;
+      margin-bottom: 4px;
+    }
 
-.date{
-text-align:center;
-margin-bottom:15px;
-font-size:15px;
-color:#555;
-}
+    .date {
+      text-align: center;
+      margin-bottom: 15px;
+      font-size: 15px;
+      color: #555;
+    }
 
-h2, .date{
-page-break-after: avoid;
-}
+    h2,
+    .date {
+      page-break-after: avoid;
+    }
 
-.section{
-page-break-inside:auto;
-margin-top:10px;
-page-break-before: auto;
-}
+    .section {
+      page-break-inside: auto;
+      margin-top: 10px;
+      page-break-before: auto;
+    }
 
-table{
-width:99%;
-border-collapse:collapse;
-font-size:13.5px;
-page-break-before:auto;
-page-break-inside:auto;
-table-layout: fixed;
-}
+    table {
+      width: 99%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      page-break-before: auto;
+      page-break-inside: auto;
+      table-layout: fixed;
+    }
 
-th, td{
-border:1px solid #000;
-padding:5px 3px;
-text-align:center;
-word-break: normal;
-white-space: nowrap;
-page-break-inside: auto;
-}
+    th,
+    td {
+      border: 1px solid #000;
+      padding: 5px 3px;
+      text-align: center;
+      word-break: normal;
+      white-space: nowrap;
+      page-break-inside: auto;
+    }
 
-td:first-child{
-white-space:normal;
-}
+    td:first-child {
+      white-space: normal;
+    }
 
-th{
-background:#e5e7eb;
-font-weight:600;
-}
+    th {
+      background: #e5e7eb;
+      font-weight: 600;
+    }
 
-tr{
-page-break-inside: avoid;
-page-break-after:auto;
-break-inside: avoid;
-}
+    tr {
+      page-break-inside: avoid;
+      page-break-after: auto;
+      break-inside: avoid;
+    }
 
-.summary, .footer{
-page-break-inside: avoid;
-}
+    .summary,
+    .footer {
+      page-break-inside: avoid;
+    }
 
-thead{
-display: table-header-group;
-}  
+    thead {
+      display: table-header-group;
+    }
 
-thead th{
-background:#e5e7eb !important;
--webkit-print-color-adjust: exact;
-print-color-adjust: exact;
-} 
+    thead th {
+      background: #e5e7eb !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
 
-th:first-child, td:first-child{
-width:27%;
-}
+    th:first-child,
+    td:first-child {
+      width: 27%;
+    }
 
-.total{
-background:#fde68a;
-font-weight:bold;
-}
+    .total {
+      background: #fde68a;
+      font-weight: bold;
+    }
 
-.primary{
-background:#fde68a;
-}
+    .primary {
+      background: #fde68a;
+    }
 
-.secondary{
-background:#86efac;
-}
+    .secondary {
+      background: #86efac;
+    }
 
-.primary-total{
-background:#facc15;
-font-weight:bold;
-}
+    .primary-total {
+      background: #facc15;
+      font-weight: bold;
+    }
 
-.secondary-total{
-background:#22c55e;
-color:#000000;
-font-weight:bold;
-}
+    .secondary-total {
+      background: #22c55e;
+      color: #000000;
+      font-weight: bold;
+    }
 
-.primary-total,
-.secondary-total{
--webkit-print-color-adjust: exact;
-print-color-adjust: exact;
-}
-  
-.total-all{
-background:#93c5fd;
-}
+    .primary-total,
+    .secondary-total {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
 
-.primary, .secondary, .total-all{
--webkit-print-color-adjust: exact;
-print-color-adjust: exact;
-}
+    .total-all {
+      background: #93c5fd;
+    }
 
-.summary{
-margin-top:50px;
-font-size:14px;
-line-height:2.4;
-padding-top:20px;
-border-top:2px solid #000;
-text-align:center;
-letter-spacing:0.5px;
-font-family:'Sarabun',sans-serif;
-page-break-before: auto;
-break-inside: avoid;
-}
+    .primary,
+    .secondary,
+    .total-all {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
 
-.summary br{
-margin-bottom:10px;
-}
+    .summary {
+      margin-top: 50px;
+      font-size: 14px;
+      line-height: 2.4;
+      padding-top: 20px;
+      border-top: 2px solid #000;
+      text-align: center;
+      letter-spacing: 0.5px;
+      font-family: 'Sarabun', sans-serif;
+      page-break-before: auto;
+      break-inside: avoid;
+    }
 
-.sum-row{
-font-weight:bold;
--webkit-print-color-adjust: exact;
-print-color-adjust: exact;
-page-break-inside: avoid !important;
-break-inside: avoid;
-}
+    .summary br {
+      margin-bottom: 10px;
+    }
 
-.footer{
-margin-top:50px;
-display:grid;
-grid-template-columns: repeat(2, 1fr);
-gap:50px 60px;
-text-align:center;
-font-size:14px;
-break-inside: avoid;
-page-break-before: avoid;
-page-break-inside: avoid;
-}
+    .sum-row {
+      font-weight: bold;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      page-break-inside: avoid !important;
+      break-inside: avoid;
+    }
 
-.sign{
-display:flex;
-flex-direction:column;
-align-items:center;
-gap:10px;
-}
+    .footer {
+      margin-top: 50px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 50px 60px;
+      text-align: center;
+      font-size: 14px;
+      break-inside: avoid;
+      page-break-before: avoid;
+      page-break-inside: avoid;
+    }
 
-.line{
-width:80%;
-border-bottom:1px solid #000;
-height:20px;
-}
+    .sign {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
 
-.footer div{
-width:100%;
-}
+    .line {
+      width: 80%;
+      border-bottom: 1px solid #000;
+      height: 20px;
+    }
 
-.actions{
-margin:30px auto 60px;
-display:flex;
-justify-content:center;
-gap:15px;
-}
+    .footer div {
+      width: 100%;
+    }
 
-.btn{
-padding:10px 20px;
-border:none;
-border-radius:8px;
-font-size:14px;
-cursor:pointer;
-transition:0.2s;
-font-family:'Prompt',sans-serif;
-}
+    .actions {
+      margin: 30px auto 60px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
 
-.btn.primary{
-background:#ef4444;
-color:white;
-}
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.2s;
+      font-family: 'Prompt', sans-serif;
+    }
 
-.btn.primary:hover{
-background:#dc2626;
-}
+    .btn.primary {
+      background: #ef4444;
+      color: white;
+    }
 
-.btn.secondary{
-background:#e5e7eb;
-}
+    .btn.primary:hover {
+      background: #dc2626;
+    }
 
-.btn.secondary:hover{
-background:#d1d5db;
-}
+    .btn.secondary {
+      background: #e5e7eb;
+    }
 
-.section-break{
-page-break-inside: avoid;
-}
+    .btn.secondary:hover {
+      background: #d1d5db;
+    }
 
-@media print{
+    .section-break {
+      page-break-inside: avoid;
+    }
 
-*{
--webkit-print-color-adjust: exact !important;
-print-color-adjust: exact !important;
-}
+    @media print {
 
-body{
-background:white;
--webkit-font-smoothing: antialiased;
-zoom: 100%;
-}
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
 
-.report{
-box-shadow:none;
-margin:0 !important;
-padding-top:10mm;
-padding:5mm 10mm 10mm 10mm !important;
-page-break-before: avoid;
-overflow:hidden;
-}
+      body {
+        background: white;
+        -webkit-font-smoothing: antialiased;
+        zoom: 100%;
+      }
 
-table {
-page-break-inside: auto;
-}
+      .report {
+        box-shadow: none;
+        margin: 0 !important;
+        padding-top: 10mm;
+        padding: 5mm 10mm 10mm 10mm !important;
+        page-break-before: avoid;
+        overflow: hidden;
+      }
 
-thead {
-display: table-header-group !important;
-}
+      table {
+        page-break-inside: auto;
+      }
 
-tfoot {
-display: table-footer-group;
-}
+      thead {
+        display: table-header-group !important;
+      }
 
-tr {
-page-break-inside: avoid;
-}
+      tfoot {
+        display: table-footer-group;
+      }
 
-.actions, button{
-display:none !important;
-}
+      tr {
+        page-break-inside: avoid;
+      }
 
-@page{ 
-size:A4;
-margin:10mm;
+      .actions,
+      button {
+        display: none !important;
+      }
 
-}
+      @page {
+        size: A4;
+        margin: 10mm;
 
-}
-</style>
+      }
+
+    }
+  </style>
 </head>
 
 <body>
 
-<div id="loading" style="
+  <div id="loading" style="
 position:fixed;
 top:0;left:0;
 width:100%;height:100%;
@@ -296,506 +305,515 @@ align-items:center;
 font-size:20px;
 z-index:9999;
 ">
-⏳ กำลังสร้างแบบรายงาน...
-</div>
+    ⏳ กำลังสร้างแบบรายงาน...
+  </div>
 
-<div class="report" id="report">
+  <div class="report" id="report">
 
-<h2>รายงานสถิตินักเรียนประจำวัน</h2>
-<div class="date" id="dateText"></div>
+    <h2>รายงานสถิตินักเรียนประจำวัน</h2>
+    <div class="date" id="dateText"></div>
 
-<div class="section">
-<table>
+    <div class="section">
+      <table>
 
-<colgroup>
-<col style="width:27%">
+        <colgroup>
+          <col style="width:27%">
 
-<col style="width:4.6%">
-<col style="width:4.8%">
-<col style="width:4.6%">
+          <col style="width:4.6%">
+          <col style="width:4.8%">
+          <col style="width:4.6%">
 
-<col style="width:4.6%">
-<col style="width:4.8%">
-<col style="width:4.6%">
+          <col style="width:4.6%">
+          <col style="width:4.8%">
+          <col style="width:4.6%">
 
-<col style="width:4.6%">
-<col style="width:4.6%">
-<col style="width:4.6%">
+          <col style="width:4.6%">
+          <col style="width:4.6%">
+          <col style="width:4.6%">
 
-<col style="width:4.6%">
-<col style="width:4.8%">
-<col style="width:4.6%">
+          <col style="width:4.6%">
+          <col style="width:4.8%">
+          <col style="width:4.6%">
 
-<col style="width:4.6%">
-<col style="width:4.8%">
-<col style="width:4.6%">
-</colgroup>
+          <col style="width:4.6%">
+          <col style="width:4.8%">
+          <col style="width:4.6%">
+        </colgroup>
 
-<thead>
-<tr>
+        <thead>
+          <tr>
 
-<th rowspan="2">ชั้น</th>
-<th colspan="3">นักเรียนทั้งหมด</th>
-<th colspan="3">มาเรียนวันนี้</th>
-<th rowspan="2">ป่วย</th>
-<th rowspan="2">ลา</th>
-<th rowspan="2">ขาด</th>
-<th colspan="3">เข้าใหม่</th>
-<th colspan="3">จำหน่าย</th>
-</tr>
-<tr>
-<th>ชาย</th>
-<th>หญิง</th>
-<th>รวม</th>
-<th>ชาย</th>
-<th>หญิง</th>
-<th>รวม</th>
+            <th rowspan="2">ชั้น</th>
+            <th colspan="3">นักเรียนทั้งหมด</th>
+            <th colspan="3">มาเรียนวันนี้</th>
+            <th rowspan="2">ป่วย</th>
+            <th rowspan="2">ลา</th>
+            <th rowspan="2">ขาด</th>
+            <th colspan="3">เข้าใหม่</th>
+            <th colspan="3">จำหน่าย</th>
+          </tr>
+          <tr>
+            <th>ชาย</th>
+            <th>หญิง</th>
+            <th>รวม</th>
+            <th>ชาย</th>
+            <th>หญิง</th>
+            <th>รวม</th>
 
-<th>ชาย</th>
-<th>หญิง</th>
-<th>รวม</th>
-<th>ชาย</th>
-<th>หญิง</th>
-<th>รวม</th>
-</tr>
-</thead>
+            <th>ชาย</th>
+            <th>หญิง</th>
+            <th>รวม</th>
+            <th>ชาย</th>
+            <th>หญิง</th>
+            <th>รวม</th>
+          </tr>
+        </thead>
 
-<tbody id="dataBody"></tbody>
-</table>
-</div>
+        <tbody id="dataBody"></tbody>
+      </table>
+    </div>
 
-<div class="summary" id="summary"></div>
+    <div class="summary" id="summary"></div>
 
-<div class="footer">
-<div class="sign">
-<div class="line"></div>
-<div id="teacherName">( - )</div>
-<div>ครูเวรประจำวัน</div>
-</div>
+    <div class="footer">
+      <div class="sign">
+        <div class="line"></div>
+        <div id="teacherName">( - )</div>
+        <div>ครูเวรประจำวัน</div>
+      </div>
 
-<div class="sign">
-<div class="line"></div>
-<div id="assistantName">( - )</div>
-<div>ผช.ผอ.ฝ่ายบริหารทั่วไป</div>
-</div>
+      <div class="sign">
+        <div class="line"></div>
+        <div id="assistantName">( - )</div>
+        <div>ผช.ผอ.ฝ่ายบริหารทั่วไป</div>
+      </div>
 
-<div class="sign">
-<div class="line"></div>
-<div id="deputyName">( - )</div>
-<div>รองผู้อำนวยการสถานศึกษา</div>
-</div>
+      <div class="sign">
+        <div class="line"></div>
+        <div id="deputyName">( - )</div>
+        <div>รองผู้อำนวยการสถานศึกษา</div>
+      </div>
 
-<div class="sign">
-<div class="line"></div>
-<div id="directorName">( - )</div>
-<div>ผู้อำนวยการสถานศึกษา</div>
-</div>
-</div>
+      <div class="sign">
+        <div class="line"></div>
+        <div id="directorName">( - )</div>
+        <div>ผู้อำนวยการสถานศึกษา</div>
+      </div>
+    </div>
 
-</div>
+  </div>
 
-<div class="actions">
-<button class="btn primary" onclick="window.print()">
-📄 ดาวน์โหลด / พิมพ์เอกสาร
-</button>
-</div>
+  <div class="actions">
+    <button class="btn primary" onclick="window.print()">
+      📄 ดาวน์โหลด / พิมพ์เอกสาร
+    </button>
+  </div>
 
-<script>
+  <script>
 
-let isLoaded = false
+    let isLoaded = false
 
-const API="https://script.google.com/macros/s/AKfycbyV4PNjlFskTfF0Ol6xrZdWpSCJm54bi33l0M66QpluNo8X6B7Js8LZRtuY7T05KsShoQ/exec"
+    const API = "https://script.google.com/macros/s/AKfycbyV4PNjlFskTfF0Ol6xrZdWpSCJm54bi33l0M66QpluNo8X6B7Js8LZRtuY7T05KsShoQ/exec"
 
-const params = new URLSearchParams(location.search)
-function getLocalDate(){
-const d = new Date()
-const year = d.getFullYear()
-const month = String(d.getMonth()+1).padStart(2,'0')
-const day = String(d.getDate()).padStart(2,'0')
-return `${year}-${month}-${day}`
-}
+    const params = new URLSearchParams(location.search)
+    function getLocalDate() {
+      const d = new Date()
+      const year = d.getFullYear()
+      const month = String(d.getMonth() + 1).padStart(2, '0')
+      const day = String(d.getDate()).padStart(2, '0')
+      return `${year}-${month}-${day}`
+    }
 
-const date = params.get("date") || getLocalDate()
+    const date = params.get("date") || getLocalDate()
 
-function toLocalDate(d){
-const year = d.getFullYear()
-const month = String(d.getMonth()+1).padStart(2,'0')
-const day = String(d.getDate()).padStart(2,'0')
-return `${year}-${month}-${day}`
-}
-  
-function formatThaiDate(dateStr){
-const d = new Date(dateStr + "T00:00:00")
+    function toLocalDate(d) {
+      const year = d.getFullYear()
+      const month = String(d.getMonth() + 1).padStart(2, '0')
+      const day = String(d.getDate()).padStart(2, '0')
+      return `${year}-${month}-${day}`
+    }
 
-const day = d.toLocaleDateString('th-TH',{ weekday:'long' }).replace("วัน","")
-const dNum = d.getDate()
-const month = d.toLocaleDateString('th-TH',{ month:'long' })
-const year = d.getFullYear() + 543
+    function formatThaiDate(dateStr) {
+      const d = new Date(dateStr + "T00:00:00")
 
-return `
+      const day = d.toLocaleDateString('th-TH', { weekday: 'long' }).replace("วัน", "")
+      const dNum = d.getDate()
+      const month = d.toLocaleDateString('th-TH', { month: 'long' })
+      const year = d.getFullYear() + 543
+
+      return `
 วัน&nbsp;&nbsp;&nbsp;&nbsp;${day}
 &nbsp;&nbsp;&nbsp;&nbsp;ที่&nbsp;&nbsp;&nbsp;&nbsp;${dNum}
 &nbsp;&nbsp;&nbsp;&nbsp;เดือน&nbsp;&nbsp;&nbsp;&nbsp;${month}
 &nbsp;&nbsp;&nbsp;&nbsp;พ.ศ.&nbsp;&nbsp;&nbsp;&nbsp;${year}
 `
-}
+    }
 
-function formatTitleDate(dateStr){
-const d = new Date(dateStr + "T00:00:00")
-const day = d.getDate()
-const month = d.toLocaleDateString('th-TH',{ month:'short' })
-const year = d.getFullYear() + 543
-return `${day} ${month} ${year}`
-}
+    function formatTitleDate(dateStr) {
+      const d = new Date(dateStr + "T00:00:00")
+      const day = d.getDate()
+      const month = d.toLocaleDateString('th-TH', { month: 'short' })
+      const year = d.getFullYear() + 543
+      return `${day} ${month} ${year}`
+    }
 
-document.title = `รายงานสถิตินักเรียน (${formatTitleDate(date)})`
+    document.title = `รายงานสถิตินักเรียน (${formatTitleDate(date)})`
 
-document.getElementById("loading").innerText = "⏳ กำลังโหลดข้อมูล..."
+    document.getElementById("loading").innerText = "⏳ กำลังโหลดข้อมูล..."
 
-function show(v){
-return (v === 0 || v === "0") ? "" : v
-}
+    function show(v) {
+      return (v === 0 || v === "0") ? "" : v
+    }
 
-async function fetchWithFallback(dateStr){
+    async function fetchWithFallback(dateStr) {
 
-let d = new Date(dateStr + "T00:00:00")
+      let d = new Date(dateStr + "T00:00:00")
 
-for(let i=0;i<30;i++){
+      for (let i = 0; i < 30; i++) {
 
-const tryDate = toLocalDate(d)
+        const tryDate = toLocalDate(d)
 
-try{
+        try {
 
-const res = await fetch(API + "?mode=report&date=" + tryDate)
-const data = await res.json()
+          const res = await fetch(API + "?mode=report&date=" + tryDate)
+          const data = await res.json()
 
-if(Array.isArray(data) && data.length > 0){
+          if (Array.isArray(data) && data.length > 0) {
 
-return { data, fallbackDate: tryDate }
+            return { data, fallbackDate: tryDate }
 
-}
+          }
 
-}catch(e){}
+        } catch (e) { }
 
-d.setDate(d.getDate()-1)
+        d.setDate(d.getDate() - 1)
 
-}
+      }
 
-return { data:[], fallbackDate:null }
+      return { data: [], fallbackDate: null }
 
-}
+    }
 
-async function getPreviousData(room, date){
+    async function getPreviousData(room, date) {
 
-let d = new Date(date)
+      let d = new Date(date)
 
-for(let i=0;i<30;i++){
+      for (let i = 0; i < 30; i++) {
 
-d.setDate(d.getDate() - 1)
-const prevDate = toLocalDate(d)
+        d.setDate(d.getDate() - 1)
+        const prevDate = toLocalDate(d)
 
-try{
+        try {
 
-const res = await fetch(API + `?mode=getbydate&room=${room}&date=${prevDate}`)
-const data = await res.json()
+          const res = await fetch(API + `?mode=getbydate&room=${room}&date=${prevDate}`)
+          const data = await res.json()
 
-if(data && (data.all_boys != null || data.all_girls != null)){
-  return data
-}
+          if (data && (data.all_boys != null || data.all_girls != null)) {
+            return data
+          }
 
-}catch(e){}
+        } catch (e) { }
 
-}
+      }
 
-return {}
-}
+      return {}
+    }
 
-const roomCache = {}
+    const roomCache = {}
 
-async function getPreviousDataFast(cache, room, date){
+    async function getPreviousDataFast(cache, room, date) {
 
-if(cache[room]) return cache[room]
+      const key = JSON.stringify([room, date])
+      if (cache[key]) return cache[key]
 
-try{
-const res = await fetch(API + `?mode=getprevious&room=${room}&date=${date}`)
-const data = await res.json()
+      try {
+        const res = await fetch(API + `?mode=getprevious&room=${room}&date=${date}`)
+        const data = await res.json()
 
-cache[room] = data || {}
-return cache[room]
+        cache[key] = data || {}
+        return cache[key]
 
-}catch(e){
-cache[room] = {}
-return {}
-}
-}
+      } catch (e) {
+        cache[key] = {}
+        return {}
+      }
+    }
 
-async function loadReport(){
+    async function loadReport() {
 
-document.getElementById("dateText").innerHTML = formatThaiDate(date)
+      document.getElementById("dateText").innerHTML = formatThaiDate(date)
 
-let data = []
-let isFallback = false
+      let data = []
+      let isFallback = false
 
-let useDate = date
+      let useDate = date
 
-try{
-const result = await fetchWithFallback(date)
-data = result.data
-isFallback = result.fallbackDate !== date
+      try {
+        const result = await fetchWithFallback(date)
+        data = result.data
+        isFallback = result.fallbackDate !== date
 
-useDate = result.fallbackDate || date
+        useDate = result.fallbackDate || date
 
-if(data.length === 0){
+        if (data.length === 0) {
 
-document.getElementById("dataBody").innerHTML = `
+          document.getElementById("dataBody").innerHTML = `
 
 <tr><td colspan="16">⚠ ไม่พบข้อมูล</td></tr>
 `
 
-document.getElementById("dateText").innerHTML = formatThaiDate(date)
+          document.getElementById("dateText").innerHTML = formatThaiDate(date)
 
-document.getElementById("loading").style.display = "none"
+          document.getElementById("loading").style.display = "none"
 
-return
+          return
 
-}
+        }
 
-}catch(e){
+      } catch (e) {
 
-alert("❌ โหลดข้อมูลไม่สำเร็จ กรุณาลองใหม่อีกครั้ง")
+        alert("❌ โหลดข้อมูลไม่สำเร็จ กรุณาลองใหม่อีกครั้ง")
 
-document.getElementById("loading").style.display = "none"
+        document.getElementById("loading").style.display = "none"
 
-return
+        return
 
-}
+      }
 
-let html=""
+      let html = ""
 
-document.getElementById("loading").innerText = "⏳ กำลังสร้างรายงาน..."
-document.getElementById("dataBody").innerHTML = `<tr><td colspan="16">⏳ กำลังสร้าง Report...</td></tr>`;
+      document.getElementById("loading").innerText = "⏳ กำลังสร้างรายงาน..."
+      document.getElementById("dataBody").innerHTML = `<tr><td colspan="16">⏳ กำลังสร้าง Report...</td></tr>`;
 
-let levels = {}
+      let levels = {}
 
-let totalAll = 0
-let totalMale = 0
-let totalFemale = 0
+      let totalAll = 0
+      let totalMale = 0
+      let totalFemale = 0
 
-let totalPresent = 0
-let totalPresentMale = 0
-let totalPresentFemale = 0
+      let totalPresent = 0
+      let totalPresentMale = 0
+      let totalPresentFemale = 0
 
-let totalSick = 0
-let totalLeave = 0
-let totalAbsent = 0
+      let totalSick = 0
+      let totalLeave = 0
+      let totalAbsent = 0
 
-let totalInMale = 0
-let totalInFemale = 0
-let totalInTotal = 0
+      let totalInMale = 0
+      let totalInFemale = 0
+      let totalInTotal = 0
 
-let totalOutMale = 0
-let totalOutFemale = 0
-let totalOutTotal = 0
+      let totalOutMale = 0
+      let totalOutFemale = 0
+      let totalOutTotal = 0
 
-const prevResults = await Promise.all(
-data.map(r => getPreviousDataFast(roomCache, r.room, useDate))
-)
+      const prevResults = await Promise.all(data.map(r =>
+        Object.hasOwn(r, 'prev_male') && Object.hasOwn(r, 'prev_female')
+          ? { all_boys: r.prev_male, all_girls: r.prev_female }
+          : getPreviousDataFast(roomCache, r.room, useDate)
+      ))
 
-for (let i = 0; i < data.length; i++) {
-const r = data[i]
-const prevData = prevResults[i]
+      for (let i = 0; i < data.length; i++) {
+        const r = data[i]
+        const prevData = prevResults[i]
 
-const prevMale = Number(prevData.all_boys) || 0
-const prevFemale = Number(prevData.all_girls) || 0
+        const prevMale = Number(prevData.all_boys) || 0
+        const prevFemale = Number(prevData.all_girls) || 0
 
-let currMale = Number(r.male) || prevMale
-let currFemale = Number(r.female) || prevFemale
+        let currMale = Number(r.male) || prevMale
+        let currFemale = Number(r.female) || prevFemale
 
-const hasPresentData = r.present_m !== undefined && r.present_f !== undefined
+        const hasPresentData = r.present_m !== undefined && r.present_f !== undefined
 
-const total = currMale + currFemale
+        const total = currMale + currFemale
 
-let inMale = 0
-let inFemale = 0
-let outMale = 0
-let outFemale = 0
-let inTotal = 0
-let outTotal = 0
+        let inMale = 0
+        let inFemale = 0
+        let outMale = 0
+        let outFemale = 0
+        let inTotal = 0
+        let outTotal = 0
 
-if (prevMale !== 0 || prevFemale !== 0) {
+        if (prevMale !== 0 || prevFemale !== 0) {
 
-if (currMale > prevMale) {
-inMale = currMale - prevMale
-inTotal += inMale
-} else if (currMale < prevMale) {
-outMale = prevMale - currMale
-outTotal += outMale
-}
+          if (currMale > prevMale) {
+            inMale = currMale - prevMale
+            inTotal += inMale
+          } else if (currMale < prevMale) {
+            outMale = prevMale - currMale
+            outTotal += outMale
+          }
 
-if (currFemale > prevFemale) {
-inFemale = currFemale - prevFemale
-inTotal += inFemale
-} else if (currFemale < prevFemale) {
-outFemale = prevFemale - currFemale
-outTotal += outFemale
-}
+          if (currFemale > prevFemale) {
+            inFemale = currFemale - prevFemale
+            inTotal += inFemale
+          } else if (currFemale < prevFemale) {
+            outFemale = prevFemale - currFemale
+            outTotal += outFemale
+          }
 
-totalInMale += inMale
-totalInFemale += inFemale
-totalInTotal += inTotal
+          totalInMale += inMale
+          totalInFemale += inFemale
+          totalInTotal += inTotal
 
-totalOutMale += outMale
-totalOutFemale += outFemale
-totalOutTotal += outTotal
+          totalOutMale += outMale
+          totalOutFemale += outFemale
+          totalOutTotal += outTotal
 
-}
+        }
 
-const level = getLevel(r.room)
+        const level = getLevel(r.room)
 
-if(!levels[level]){
-levels[level] = {
-  rows:[],
-  total:0,
-  male:0,
-  female:0,
-  present:0,
-  presentMale:0,
-  presentFemale:0,
-  sick:0,
-  leave:0,
-  absent:0,
-  inMale:0,
-  inFemale:0, 
-  inTotal:0,
-  
-  outMale:0, 
-  outFemale:0, 
-  outTotal:0,
-}
-}
+        if (!levels[level]) {
+          levels[level] = {
+            rows: [],
+            total: 0,
+            male: 0,
+            female: 0,
+            present: 0,
+            presentMale: 0,
+            presentFemale: 0,
+            sick: 0,
+            leave: 0,
+            absent: 0,
+            inMale: 0,
+            inFemale: 0,
+            inTotal: 0,
 
-const hasTodayInput = r.present_m !== undefined && r.present_f !== undefined
+            outMale: 0,
+            outFemale: 0,
+            outTotal: 0,
+          }
+        }
 
-const presentMaleVal = hasTodayInput ? Number(r.present_m) || 0 : 0
-const presentFemaleVal = hasTodayInput ? Number(r.present_f) || 0 : 0
+        const hasTodayInput = r.present_m !== undefined && r.present_f !== undefined
 
-const presentMale = hasTodayInput ? presentMaleVal : ""
-const presentFemale = hasTodayInput ? presentFemaleVal : ""
-const present = hasTodayInput ? (presentMaleVal + presentFemaleVal) : 0
+        const presentMaleVal = hasTodayInput ? Number(r.present_m) || 0 : 0
+        const presentFemaleVal = hasTodayInput ? Number(r.present_f) || 0 : 0
 
-const sick = Number(r.sick) || 0
-const leave = Number(r.leave) || 0
-const absent = Number(r.absent) || 0
+        const presentMale = hasTodayInput ? presentMaleVal : ""
+        const presentFemale = hasTodayInput ? presentFemaleVal : ""
+        const present = hasTodayInput ? (presentMaleVal + presentFemaleVal) : 0
 
-totalSick += sick
-totalLeave += leave
-totalAbsent += absent
+        const sick = Number(r.sick) || 0
+        const leave = Number(r.leave) || 0
+        const absent = Number(r.absent) || 0
 
-totalAll += total
-totalMale += currMale
-totalFemale += currFemale
+        totalSick += sick
+        totalLeave += leave
+        totalAbsent += absent
 
-totalPresent += present
-totalPresentMale += presentMaleVal
-totalPresentFemale += presentFemaleVal
+        totalAll += total
+        totalMale += currMale
+        totalFemale += currFemale
 
-levels[level].rows.push({
-room:r.room,
-total,
-male: currMale,
-female: currFemale,
-present,presentMale,presentFemale,
-hasTodayInput,
-sick,leave,absent,
-inMale, inFemale, inTotal,
-outMale, outFemale, outTotal
-})
+        totalPresent += present
+        totalPresentMale += presentMaleVal
+        totalPresentFemale += presentFemaleVal
 
-levels[level].male += currMale
-levels[level].female += currFemale
-levels[level].total += total
-levels[level].present += Number(present) || 0
-levels[level].presentMale += Number(presentMaleVal) || 0
-levels[level].presentFemale += Number(presentFemaleVal) || 0
-levels[level].sick += sick
-levels[level].leave += leave
-levels[level].absent += absent
+        levels[level].rows.push({
+          room: r.room,
+          total,
+          male: currMale,
+          female: currFemale,
+          present, presentMale, presentFemale,
+          hasTodayInput,
+          sick, leave, absent,
+          inMale, inFemale, inTotal,
+          outMale, outFemale, outTotal
+        })
 
-levels[level].inMale += inMale
-levels[level].inFemale += inFemale
-levels[level].inTotal += inTotal
+        levels[level].male += currMale
+        levels[level].female += currFemale
+        levels[level].total += total
+        levels[level].present += Number(present) || 0
+        levels[level].presentMale += Number(presentMaleVal) || 0
+        levels[level].presentFemale += Number(presentFemaleVal) || 0
+        levels[level].sick += sick
+        levels[level].leave += leave
+        levels[level].absent += absent
 
-levels[level].outMale += outMale
-levels[level].outFemale += outFemale
-levels[level].outTotal += outTotal
-}
+        levels[level].inMale += inMale
+        levels[level].inFemale += inFemale
+        levels[level].inTotal += inTotal
 
-let groupSum = {
-"ป.": {male:0,female:0,total:0,presentMale:0,presentFemale:0,present:0, sick:0, leave:0, absent:0,
-inMale:0,inFemale:0,inTotal:0,
-outMale:0,outFemale:0,outTotal:0},
-"ม.": {male:0,female:0,total:0,presentMale:0,presentFemale:0,present:0, sick:0, leave:0, absent:0,
-inMale:0,inFemale:0,inTotal:0,
-outMale:0,outFemale:0,outTotal:0},
-"ปวช": {male:0,female:0,total:0,presentMale:0,presentFemale:0,present:0, sick:0, leave:0, absent:0,
-inMale:0,inFemale:0,inTotal:0,
-outMale:0,outFemale:0,outTotal:0}
-}
+        levels[level].outMale += outMale
+        levels[level].outFemale += outFemale
+        levels[level].outTotal += outTotal
+      }
 
-const order = ["ป.1","ป.2","ป.3","ป.4","ป.5","ป.6","ม.1","ม.2","ม.3","ม.4","ม.5","ม.6","ปวช.1","ปวช.2","ปวช.3"]
+      let groupSum = {
+        "ป.": {
+          male: 0, female: 0, total: 0, presentMale: 0, presentFemale: 0, present: 0, sick: 0, leave: 0, absent: 0,
+          inMale: 0, inFemale: 0, inTotal: 0,
+          outMale: 0, outFemale: 0, outTotal: 0
+        },
+        "ม.": {
+          male: 0, female: 0, total: 0, presentMale: 0, presentFemale: 0, present: 0, sick: 0, leave: 0, absent: 0,
+          inMale: 0, inFemale: 0, inTotal: 0,
+          outMale: 0, outFemale: 0, outTotal: 0
+        },
+        "ปวช": {
+          male: 0, female: 0, total: 0, presentMale: 0, presentFemale: 0, present: 0, sick: 0, leave: 0, absent: 0,
+          inMale: 0, inFemale: 0, inTotal: 0,
+          outMale: 0, outFemale: 0, outTotal: 0
+        }
+      }
 
-order.forEach(lv => {
+      const order = ["ป.1", "ป.2", "ป.3", "ป.4", "ป.5", "ป.6", "ม.1", "ม.2", "ม.3", "ม.4", "ม.5", "ม.6", "ปวช.1", "ปวช.2", "ปวช.3"]
 
-let groupKey = ""
+      order.forEach(lv => {
 
-if(lv.startsWith("ป.")) groupKey = "ป."
-else if(lv.startsWith("ม.")) groupKey = "ม."
-else if(lv.startsWith("ปวช")) groupKey = "ปวช"
+        let groupKey = ""
 
-if(groupKey && levels[lv]){
-groupSum[groupKey].male += levels[lv].male
-groupSum[groupKey].female += levels[lv].female
-groupSum[groupKey].total += levels[lv].total
+        if (lv.startsWith("ป.")) groupKey = "ป."
+        else if (lv.startsWith("ม.")) groupKey = "ม."
+        else if (lv.startsWith("ปวช")) groupKey = "ปวช"
 
-groupSum[groupKey].presentMale += Number(levels[lv].presentMale) || 0
-groupSum[groupKey].presentFemale += Number(levels[lv].presentFemale) || 0
-groupSum[groupKey].present += Number(levels[lv].present) || 0
+        if (groupKey && levels[lv]) {
+          groupSum[groupKey].male += levels[lv].male
+          groupSum[groupKey].female += levels[lv].female
+          groupSum[groupKey].total += levels[lv].total
 
-groupSum[groupKey].sick += levels[lv].sick
-groupSum[groupKey].leave += levels[lv].leave
-groupSum[groupKey].absent += levels[lv].absent
+          groupSum[groupKey].presentMale += Number(levels[lv].presentMale) || 0
+          groupSum[groupKey].presentFemale += Number(levels[lv].presentFemale) || 0
+          groupSum[groupKey].present += Number(levels[lv].present) || 0
 
-groupSum[groupKey].inMale += levels[lv].inMale
-groupSum[groupKey].inFemale += levels[lv].inFemale
-groupSum[groupKey].inTotal += levels[lv].inTotal
+          groupSum[groupKey].sick += levels[lv].sick
+          groupSum[groupKey].leave += levels[lv].leave
+          groupSum[groupKey].absent += levels[lv].absent
 
-groupSum[groupKey].outMale += levels[lv].outMale
-groupSum[groupKey].outFemale += levels[lv].outFemale
-groupSum[groupKey].outTotal += levels[lv].outTotal
-}
+          groupSum[groupKey].inMale += levels[lv].inMale
+          groupSum[groupKey].inFemale += levels[lv].inFemale
+          groupSum[groupKey].inTotal += levels[lv].inTotal
 
-if(!levels[lv]) return;
+          groupSum[groupKey].outMale += levels[lv].outMale
+          groupSum[groupKey].outFemale += levels[lv].outFemale
+          groupSum[groupKey].outTotal += levels[lv].outTotal
+        }
 
-levels[lv].rows.sort((a,b)=>{
+        if (!levels[lv]) return;
 
-const numA = a.room.match(/\d+/g) || [0,0]
-const numB = b.room.match(/\d+/g) || [0,0]
+        levels[lv].rows.sort((a, b) => {
 
-if(!numA || !numB) return 0
+          const numA = a.room.match(/\d+/g) || [0, 0]
+          const numB = b.room.match(/\d+/g) || [0, 0]
 
-if(numA[0] != numB[0]){
+          if (!numA || !numB) return 0
 
-return Number(numA[0]) - Number(numB[0])
+          if (numA[0] != numB[0]) {
 
-}
+            return Number(numA[0]) - Number(numB[0])
 
-return (Number(numA[1]||0)) - (Number(numB[1]||0))
+          }
 
-})
+          return (Number(numA[1] || 0)) - (Number(numB[1] || 0))
 
-levels[lv].rows.forEach(r=>{
+        })
 
-html += `
+        levels[lv].rows.forEach(r => {
+
+          html += `
 <tr>
 <td>${r.room}</td>
 
@@ -821,20 +839,20 @@ html += `
 </tr>
 `
 
-})
+        })
 
-let colorClass = ""
+        let colorClass = ""
 
-if(lv.startsWith("ป.")){
-colorClass = "primary"
-}else if(lv.startsWith("ม.") || lv.startsWith("ปวช")){
-colorClass = "secondary"
-}
+        if (lv.startsWith("ป.")) {
+          colorClass = "primary"
+        } else if (lv.startsWith("ม.") || lv.startsWith("ปวช")) {
+          colorClass = "secondary"
+        }
 
-if(!(lv === "ม.4" || lv === "ม.5" || lv === "ม.6" || 
-     lv === "ปวช.1" || lv === "ปวช.2" || lv === "ปวช.3")){
+        if (!(lv === "ม.4" || lv === "ม.5" || lv === "ม.6" ||
+          lv === "ปวช.1" || lv === "ปวช.2" || lv === "ปวช.3")) {
 
-html += `
+          html += `
 <tr class="sum-row ${colorClass}">
 <td>รวม ${lv}</td>
 
@@ -859,10 +877,10 @@ html += `
 <td>${levels[lv].outTotal || 0}</td>
 </tr>
 `
-}
+        }
 
-if(lv === "ป.6"){
-html += `
+        if (lv === "ป.6") {
+          html += `
 <tr class="sum-row primary-total section-break">
 <td>รวมประถมทั้งหมด</td>
 
@@ -888,86 +906,86 @@ html += `
 </tr>
 `
 
-}
+        }
 
-if(lv === "ม.3"){
-    
-const lowerMale =
-(levels["ม.1"]?.male || 0) +
-(levels["ม.2"]?.male || 0) +
-(levels["ม.3"]?.male || 0)
+        if (lv === "ม.3") {
 
-const lowerFemale =
-(levels["ม.1"]?.female || 0) +
-(levels["ม.2"]?.female || 0) +
-(levels["ม.3"]?.female || 0)
+          const lowerMale =
+            (levels["ม.1"]?.male || 0) +
+            (levels["ม.2"]?.male || 0) +
+            (levels["ม.3"]?.male || 0)
 
-const lowerTotal =
-(levels["ม.1"]?.total || 0) +
-(levels["ม.2"]?.total || 0) +
-(levels["ม.3"]?.total || 0)
+          const lowerFemale =
+            (levels["ม.1"]?.female || 0) +
+            (levels["ม.2"]?.female || 0) +
+            (levels["ม.3"]?.female || 0)
 
-const lowerPresentMale =
-(levels["ม.1"]?.presentMale || 0) +
-(levels["ม.2"]?.presentMale || 0) +
-(levels["ม.3"]?.presentMale || 0)
+          const lowerTotal =
+            (levels["ม.1"]?.total || 0) +
+            (levels["ม.2"]?.total || 0) +
+            (levels["ม.3"]?.total || 0)
 
-const lowerPresentFemale =
-(levels["ม.1"]?.presentFemale || 0) +
-(levels["ม.2"]?.presentFemale || 0) +
-(levels["ม.3"]?.presentFemale || 0)
+          const lowerPresentMale =
+            (levels["ม.1"]?.presentMale || 0) +
+            (levels["ม.2"]?.presentMale || 0) +
+            (levels["ม.3"]?.presentMale || 0)
 
-const lowerPresent =
-(levels["ม.1"]?.present || 0) +
-(levels["ม.2"]?.present || 0) +
-(levels["ม.3"]?.present || 0)
+          const lowerPresentFemale =
+            (levels["ม.1"]?.presentFemale || 0) +
+            (levels["ม.2"]?.presentFemale || 0) +
+            (levels["ม.3"]?.presentFemale || 0)
 
-const lowerSick =
-(levels["ม.1"]?.sick || 0) +
-(levels["ม.2"]?.sick || 0) +
-(levels["ม.3"]?.sick || 0)
+          const lowerPresent =
+            (levels["ม.1"]?.present || 0) +
+            (levels["ม.2"]?.present || 0) +
+            (levels["ม.3"]?.present || 0)
 
-const lowerLeave =
-(levels["ม.1"]?.leave || 0) +
-(levels["ม.2"]?.leave || 0) +
-(levels["ม.3"]?.leave || 0)
+          const lowerSick =
+            (levels["ม.1"]?.sick || 0) +
+            (levels["ม.2"]?.sick || 0) +
+            (levels["ม.3"]?.sick || 0)
 
-const lowerAbsent =
-(levels["ม.1"]?.absent || 0) +
-(levels["ม.2"]?.absent || 0) +
-(levels["ม.3"]?.absent || 0)
+          const lowerLeave =
+            (levels["ม.1"]?.leave || 0) +
+            (levels["ม.2"]?.leave || 0) +
+            (levels["ม.3"]?.leave || 0)
 
-const lowerInMale =
-(levels["ม.1"]?.inMale || 0) +
-(levels["ม.2"]?.inMale || 0) +
-(levels["ม.3"]?.inMale || 0)
+          const lowerAbsent =
+            (levels["ม.1"]?.absent || 0) +
+            (levels["ม.2"]?.absent || 0) +
+            (levels["ม.3"]?.absent || 0)
 
-const lowerInFemale =
-(levels["ม.1"]?.inFemale || 0) +
-(levels["ม.2"]?.inFemale || 0) +
-(levels["ม.3"]?.inFemale || 0)
+          const lowerInMale =
+            (levels["ม.1"]?.inMale || 0) +
+            (levels["ม.2"]?.inMale || 0) +
+            (levels["ม.3"]?.inMale || 0)
 
-const lowerInTotal =
-(levels["ม.1"]?.inTotal || 0) +
-(levels["ม.2"]?.inTotal || 0) +
-(levels["ม.3"]?.inTotal || 0)
+          const lowerInFemale =
+            (levels["ม.1"]?.inFemale || 0) +
+            (levels["ม.2"]?.inFemale || 0) +
+            (levels["ม.3"]?.inFemale || 0)
 
-const lowerOutMale =
-(levels["ม.1"]?.outMale || 0) +
-(levels["ม.2"]?.outMale || 0) +
-(levels["ม.3"]?.outMale || 0)
+          const lowerInTotal =
+            (levels["ม.1"]?.inTotal || 0) +
+            (levels["ม.2"]?.inTotal || 0) +
+            (levels["ม.3"]?.inTotal || 0)
 
-const lowerOutFemale =
-(levels["ม.1"]?.outFemale || 0) +
-(levels["ม.2"]?.outFemale || 0) +
-(levels["ม.3"]?.outFemale || 0)
+          const lowerOutMale =
+            (levels["ม.1"]?.outMale || 0) +
+            (levels["ม.2"]?.outMale || 0) +
+            (levels["ม.3"]?.outMale || 0)
 
-const lowerOutTotal =
-(levels["ม.1"]?.outTotal || 0) +
-(levels["ม.2"]?.outTotal || 0) +
-(levels["ม.3"]?.outTotal || 0)
+          const lowerOutFemale =
+            (levels["ม.1"]?.outFemale || 0) +
+            (levels["ม.2"]?.outFemale || 0) +
+            (levels["ม.3"]?.outFemale || 0)
 
-html += `
+          const lowerOutTotal =
+            (levels["ม.1"]?.outTotal || 0) +
+            (levels["ม.2"]?.outTotal || 0) +
+            (levels["ม.3"]?.outTotal || 0)
+
+          html += `
 <tr class="sum-row secondary-total section-break">
 <td>รวมมัธยมต้น</td>
 
@@ -992,86 +1010,86 @@ html += `
 <td>${lowerOutTotal}</td>
 </tr>
 `
-}
+        }
 
-if(lv === "ม.6"){
+        if (lv === "ม.6") {
 
-const upperMale =
-(levels["ม.4"]?.male || 0) +
-(levels["ม.5"]?.male || 0) +
-(levels["ม.6"]?.male || 0)
+          const upperMale =
+            (levels["ม.4"]?.male || 0) +
+            (levels["ม.5"]?.male || 0) +
+            (levels["ม.6"]?.male || 0)
 
-const upperFemale =
-(levels["ม.4"]?.female || 0) +
-(levels["ม.5"]?.female || 0) +
-(levels["ม.6"]?.female || 0)
+          const upperFemale =
+            (levels["ม.4"]?.female || 0) +
+            (levels["ม.5"]?.female || 0) +
+            (levels["ม.6"]?.female || 0)
 
-const upperTotal =
-(levels["ม.4"]?.total || 0) +
-(levels["ม.5"]?.total || 0) +
-(levels["ม.6"]?.total || 0)
+          const upperTotal =
+            (levels["ม.4"]?.total || 0) +
+            (levels["ม.5"]?.total || 0) +
+            (levels["ม.6"]?.total || 0)
 
-const upperPresentMale =
-(levels["ม.4"]?.presentMale || 0) +
-(levels["ม.5"]?.presentMale || 0) +
-(levels["ม.6"]?.presentMale || 0)
+          const upperPresentMale =
+            (levels["ม.4"]?.presentMale || 0) +
+            (levels["ม.5"]?.presentMale || 0) +
+            (levels["ม.6"]?.presentMale || 0)
 
-const upperPresentFemale =
-(levels["ม.4"]?.presentFemale || 0) +
-(levels["ม.5"]?.presentFemale || 0) +
-(levels["ม.6"]?.presentFemale || 0)
+          const upperPresentFemale =
+            (levels["ม.4"]?.presentFemale || 0) +
+            (levels["ม.5"]?.presentFemale || 0) +
+            (levels["ม.6"]?.presentFemale || 0)
 
-const upperPresent =
-(levels["ม.4"]?.present || 0) +
-(levels["ม.5"]?.present || 0) +
-(levels["ม.6"]?.present || 0)
+          const upperPresent =
+            (levels["ม.4"]?.present || 0) +
+            (levels["ม.5"]?.present || 0) +
+            (levels["ม.6"]?.present || 0)
 
-const upperSick =
-(levels["ม.4"]?.sick || 0) +
-(levels["ม.5"]?.sick || 0) +
-(levels["ม.6"]?.sick || 0)
+          const upperSick =
+            (levels["ม.4"]?.sick || 0) +
+            (levels["ม.5"]?.sick || 0) +
+            (levels["ม.6"]?.sick || 0)
 
-const upperLeave =
-(levels["ม.4"]?.leave || 0) +
-(levels["ม.5"]?.leave || 0) +
-(levels["ม.6"]?.leave || 0)
+          const upperLeave =
+            (levels["ม.4"]?.leave || 0) +
+            (levels["ม.5"]?.leave || 0) +
+            (levels["ม.6"]?.leave || 0)
 
-const upperAbsent =
-(levels["ม.4"]?.absent || 0) +
-(levels["ม.5"]?.absent || 0) +
-(levels["ม.6"]?.absent || 0)
+          const upperAbsent =
+            (levels["ม.4"]?.absent || 0) +
+            (levels["ม.5"]?.absent || 0) +
+            (levels["ม.6"]?.absent || 0)
 
-const upperInMale =
-(levels["ม.4"]?.inMale || 0) +
-(levels["ม.5"]?.inMale || 0) +
-(levels["ม.6"]?.inMale || 0)
+          const upperInMale =
+            (levels["ม.4"]?.inMale || 0) +
+            (levels["ม.5"]?.inMale || 0) +
+            (levels["ม.6"]?.inMale || 0)
 
-const upperInFemale =
-(levels["ม.4"]?.inFemale || 0) +
-(levels["ม.5"]?.inFemale || 0) +
-(levels["ม.6"]?.inFemale || 0)
+          const upperInFemale =
+            (levels["ม.4"]?.inFemale || 0) +
+            (levels["ม.5"]?.inFemale || 0) +
+            (levels["ม.6"]?.inFemale || 0)
 
-const upperInTotal =
-(levels["ม.4"]?.inTotal || 0) +
-(levels["ม.5"]?.inTotal || 0) +
-(levels["ม.6"]?.inTotal || 0)
+          const upperInTotal =
+            (levels["ม.4"]?.inTotal || 0) +
+            (levels["ม.5"]?.inTotal || 0) +
+            (levels["ม.6"]?.inTotal || 0)
 
-const upperOutMale =
-(levels["ม.4"]?.outMale || 0) +
-(levels["ม.5"]?.outMale || 0) +
-(levels["ม.6"]?.outMale || 0)
+          const upperOutMale =
+            (levels["ม.4"]?.outMale || 0) +
+            (levels["ม.5"]?.outMale || 0) +
+            (levels["ม.6"]?.outMale || 0)
 
-const upperOutFemale =
-(levels["ม.4"]?.outFemale || 0) +
-(levels["ม.5"]?.outFemale || 0) +
-(levels["ม.6"]?.outFemale || 0)
+          const upperOutFemale =
+            (levels["ม.4"]?.outFemale || 0) +
+            (levels["ม.5"]?.outFemale || 0) +
+            (levels["ม.6"]?.outFemale || 0)
 
-const upperOutTotal =
-(levels["ม.4"]?.outTotal || 0) +
-(levels["ม.5"]?.outTotal || 0) +
-(levels["ม.6"]?.outTotal || 0)
+          const upperOutTotal =
+            (levels["ม.4"]?.outTotal || 0) +
+            (levels["ม.5"]?.outTotal || 0) +
+            (levels["ม.6"]?.outTotal || 0)
 
-html += `
+          html += `
 <tr class="sum-row secondary-total section-break">
 <td>รวมมัธยมปลาย</td>
 
@@ -1097,7 +1115,7 @@ html += `
 </tr>
 `
 
-html += `
+          html += `
 <tr class="sum-row primary-total section-break">
 <td>รวมมัธยมต้นและมัธยมปลาย</td>
 
@@ -1122,11 +1140,11 @@ html += `
 <td>${groupSum["ม."].outTotal}</td>
 </tr>
 `
-}
+        }
 
-if(lv === "ปวช.3"){
+        if (lv === "ปวช.3") {
 
-html += `
+          html += `
 <tr class="sum-row secondary section-break">
 <td>รวม ปวช ทั้งหมด</td>
 
@@ -1152,11 +1170,11 @@ html += `
 </tr>
 `
 
-}
+        }
 
-})
+      })
 
-html += `
+      html += `
 <tr class="sum-row total-all">
 <td>รวมนักเรียนทั้งหมด</td>
 
@@ -1182,13 +1200,13 @@ html += `
 </tr>
 `
 
-document.getElementById("dataBody").innerHTML = html;
+      document.getElementById("dataBody").innerHTML = html;
 
-const percent = totalAll ? ((totalPresent/totalAll)*100).toFixed(2) : 0
-const malePercent = totalMale ? ((totalPresentMale/totalMale)*100).toFixed(2) : 0
-const femalePercent = totalFemale ? ((totalPresentFemale/totalFemale)*100).toFixed(2) : 0
+      const percent = totalAll ? ((totalPresent / totalAll) * 100).toFixed(2) : 0
+      const malePercent = totalMale ? ((totalPresentMale / totalMale) * 100).toFixed(2) : 0
+      const femalePercent = totalFemale ? ((totalPresentFemale / totalFemale) * 100).toFixed(2) : 0
 
-document.getElementById("summary").innerHTML = `
+      document.getElementById("summary").innerHTML = `
 จำนวนนักเรียนทั้งหมด&nbsp;&nbsp;&nbsp;${totalAll}&nbsp;&nbsp;&nbsp;คน
 &nbsp;&nbsp;&nbsp;&nbsp;ชาย&nbsp;&nbsp;&nbsp;${totalMale}&nbsp;&nbsp;&nbsp;คน
 &nbsp;&nbsp;&nbsp;&nbsp;หญิง&nbsp;&nbsp;&nbsp;${totalFemale}&nbsp;&nbsp;&nbsp;คน
@@ -1203,84 +1221,85 @@ document.getElementById("summary").innerHTML = `
 นักเรียนมาเรียนวันนี้&nbsp;&nbsp;คิดเป็นร้อยละ&nbsp;&nbsp;${percent}
 `
 
-document.getElementById("loading").style.display = "none"
+      document.getElementById("loading").style.display = "none"
 
-isLoaded = true
+      isLoaded = true
 
-}
+    }
 
-function getLevel(room){
+    function getLevel(room) {
 
-if(!room) return "อื่นๆ"
+      if (!room) return "อื่นๆ"
 
-room = room.trim()
+      room = room.trim()
 
-let match = room.match(/ป\.?\s*(\d+)/)
-if(match) return "ป." + match[1]
+      let match = room.match(/ป\.?\s*(\d+)/)
+      if (match) return "ป." + match[1]
 
-if(room.includes("ประถม")){
-match = room.match(/\d+/)
-if(match) return "ป." + match[0]
-}
+      if (room.includes("ประถม")) {
+        match = room.match(/\d+/)
+        if (match) return "ป." + match[0]
+      }
 
-match = room.match(/ม\.?\s*(\d+)/)
-if(match) return "ม." + match[1]
+      match = room.match(/ม\.?\s*(\d+)/)
+      if (match) return "ม." + match[1]
 
-if(room.includes("มัธยม")){
-match = room.match(/\d+/)
-if(match) return "ม." + match[0]
-}
+      if (room.includes("มัธยม")) {
+        match = room.match(/\d+/)
+        if (match) return "ม." + match[0]
+      }
 
-match = room.match(/ปวช\.?\s*(\d+)/)
-if(match) return "ปวช." + match[1]
+      match = room.match(/ปวช\.?\s*(\d+)/)
+      if (match) return "ปวช." + match[1]
 
-if(room.includes("ชั้นประกาศนียบัตรวิชาชีพ")){
-match = room.match(/\d+/)
-if(match) return "ปวช." + match[0]
-}
+      if (room.includes("ชั้นประกาศนียบัตรวิชาชีพ")) {
+        match = room.match(/\d+/)
+        if (match) return "ปวช." + match[0]
+      }
 
-return "อื่นๆ"
+      return "อื่นๆ"
 
-}
+    }
 
-async function loadSignatureToReport(){
+    async function loadSignatureToReport() {
 
-try{
+      try {
 
-const res = await fetch(API + "?mode=getsigconfig")
-let data = {}
+        const res = await fetch(API + "?mode=getsigconfig")
+        let data = {}
 
-try{
-data = await res.json()
-}catch(e){
-data = {}
-}
+        try {
+          data = await res.json()
+        } catch (e) {
+          data = {}
+        }
 
-const day = new Date(date).getDay()
+        const day = new Date(date).getDay()
 
-let teacher = ""
+        let teacher = ""
 
-if(day === 1) teacher = data.mon
-if(day === 2) teacher = data.tue
-if(day === 3) teacher = data.wed
-if(day === 4) teacher = data.thu
-if(day === 5) teacher = data.fri
+        if (day === 1) teacher = data.mon
+        if (day === 2) teacher = data.tue
+        if (day === 3) teacher = data.wed
+        if (day === 4) teacher = data.thu
+        if (day === 5) teacher = data.fri
 
-document.getElementById("teacherName").innerText = `(${teacher || "-"})`
-document.getElementById("assistantName").innerText = `(${data.assistant || "-"})`
-document.getElementById("deputyName").innerText = `(${data.deputy || "-"})`
-document.getElementById("directorName").innerText = `(${data.director || "-"})`
+        document.getElementById("teacherName").innerText = `(${teacher || "-"})`
+        document.getElementById("assistantName").innerText = `(${data.assistant || "-"})`
+        document.getElementById("deputyName").innerText = `(${data.deputy || "-"})`
+        document.getElementById("directorName").innerText = `(${data.director || "-"})`
 
-}catch(e){
+      } catch (e) {
 
-console.log("โหลดลายเซ็นไม่สำเร็จ")
+        console.log("โหลดลายเซ็นไม่สำเร็จ")
 
-}
+      }
 
-}
+    }
 
-loadReport()
-loadSignatureToReport()
-</script>
+    loadReport()
+    loadSignatureToReport()
+  </script>
 </body>
+
 </html>
