@@ -1226,11 +1226,18 @@ function updateTerm(e) {
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID)
   let sheet = ss.getSheetByName("settings")
   if (!sheet) sheet = ss.insertSheet("settings")
+  const previous = sheet.getRange("B1:B2").getValues().flat().map(v => String(v).trim());
   sheet.getRange("A1").setValue("term")
   sheet.getRange("B1").setValue(term)
   sheet.getRange("A2").setValue("year")
   sheet.getRange("B2").setValue(year)
 
+  if (previous[0] !== String(term).trim() || previous[1] !== String(year).trim()) {
+    PropertiesService.getScriptProperties().setProperty("BURAPA_NOTIFY_TERM_STATE", JSON.stringify({
+      termKey: JSON.stringify([String(year).trim(), String(term).trim()]), firstDate: "", skipDate: ""
+    }));
+    PropertiesService.getScriptProperties().deleteProperty("BURAPA_NOTIFY_DELIVERY");
+  }
   return { status: "success" }
 }
 
@@ -1397,112 +1404,94 @@ function updateSignatureConfig(e) {
 }
 
 function notifyMissingRooms() {
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(5000)) return;
+  try { notifyMissingRoomsForTerm_(); }
+  finally { lock.releaseLock(); }
+}
 
-  const day = Number(
-    Utilities.formatDate(new Date(), "Asia/Bangkok", "u")
-  );
-
-  if (day !== 1 && day !== 4) {
-    return;
-  }
-
-  const token = PropertiesService.getScriptProperties().getProperty("LINE_TOKEN")
-
+function notifyMissingRoomsForTerm_() {
+  const props = PropertiesService.getScriptProperties();
+  const now = new Date();
+  const today = Utilities.formatDate(now, "Asia/Bangkok", "yyyy-MM-dd");
+  const day = Number(Utilities.formatDate(now, "Asia/Bangkok", "u"));
+  const regular = day === 1 || day === 4;
+  const term = getTerm();
+  const termKey = JSON.stringify([String(term.year).trim(), String(term.term).trim()]);
+  let state;
+  try { state = JSON.parse(props.getProperty("BURAPA_NOTIFY_TERM_STATE") || "null"); } catch (_) { }
+  if (!state || state.termKey !== termKey) state = { termKey, firstDate: "", skipDate: "" };
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const classSheet = ss.getSheetByName("classrooms");
+  const recordSheet = ss.getSheetByName("record_stu");
+  const classCount = Math.max(0, classSheet.getLastRow() - 1);
+  const classrooms = classCount ? [...new Set(classSheet.getRange(2, 1, classCount, 1).getValues().flat().map(String).map(s => s.trim()).filter(Boolean))] : [];
+  const validRooms = new Set(classrooms);
+  const count = Math.max(0, recordSheet.getLastRow() - 1);
+  const records = count ? recordSheet.getRange(2, 1, count, 13).getValues() : [];
+  const submitted = new Set();
+  let earliest = "";
+  records.forEach(row => {
+    const room = String(row[1] || "").trim();
+    if (!validRooms.has(room) || /autofill/i.test(String(row[12] || ""))) return;
+    const dateValue = new Date(row[0]);
+    if (isNaN(dateValue.getTime())) return;
+    const date = Utilities.formatDate(dateValue, "Asia/Bangkok", "yyyy-MM-dd");
+    if (date > today) return;
+    if (!earliest || date < earliest) earliest = date;
+    if (date === today) submitted.add(room);
+  });
+  if (!state.firstDate && earliest) state.firstDate = earliest;
+  props.setProperty("BURAPA_NOTIFY_TERM_STATE", JSON.stringify(state));
+  if (!submitted.size || state.skipDate === today) return;
+  const firstDay = state.firstDate === today;
+  if (!regular && !firstDay) return;
+  const missing = classrooms.filter(room => !submitted.has(room));
+  if (!missing.length) return;
+  const token = props.getProperty("LINE_TOKEN");
+  if (!token) throw Error("ไม่พบ LINE_TOKEN");
   const groupIds = [
     "Cc1aa912c44ae1bd927d50063da026cec" //กลุ่มสถิตินักเรียน
   ];
 
-  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
 
-  const classSheet = ss.getSheetByName("classrooms");
-  const recordSheet = ss.getSheetByName("record_stu");
-
-  const today = Utilities.formatDate(
-    new Date(),
-    "Asia/Bangkok",
-    "yyyy-MM-dd"
-  );
-
-  const classrooms = classSheet
-    .getRange(2, 1, classSheet.getLastRow() - 1, 1)
-    .getValues()
-    .flat();
-
-  const records = recordSheet
-    .getRange(2, 1, recordSheet.getLastRow() - 1, 13)
-    .getValues();
-
-  let submitted = new Set();
-
-  records.forEach(r => {
-    const rowDate = Utilities.formatDate(
-      new Date(r[0]),
-      "Asia/Bangkok",
-      "yyyy-MM-dd"
-    );
-
-    if (rowDate === today) {
-      submitted.add(r[1]);
+  let text = "📢 แจ้งเตือนอัตโนมัติจากระบบ\n";
+  text += `ยังไม่กรอกสถิติวันนี้จำนวน ${missing.length} ห้อง\n\nห้องที่เหลือได้แก่:\n`;
+  text += missing.map(room => "- " + room + "\n").join("");
+  text += "\nกรุณากรอกข้อมูลภายใน 16:00 น.";
+  text += "\n\n📌 ลิ้งค์เข้าใช้งานระบบ:\nhttps://burapaubon.github.io/burapa-student-system";
+  let delivery;
+  try { delivery = JSON.parse(props.getProperty("BURAPA_NOTIFY_DELIVERY") || "null"); } catch (_) { }
+  if (!delivery || delivery.termKey !== termKey || delivery.date !== today)
+    delivery = { termKey, date: today, groups: {} };
+  groupIds.forEach(groupId => {
+    let item = delivery.groups[groupId];
+    if (item && item.sent) return;
+    if (!item) {
+      item = delivery.groups[groupId] = { retryKey: Utilities.getUuid(), sent: false };
+      props.setProperty("BURAPA_NOTIFY_DELIVERY", JSON.stringify(delivery));
     }
+    const response = UrlFetchApp.fetch("https://api.line.me/v2/bot/message/push", {
+      method: "post", muteHttpExceptions: true,
+      headers: { "Content-Type": "application/json", Authorization: "Bearer " + token, "X-Line-Retry-Key": item.retryKey },
+      payload: JSON.stringify({ to: groupId, messages: [{ type: "text", text }] })
+    });
+    const code = response.getResponseCode();
+    const headers = response.getAllHeaders();
+    const acceptedRetry = code === 409 && Object.keys(headers).some(key => key.toLowerCase() === "x-line-accepted-request-id");
+    if ((code < 200 || code >= 300) && !acceptedRetry) throw Error("LINE แจ้งเตือนไม่สำเร็จ HTTP " + code);
+    item.sent = true;
+    props.setProperty("BURAPA_NOTIFY_DELIVERY", JSON.stringify(delivery));
   });
-
-  const missing = classrooms.filter(r => !submitted.has(r));
-
-  if (submitted.size === 0) {
-    return;
+  if (firstDay && !regular && !state.skipDate) {
+    const next = new Date(today + "T12:00:00+07:00");
+    do { next.setTime(next.getTime() + 86400000); }
+    while (![1, 4].includes(Number(Utilities.formatDate(next, "Asia/Bangkok", "u"))));
+    state.skipDate = Utilities.formatDate(next, "Asia/Bangkok", "yyyy-MM-dd");
+    props.setProperty("BURAPA_NOTIFY_TERM_STATE", JSON.stringify(state));
   }
-
-  if (missing.length > 0) {
-
-    let text = "📢 แจ้งเตือนอัตโนมัติจากระบบ\n";
-    text += `ยังไม่กรอกสถิติวันนี้จำนวน ${missing.length} ห้อง\n\n`;
-    text += "ห้องที่เหลือได้แก่:\n";
-
-    missing.forEach(r => {
-      text += "- " + r + "\n";
-    });
-
-    const formUrl = "https://burapaubon.github.io/burapa-student-system";
-
-    text += "\nกรุณากรอกข้อมูลภายใน 16:00 น.";
-    text += "\n\n📌 ลิ้งค์เข้าใช้งานระบบ:\n" + formUrl;
-
-    groupIds.forEach(groupId => {
-      UrlFetchApp.fetch(
-        "https://api.line.me/v2/bot/message/push",
-        {
-          method: "post",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + token
-          },
-          payload: JSON.stringify({
-            to: groupId,
-            messages: [
-              {
-                type: "text",
-                text: text
-              }
-            ]
-          })
-        });
-    });
-
-    PropertiesService
-      .getScriptProperties()
-      .setProperty(
-        "lastNotifyMissingRoom",
-        new Date().toISOString()
-      );
-
-    PropertiesService
-      .getScriptProperties()
-      .setProperty(
-        "lastNotifyMissingRoomText",
-        text
-      );
-  }
-
+  props.setProperty("lastNotifyMissingRoom", now.toISOString());
+  props.setProperty("lastNotifyMissingRoomText", text);
 }
 
 function notifyAdminAction(actionText) {
@@ -1511,7 +1500,7 @@ function notifyAdminAction(actionText) {
   const adminGroupId = "C9b24e53878a976cd18f72fa675a4d4f3";  //กลุ่มแอดมิน 
 
   const message =
-    "⚙️ To ADM‼️\n\n" +
+    "⚙️ Notify ADMIN‼️\n\n" +
     actionText;
 
   UrlFetchApp.fetch(
