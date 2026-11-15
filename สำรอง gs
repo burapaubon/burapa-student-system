@@ -1296,6 +1296,8 @@ function getReport(e) {
       male: 0, female: 0, total: 0,
       prev_male: Number((previous.get(c) || {}).all_boys) || 0,
       prev_female: Number((previous.get(c) || {}).all_girls) || 0,
+      hasStudentData: previous.has(c),
+      hasTodayRecord: false,
       present_m: 0, present_f: 0, present: 0,
       sick: 0, leave: 0, absent: 0,
       _time: 0
@@ -1334,6 +1336,8 @@ function getReport(e) {
 
     if (time < map[room]._time) return
     map[room]._time = time
+    map[room].hasStudentData = true
+    map[room].hasTodayRecord = true
 
     map[room].male = Number(r[2]) || 0
     map[room].female = Number(r[3]) || 0

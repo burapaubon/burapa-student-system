@@ -1,0 +1,139 @@
+.bp-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, .48);
+    z-index: 2147483000;
+    display: grid;
+    place-items: center;
+    padding: 18px;
+    backdrop-filter: blur(3px)
+}
+
+.bp-dialog {
+    background: #fff;
+    color: #1e293b;
+    border-radius: 20px;
+    max-width: 440px;
+    width: 100%;
+    box-shadow: 0 24px 75px #0f172a40;
+    padding: 25px;
+    font-family: inherit;
+    animation: bp-enter .18s ease-out
+}
+
+.bp-dialog h2 {
+    font-size: 1.15rem;
+    margin: 0 0 12px;
+    font-weight: 750
+}
+
+.bp-dialog p {
+    margin: 0 0 20px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere
+}
+
+.bp-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap
+}
+
+.bp-btn {
+    border: 0;
+    border-radius: 11px;
+    padding: 11px 17px;
+    font: inherit;
+    cursor: pointer;
+    background: #e2e8f0;
+    color: #334155
+}
+
+.bp-btn-primary {
+    background: #be123c;
+    color: white
+}
+
+.bp-btn:focus-visible,
+.bp-input:focus-visible {
+    outline: 3px solid #fb7185;
+    outline-offset: 2px
+}
+
+.bp-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    font: inherit;
+    margin: 0 0 18px
+}
+
+.bp-toast-stack {
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    z-index: 2147483001;
+    display: grid;
+    gap: 10px;
+    max-width: min(400px, calc(100vw - 36px))
+}
+
+.bp-toast {
+    background: #fff;
+    border-left: 4px solid #2563eb;
+    color: #1e293b;
+    padding: 14px 16px;
+    border-radius: 12px;
+    box-shadow: 0 8px 28px #0f172a30;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    line-height: 1.5;
+    overflow-wrap: anywhere
+}
+
+.bp-toast.error {
+    border-left-color: #dc2626
+}
+
+.bp-toast button {
+    background: none;
+    border: 0;
+    cursor: pointer;
+    font-size: 20px;
+    margin-left: auto;
+    color: inherit
+}
+
+@keyframes bp-enter {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(.98)
+    }
+
+    to {
+        opacity: 1;
+        transform: none
+    }
+}
+
+@media(prefers-reduced-motion:reduce) {
+    .bp-dialog {
+        animation: none
+    }
+}
+
+@media(max-width:520px) {
+    .bp-toast-stack {
+        left: 18px;
+        right: 18px
+    }
+
+    .bp-dialog {
+        padding: 20px
+    }
+}

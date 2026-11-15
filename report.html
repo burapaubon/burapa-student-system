@@ -290,6 +290,8 @@
 
     }
   </style>
+  <link rel="stylesheet" href="burapa-notices.css">
+  <script defer src="burapa-notices.js"></script>
 </head>
 
 <body>
@@ -572,7 +574,7 @@ z-index:9999;
 
       } catch (e) {
 
-        alert("❌ โหลดข้อมูลไม่สำเร็จ กรุณาลองใหม่อีกครั้ง")
+        BurapaNotice.toast("❌ โหลดข้อมูลไม่สำเร็จ กรุณาลองใหม่อีกครั้ง")
 
         document.getElementById("loading").style.display = "none"
 
@@ -686,7 +688,7 @@ z-index:9999;
           }
         }
 
-        const hasTodayInput = r.present_m !== undefined && r.present_f !== undefined
+        const hasTodayInput = r.hasTodayRecord === true || (r.hasTodayRecord == null && r.present_m !== undefined && r.present_f !== undefined)
 
         const presentMaleVal = hasTodayInput ? Number(r.present_m) || 0 : 0
         const presentFemaleVal = hasTodayInput ? Number(r.present_f) || 0 : 0
@@ -713,6 +715,7 @@ z-index:9999;
 
         levels[level].rows.push({
           room: r.room,
+          hasStudentData: r.hasStudentData === true || (r.hasStudentData == null && (total > 0 || hasTodayInput)),
           total,
           male: currMale,
           female: currFemale,
@@ -812,6 +815,11 @@ z-index:9999;
         })
 
         levels[lv].rows.forEach(r => {
+
+          if (!r.hasStudentData) {
+            html += `<tr><td>${r.room}</td>${"<td></td>".repeat(15)}</tr>`;
+            return;
+          }
 
           html += `
 <tr>

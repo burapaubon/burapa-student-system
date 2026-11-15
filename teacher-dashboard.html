@@ -618,6 +618,8 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="burapa-notices.css">
+    <script defer src="burapa-notices.js"></script>
 </head>
 
 <body>
@@ -1146,7 +1148,7 @@ font-weight:600;
 <div>
 ${escapeHTML(r.room)}
 <br>
-<small style="color:#888">มีนักเรียนทั้งหมด ${r.total || 0} คน</small>
+<small style="color:#888">${r.lastUpdateDate ? `มีนักเรียนทั้งหมด ${r.total ?? 0} คน` : "ยังไม่มีข้อมูลในระบบ"}</small>
 </div>
 
 ${status}
@@ -1225,7 +1227,7 @@ this.dataset.clicked=1; this.disabled = true; location.href='form.html?room=${en
 
             if (!date) {
 
-                alert("กรุณาเลือกวันที่")
+                BurapaNotice.toast("กรุณาเลือกวันที่")
 
                 return
 

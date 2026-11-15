@@ -285,6 +285,8 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="burapa-notices.css">
+    <script defer src="burapa-notices.js"></script>
 </head>
 
 <body>
@@ -372,7 +374,7 @@ color:#888;
             const p = document.getElementById("pass").value.trim()
 
             if (!u || !p) {
-                alert("กรุณากรอก Username และ Password")
+                BurapaNotice.toast("กรุณากรอก Username และ Password")
                 btn.disabled = false
                 btnText.innerHTML = "เข้าสู่ระบบ"
                 return
@@ -417,7 +419,7 @@ color:#888;
 
                 } else {
 
-                    alert("Username หรือ Password ไม่ถูกต้อง")
+                    BurapaNotice.toast("Username หรือ Password ไม่ถูกต้อง")
 
                     document.getElementById("pass").value = ""
 
@@ -429,11 +431,11 @@ color:#888;
             } catch (err) {
 
                 if (err.name === "AbortError") {
-                    alert("เซิร์ฟเวอร์ตอบสนองช้า กรุณาลองใหม่")
+                    BurapaNotice.toast("เซิร์ฟเวอร์ตอบสนองช้า กรุณาลองใหม่")
                 } else if (!navigator.onLine) {
-                    alert("อินเทอร์เน็ตไม่เสถียร")
+                    BurapaNotice.toast("อินเทอร์เน็ตไม่เสถียร")
                 } else {
-                    alert("เซิร์ฟเวอร์ไม่ตอบสนอง กรุณาลองใหม่")
+                    BurapaNotice.toast("เซิร์ฟเวอร์ไม่ตอบสนอง กรุณาลองใหม่")
                 }
 
                 btn.disabled = false
@@ -545,7 +547,7 @@ color:#888;
 
                     if (diff > 3600000) {
                         sessionStorage.clear()
-                        alert("Session หมดอายุ กรุณาเข้าสู่ระบบใหม่")
+                        BurapaNotice.toast("Session หมดอายุ กรุณาเข้าสู่ระบบใหม่")
                         location.href = "admin-login.html"
                     }
                 }

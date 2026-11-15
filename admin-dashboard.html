@@ -910,6 +910,8 @@
       padding-right: 6px;
     }
   </style>
+  <link rel="stylesheet" href="burapa-notices.css">
+  <script defer src="burapa-notices.js"></script>
 </head>
 
 <body>
@@ -1185,7 +1187,7 @@ font-weight:600;
     const token = sessionStorage.getItem("adminToken")
 
     if (!token) {
-      alert("กรุณาเข้าสู่ระบบก่อน")
+      BurapaNotice.toast("กรุณาเข้าสู่ระบบก่อน")
       location.replace("admin-login.html")
     }
 
@@ -1227,9 +1229,9 @@ font-weight:600;
       }, 2500);
     }
 
-    function logout() {
+    async function logout() {
 
-      if (!confirm("ⓘ คุณต้องการออกจากระบบหรือไม่")) return
+      if (!await BurapaNotice.confirm("ⓘ คุณต้องการออกจากระบบหรือไม่")) return
 
       sessionStorage.removeItem("adminToken")
       sessionStorage.removeItem("loginTime")
@@ -1725,7 +1727,7 @@ font-weight:600;
 ${escapeHTML(r.room)}
 <br>
 <small style="color:#888">
-มีนักเรียนทั้งหมด ${r.total || 0} คน
+${r.lastUpdateDate ? `มีนักเรียนทั้งหมด ${r.total ?? 0} คน` : "ยังไม่มีข้อมูลในระบบ"}
 </small>
 </div>
 
@@ -1781,7 +1783,7 @@ data-room="${escapeHTML(r.room)}" class="btn-edit">
 
       oldRoom = decodeURIComponent(oldRoom)
 
-      let newName = prompt("แก้ไขชื่อห้อง", oldRoom)
+      let newName = await BurapaNotice.prompt("แก้ไขชื่อห้อง", oldRoom)
 
       if (!newName || newName.trim() === "" || newName === oldRoom) return
 
@@ -1823,7 +1825,7 @@ data-room="${escapeHTML(r.room)}" class="btn-edit">
 
       room = decodeURIComponent(room)
 
-      if (!confirm("⚠ ต้องการลบ " + room + " ใช่หรือไม่?")) return
+      if (!await BurapaNotice.confirm("⚠ ต้องการลบ " + room + " ใช่หรือไม่?")) return
 
       try {
 
@@ -2287,7 +2289,7 @@ data-room="${escapeHTML(r.room)}" class="btn-edit">
         btn.classList.remove("btn-sub")
         btn.classList.add("btn-main")
 
-        alert("🛠️ โหมดจัดลำดับ : ทำการเลื่อนเพื่อย้ายลำดับห้อง จากนั้นกดเสร็จสิ้นการจัดลำดับ")
+        BurapaNotice.toast("🛠️ โหมดจัดลำดับ : ทำการเลื่อนเพื่อย้ายลำดับห้อง จากนั้นกดเสร็จสิ้นการจัดลำดับ")
 
       } else {
 
@@ -2312,7 +2314,7 @@ data-room="${escapeHTML(r.room)}" class="btn-edit">
 
       if (loadingNow) return
 
-      let name = prompt("📍 พิมพ์ชื่อห้อง เช่น ชั้นประถมศึกษาปีที่ 1 , ชั้นมัธยมศึกษาปีที่ 1/2")
+      let name = await BurapaNotice.prompt("📍 พิมพ์ชื่อห้อง เช่น ชั้นประถมศึกษาปีที่ 1 , ชั้นมัธยมศึกษาปีที่ 1/2")
 
       if (!name || !name.trim()) return;
 
@@ -2406,7 +2408,7 @@ data-room="${escapeHTML(r.room)}" class="btn-edit">
 
       room = decodeURIComponent(room)
 
-      if (!confirm("⚠ คุณต้องการรีเซ็ตสถิติวันนี้ของ " + room + " ใช่ไหม?")) return
+      if (!await BurapaNotice.confirm("⚠ คุณต้องการรีเซ็ตสถิติวันนี้ของ " + room + " ใช่ไหม?")) return
 
       if (loadingNow) return
       loadingNow = true
@@ -2452,7 +2454,7 @@ data-room="${escapeHTML(r.room)}" class="btn-edit">
       const btn = e.currentTarget
       if (btn.disabled) return
 
-      if (!confirm("⚠ คุณต้องการรีเซ็ตสถิติทุกห้องในวันนี้ใช่ไหม?")) return
+      if (!await BurapaNotice.confirm("⚠ คุณต้องการรีเซ็ตสถิติทุกห้องในวันนี้ใช่ไหม?")) return
 
       btn.disabled = true
       btn.innerText = "กำลังรีเซ็ต..."
@@ -2504,7 +2506,7 @@ data-room="${escapeHTML(r.room)}" class="btn-edit">
 
       }
 
-      if (!confirm("⚠ รีเซ็ตข้อมูลช่วง " + start + " ถึง " + end + " ใช่หรือไม่")) return
+      if (!await BurapaNotice.confirm("⚠ รีเซ็ตข้อมูลช่วง " + start + " ถึง " + end + " ใช่หรือไม่")) return
 
       if (new Date(start) > new Date(end)) {
 
@@ -2548,7 +2550,7 @@ data-room="${escapeHTML(r.room)}" class="btn-edit">
 
       const btn = e.currentTarget
 
-      if (!confirm("ต้องการ Autofill ห้องที่ยังไม่กรอกสถิติวันนี้ใช่หรือไม่")) {
+      if (!await BurapaNotice.confirm("ต้องการ Autofill ห้องที่ยังไม่กรอกสถิติวันนี้ใช่หรือไม่")) {
         return
       }
 
@@ -2607,7 +2609,7 @@ data-room="${escapeHTML(r.room)}" class="btn-edit">
 
       const btn = e.currentTarget
 
-      if (!confirm("📦 ต้องการสำรองข้อมูลสถิติในระบบใช่หรือไม่")) return
+      if (!await BurapaNotice.confirm("📦 ต้องการสำรองข้อมูลสถิติในระบบใช่หรือไม่")) return
 
       btn.disabled = true
       btn.innerText = "กำลังสำรองข้อมูล..."
@@ -2665,14 +2667,14 @@ data-room="${escapeHTML(r.room)}" class="btn-edit">
 
       if (loadingNow) return
 
-      if (!confirm("⚠ คุณต้องการล้างข้อมูลสถิติในระบบทั้งหมดใช่หรือไม่")) return
-      if (!confirm("❗ ข้อมูลสถิติจะหายทั้งหมด ยืนยันอีกครั้ง")) return
+      if (!await BurapaNotice.confirm("⚠ คุณต้องการล้างข้อมูลสถิติในระบบทั้งหมดใช่หรือไม่")) return
+      if (!await BurapaNotice.confirm("❗ ข้อมูลสถิติจะหายทั้งหมด ยืนยันอีกครั้ง")) return
 
-      let confirmText = prompt("พิมพ์ 'RESET' เพื่อยืนยัน")
+      let confirmText = await BurapaNotice.prompt("พิมพ์ 'RESET' เพื่อยืนยัน")
 
       if (confirmText !== "RESET") {
 
-        alert("❌ ล้างข้อมูลไม่สำเร็จ")
+        BurapaNotice.toast("❌ ล้างข้อมูลไม่สำเร็จ")
 
         return
 
