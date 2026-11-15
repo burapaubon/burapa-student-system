@@ -464,7 +464,7 @@ z-index:9999;
     document.getElementById("loading").innerText = "⏳ กำลังโหลดข้อมูล..."
 
     function show(v) {
-      return (v === 0 || v === "0") ? "" : v
+      return v == null ? "" : v
     }
 
     async function fetchWithFallback(dateStr) {
@@ -622,8 +622,8 @@ z-index:9999;
         const prevMale = Number(prevData.all_boys) || 0
         const prevFemale = Number(prevData.all_girls) || 0
 
-        let currMale = Number(r.male) || prevMale
-        let currFemale = Number(r.female) || prevFemale
+        let currMale = r.hasTodayRecord === true ? (Number(r.male) || 0) : prevMale
+        let currFemale = r.hasTodayRecord === true ? (Number(r.female) || 0) : prevFemale
 
         const hasPresentData = r.present_m !== undefined && r.present_f !== undefined
 
@@ -817,7 +817,7 @@ z-index:9999;
         levels[lv].rows.forEach(r => {
 
           if (!r.hasStudentData) {
-            html += `<tr><td>${r.room}</td>${"<td></td>".repeat(15)}</tr>`;
+            html += `<tr><td>${r.room}</td><td></td><td></td><td>0</td><td></td><td></td><td>0</td><td></td><td></td><td></td><td></td><td></td><td>0</td><td></td><td></td><td>0</td></tr>`;
             return;
           }
 
@@ -833,16 +833,16 @@ z-index:9999;
 <td>${r.hasTodayInput ? r.presentFemale : ""}</td>
 <td>${r.present}</td>
 
-<td>${show(r.sick)}</td>
-<td>${show(r.leave)}</td>
-<td>${show(r.absent)}</td>
+<td>${r.hasTodayInput ? show(r.sick) : ""}</td>
+<td>${r.hasTodayInput ? show(r.leave) : ""}</td>
+<td>${r.hasTodayInput ? show(r.absent) : ""}</td>
 
-<td>${show(r.inMale)}</td>
-<td>${show(r.inFemale)}</td>
+<td>${r.hasTodayInput ? show(r.inMale) : ""}</td>
+<td>${r.hasTodayInput ? show(r.inFemale) : ""}</td>
 <td>${r.inTotal || 0}</td>
 
-<td>${show(r.outMale)}</td>
-<td>${show(r.outFemale)}</td>
+<td>${r.hasTodayInput ? show(r.outMale) : ""}</td>
+<td>${r.hasTodayInput ? show(r.outFemale) : ""}</td>
 <td>${r.outTotal || 0}</td>
 </tr>
 `
