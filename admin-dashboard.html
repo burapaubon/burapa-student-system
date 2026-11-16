@@ -1193,12 +1193,11 @@ font-weight:600;
             onclick="openNoticeHistory()">🕘 ประวัติข้อความ</button></div>
         <label for="noticeMessage" style="font-size:13px">พิมพ์ข้อความที่ต้องการให้ LINE Bot ส่งเข้ากลุ่ม</label>
         <textarea id="noticeMessage" maxlength="1500"
-          placeholder="เช่น ขอความร่วมมือคุณครูประจำห้อง ปวช.3 บันทึกสถิติประจำวันด้วยค่ะ"
+          placeholder="เช่น ขอความร่วมมือคุณครูประจำชั้น ปวช.3 บันทึกสถิติประจำวันด้วยนะครับ"
           oninput="document.getElementById('noticeCount').textContent=this.value.length+'/1500 ตัวอักษร'"></textarea>
         <small id="noticeCount" style="color:#64748b">0/1500 ตัวอักษร</small>
-        <div class="notice-actions"><button class="btn-main" onclick="previewNotice()">👁️ ดูตัวอย่างก่อนส่ง</button>
+        <div class="notice-actions"><button class="btn-main" onclick="previewNotice()">ดูตัวอย่างก่อนส่ง</button>
         </div>
-        <small style="color:#64748b">ส่งด้วยบัญชี Admin ที่เข้าสู่ระบบอยู่ ไม่ต้องกรอกรหัสซ้ำ</small>
       </div>
       <div class="card system-status">
         <h3>⚙️ สถานะระบบ</h3>
