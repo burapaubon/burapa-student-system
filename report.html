@@ -464,7 +464,12 @@ z-index:9999;
     document.getElementById("loading").innerText = "⏳ กำลังโหลดข้อมูล..."
 
     function show(v) {
-      return v == null ? "" : v
+      return Number(v) > 0 ? Number(v) : ""
+    }
+
+    // ช่องรวมต้องแสดงตัวเลขเสมอ แม้ไม่มีข้อมูลให้แสดง 0
+    function showTotal(v) {
+      return Number(v) || 0
     }
 
     async function fetchWithFallback(dateStr) {
@@ -827,11 +832,11 @@ z-index:9999;
 
 <td>${r.male}</td>
 <td>${r.female}</td>
-<td>${r.total}</td>
+<td>${showTotal(r.total)}</td>
 
 <td>${r.hasTodayInput ? r.presentMale : ""}</td>
 <td>${r.hasTodayInput ? r.presentFemale : ""}</td>
-<td>${r.present}</td>
+<td>${showTotal(r.present)}</td>
 
 <td>${r.hasTodayInput ? show(r.sick) : ""}</td>
 <td>${r.hasTodayInput ? show(r.leave) : ""}</td>
@@ -839,11 +844,11 @@ z-index:9999;
 
 <td>${r.hasTodayInput ? show(r.inMale) : ""}</td>
 <td>${r.hasTodayInput ? show(r.inFemale) : ""}</td>
-<td>${r.inTotal || 0}</td>
+<td>${showTotal(r.inTotal)}</td>
 
 <td>${r.hasTodayInput ? show(r.outMale) : ""}</td>
 <td>${r.hasTodayInput ? show(r.outFemale) : ""}</td>
-<td>${r.outTotal || 0}</td>
+<td>${showTotal(r.outTotal)}</td>
 </tr>
 `
 
@@ -866,23 +871,23 @@ z-index:9999;
 
 <td>${levels[lv].male}</td>
 <td>${levels[lv].female}</td>
-<td>${levels[lv].total}</td>
+<td>${showTotal(levels[lv].total)}</td>
 
 <td>${levels[lv].presentMale}</td>
 <td>${levels[lv].presentFemale}</td>
-<td>${levels[lv].present}</td>
+<td>${showTotal(levels[lv].present)}</td>
 
-<td>${levels[lv].sick || 0}</td>
-<td>${levels[lv].leave || 0}</td>
-<td>${levels[lv].absent || 0}</td>
+<td>${showTotal(levels[lv].sick)}</td>
+<td>${showTotal(levels[lv].leave)}</td>
+<td>${showTotal(levels[lv].absent)}</td>
 
-<td>${levels[lv].inMale || 0}</td>
-<td>${levels[lv].inFemale || 0}</td>
-<td>${levels[lv].inTotal || 0}</td>
+<td>${showTotal(levels[lv].inMale)}</td>
+<td>${showTotal(levels[lv].inFemale)}</td>
+<td>${showTotal(levels[lv].inTotal)}</td>
 
-<td>${levels[lv].outMale || 0}</td>
-<td>${levels[lv].outFemale || 0}</td>
-<td>${levels[lv].outTotal || 0}</td>
+<td>${showTotal(levels[lv].outMale)}</td>
+<td>${showTotal(levels[lv].outFemale)}</td>
+<td>${showTotal(levels[lv].outTotal)}</td>
 </tr>
 `
         }
@@ -894,23 +899,23 @@ z-index:9999;
 
 <td>${groupSum["ป."].male}</td>
 <td>${groupSum["ป."].female}</td>
-<td>${groupSum["ป."].total}</td>
+<td>${showTotal(groupSum["ป."].total)}</td>
 
 <td>${groupSum["ป."].presentMale}</td>
 <td>${groupSum["ป."].presentFemale}</td>
-<td>${groupSum["ป."].present}</td>
+<td>${showTotal(groupSum["ป."].present)}</td>
 
-<td>${groupSum["ป."].sick}</td>
-<td>${groupSum["ป."].leave}</td>
-<td>${groupSum["ป."].absent}</td>
+<td>${showTotal(groupSum["ป."].sick)}</td>
+<td>${showTotal(groupSum["ป."].leave)}</td>
+<td>${showTotal(groupSum["ป."].absent)}</td>
 
-<td>${groupSum["ป."].inMale}</td>
-<td>${groupSum["ป."].inFemale}</td>
-<td>${groupSum["ป."].inTotal || 0}</td>
+<td>${showTotal(groupSum["ป."].inMale)}</td>
+<td>${showTotal(groupSum["ป."].inFemale)}</td>
+<td>${showTotal(groupSum["ป."].inTotal)}</td>
 
-<td>${groupSum["ป."].outMale}</td>
-<td>${groupSum["ป."].outFemale}</td>
-<td>${groupSum["ป."].outTotal || 0}</td>
+<td>${showTotal(groupSum["ป."].outMale)}</td>
+<td>${showTotal(groupSum["ป."].outFemale)}</td>
+<td>${showTotal(groupSum["ป."].outTotal)}</td>
 </tr>
 `
 
@@ -1129,23 +1134,23 @@ z-index:9999;
 
 <td>${groupSum["ม."].male}</td>
 <td>${groupSum["ม."].female}</td>
-<td>${groupSum["ม."].total}</td>
+<td>${showTotal(groupSum["ม."].total)}</td>
 
 <td>${groupSum["ม."].presentMale}</td>
 <td>${groupSum["ม."].presentFemale}</td>
-<td>${groupSum["ม."].present}</td>
+<td>${showTotal(groupSum["ม."].present)}</td>
 
-<td>${groupSum["ม."].sick}</td>
-<td>${groupSum["ม."].leave}</td>
-<td>${groupSum["ม."].absent}</td>
+<td>${showTotal(groupSum["ม."].sick)}</td>
+<td>${showTotal(groupSum["ม."].leave)}</td>
+<td>${showTotal(groupSum["ม."].absent)}</td>
 
-<td>${groupSum["ม."].inMale}</td>
-<td>${groupSum["ม."].inFemale}</td>
-<td>${groupSum["ม."].inTotal}</td>
+<td>${showTotal(groupSum["ม."].inMale)}</td>
+<td>${showTotal(groupSum["ม."].inFemale)}</td>
+<td>${showTotal(groupSum["ม."].inTotal)}</td>
 
-<td>${groupSum["ม."].outMale}</td>
-<td>${groupSum["ม."].outFemale}</td>
-<td>${groupSum["ม."].outTotal}</td>
+<td>${showTotal(groupSum["ม."].outMale)}</td>
+<td>${showTotal(groupSum["ม."].outFemale)}</td>
+<td>${showTotal(groupSum["ม."].outTotal)}</td>
 </tr>
 `
         }
@@ -1158,23 +1163,23 @@ z-index:9999;
 
 <td>${groupSum["ปวช"].male}</td>
 <td>${groupSum["ปวช"].female}</td>
-<td>${groupSum["ปวช"].total}</td>
+<td>${showTotal(groupSum["ปวช"].total)}</td>
 
 <td>${groupSum["ปวช"].presentMale}</td>
 <td>${groupSum["ปวช"].presentFemale}</td>
-<td>${groupSum["ปวช"].present}</td>
+<td>${showTotal(groupSum["ปวช"].present)}</td>
 
-<td>${groupSum["ปวช"].sick}</td>
-<td>${groupSum["ปวช"].leave}</td>
-<td>${groupSum["ปวช"].absent}</td>
+<td>${showTotal(groupSum["ปวช"].sick)}</td>
+<td>${showTotal(groupSum["ปวช"].leave)}</td>
+<td>${showTotal(groupSum["ปวช"].absent)}</td>
 
-<td>${groupSum["ปวช"].inMale}</td>
-<td>${groupSum["ปวช"].inFemale}</td>
-<td>${groupSum["ปวช"].inTotal}</td>
+<td>${showTotal(groupSum["ปวช"].inMale)}</td>
+<td>${showTotal(groupSum["ปวช"].inFemale)}</td>
+<td>${showTotal(groupSum["ปวช"].inTotal)}</td>
 
-<td>${groupSum["ปวช"].outMale}</td>
-<td>${groupSum["ปวช"].outFemale}</td>
-<td>${groupSum["ปวช"].outTotal}</td>
+<td>${showTotal(groupSum["ปวช"].outMale)}</td>
+<td>${showTotal(groupSum["ปวช"].outFemale)}</td>
+<td>${showTotal(groupSum["ปวช"].outTotal)}</td>
 </tr>
 `
 
@@ -1188,11 +1193,11 @@ z-index:9999;
 
 <td>${totalMale}</td>
 <td>${totalFemale}</td>
-<td>${totalAll}</td>
+<td>${showTotal(totalAll)}</td>
 
 <td>${totalPresentMale}</td>
 <td>${totalPresentFemale}</td>
-<td>${totalPresent}</td>
+<td>${showTotal(totalPresent)}</td>
 
 <td>${totalSick}</td>
 <td>${totalLeave}</td>
@@ -1200,11 +1205,11 @@ z-index:9999;
 
 <td>${totalInMale || 0}</td>
 <td>${totalInFemale || 0}</td>
-<td>${totalInTotal || 0}</td>
+<td>${showTotal(totalInTotal)}</td>
 
 <td>${totalOutMale || 0}</td>
 <td>${totalOutFemale || 0}</td>
-<td>${totalOutTotal || 0}</td>
+<td>${showTotal(totalOutTotal)}</td>
 </tr>
 `
 

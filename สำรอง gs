@@ -412,6 +412,16 @@ function getDashboard() {
     }
   })
 
+  // Show last term's student count for rooms not yet recorded this term.
+  // This does not mark the room as submitted or write anything to Sheets.
+  const termBaseline = previousTermStudentCounts_(ss)
+  termBaseline.forEach((counts, room) => {
+    if (latestRoomTotals[room] == null) {
+      latestRoomTotals[room] = counts.all_boys + counts.all_girls
+      latestRoomSource[room] = "ยอดตั้งต้นจากเทอม 1 (ยังไม่กรอกเทอม 2)"
+    }
+  })
+
   total = classrooms.reduce((sum, room) => {
     return sum + (latestRoomTotals[room] || 0)
   }, 0)
@@ -452,7 +462,7 @@ function getDashboard() {
         ? formatTime(latestTeacherTime[room])
         : null,
 
-      status: hasData ? "มีข้อมูล" : "ไม่มีข้อมูล"
+      status: submitted.has(room) || (hasData && !String(latestRoomSource[room] || "").startsWith("ยอดตั้งต้นจากเทอม 1")) ? "มีข้อมูล" : "ไม่มีข้อมูล"
     }
 
   })
@@ -881,7 +891,7 @@ function getLatestRoom(e) {
   const sheet = ss.getSheetByName("record_stu")
 
   if (sheet.getLastRow() <= 1) {
-    return {}
+    return previousTermStudentCounts_(ss).get(String(room).trim()) || {}
   }
 
   const data = sheet
@@ -901,7 +911,7 @@ function getLatestRoom(e) {
 
   }
 
-  return {}
+  return previousTermStudentCounts_(ss).get(String(room).trim()) || {}
 
 }
 
@@ -1275,6 +1285,39 @@ function getTerm() {
   }
 }
 
+
+// Read-only student-count baseline from term 1 of the SAME academic year.
+// Only used when a room has no record in the current term.
+function previousTermStudentCounts_(ss) {
+  const term = getTerm();
+  if (String(term.term).trim() !== "2") return new Map();
+  const year = String(term.year).trim();
+  if (!/^\d{4}$/.test(year)) return new Map();
+
+  // Backups may be named 1-2569, 1-2569(2), etc.
+  const backups = ss.getSheets().filter(sh =>
+    new RegExp("^1-" + year + "(?:\\(\\d+\\))?$").test(sh.getName())
+  );
+  const latest = new Map();
+  const dates = new Map();
+  backups.forEach(sh => {
+    if (sh.getLastRow() < 2 || sh.getLastColumn() < 4) return;
+    const rows = sh.getRange(2, 1, sh.getLastRow() - 1, Math.min(13, sh.getLastColumn())).getValues();
+    rows.forEach(row => {
+      const room = String(row[1] || "").trim();
+      if (!room) return;
+      const d = new Date(row[0]);
+      if (isNaN(d.getTime())) return;
+      const stamp = d.getTime();
+      // Never allow an earlier snapshot to overwrite a later record.
+      if (dates.has(room) && stamp < dates.get(room)) return;
+      dates.set(room, stamp);
+      latest.set(room, { all_boys: Number(row[2]) || 0, all_girls: Number(row[3]) || 0 });
+    });
+  });
+  return latest;
+}
+
 function getReport(e) {
 
   const date = e.parameter.date
@@ -1287,6 +1330,12 @@ function getReport(e) {
   const records = recordSheet.getDataRange().getValues()
   const classes = classSheet.getLastRow() > 1 ? classSheet.getRange(2, 1, classSheet.getLastRow() - 1, 1).getValues().flat() : []
   const previous = previousRooms_(records, date)
+  // Backfill only rooms with NO current-term record at all.
+  const roomsWithCurrentRecord = new Set(records.slice(1).map(r => String(r[1] || "").trim()))
+  const previousTerm = previousTermStudentCounts_(ss)
+  previousTerm.forEach((counts, room) => {
+    if (!roomsWithCurrentRecord.has(room) && !previous.has(room)) previous.set(room, counts)
+  })
 
   let map = {}
 
@@ -1582,7 +1631,11 @@ function getPreviousData(room, dateStr, existingRows) {
 
   }
 
-  if (!latest) return {}
+  if (!latest) {
+    // Do not override a real current-term zero or any existing current-term record.
+    if (data.slice(1).some(row => String(row[1] || "").trim() === String(room).trim())) return {}
+    return previousTermStudentCounts_(SpreadsheetApp.openById(SPREADSHEET_ID)).get(String(room).trim()) || {}
+  }
 
   return {
     all_boys: latest[2],
