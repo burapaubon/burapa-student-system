@@ -14,15 +14,14 @@
             const cancel = () => controller.abort();
             job.signal?.addEventListener('abort', cancel, { once: true });
             const timer = setTimeout(cancel, job.read ? 30000 : 90000);
-            nativeFetch(job.url, { ...job.options, signal: controller.signal }).then(async response => {
-                const bytes = await response.arrayBuffer();
-                const copy = new Response([204, 205, 304].includes(response.status) ? null : bytes, {
-                    status: response.status, statusText: response.statusText, headers: response.headers
+            nativeFetch(job.url, { ...job.options, signal: controller.signal })
+                .then(job.resolve, job.reject)
+                .finally(() => {
+                    clearTimeout(timer);
+                    job.signal?.removeEventListener('abort', cancel);
+                    active--;
+                    drain();
                 });
-                Object.defineProperty(copy, 'url', { value: response.url });
-                Object.defineProperty(copy, 'redirected', { value: response.redirected });
-                return copy;
-            }).then(job.resolve, job.reject).finally(() => { clearTimeout(timer); job.signal?.removeEventListener('abort', cancel); active--; drain(); });
         }
     }
     function scheduled(url, options = {}) {
