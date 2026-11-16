@@ -1148,7 +1148,7 @@ font-weight:600;
 <div>
 ${escapeHTML(r.room)}
 <br>
-<small style="color:#888">${r.lastUpdateDate ? `มีนักเรียนทั้งหมด ${r.total ?? 0} คน` : "ยังไม่มีข้อมูลในระบบ"}</small>
+<small style="color:#888">${Number(r.total) > 0 || r.lastUpdateDate || String(r.updatedBy || "").startsWith("ข้อมูลจากภาคเรียนที่ 1") ? `มีนักเรียนทั้งหมด ${Number(r.total) || 0} คน${String(r.updatedBy || "").startsWith("ข้อมูลจากภาคเรียนที่ 1") ? " (ยอดอ้างอิงจากภาคเรียนที่ 1)" : ""}` : "ไม่พบข้อมูลจำนวนนักเรียนในภาคเรียนนี้"}</small>
 </div>
 
 ${status}

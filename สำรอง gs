@@ -93,6 +93,9 @@ function burapaGet_(e) {
     else if (mode === "backuprecords") {
       return backupRecords(e)
     }
+    else if (mode === "manualnoticehistory") {
+      result = manualNoticeHistory_(e.parameter.token)
+    }
     else {
       result = {
         status: "API Running",
@@ -135,6 +138,10 @@ function doPost(e) {
     return ContentService
       .createTextOutput(JSON.stringify(withBurapaWrite_(() => updateSignatureConfig(e))))
       .setMimeType(ContentService.MimeType.JSON)
+  }
+
+  if (data.mode === "manualnoticesend") {
+    return output(manualNoticeSend_(data))
   }
 
   if (data.mode === "login") {
@@ -942,10 +949,9 @@ function adminLogin(data) {
       String(rows[i][1]).trim() === password
     ) {
 
-      return {
-        status: "success",
-        token: "admin_" + new Date().getTime()
-      }
+      const sessionToken = Utilities.getUuid() + Utilities.getUuid();
+      CacheService.getScriptCache().put("notice_admin_" + sessionToken, username, 3600);
+      return { status: "success", token: sessionToken };
 
     }
 
@@ -2135,4 +2141,71 @@ function withBurapaWrite_(work) {
     try { SpreadsheetApp.flush(); clearDashboardCache(); }
     finally { BURAPA_WRITE_ACTIVE_ = false; lock.releaseLock(); }
   }
+}
+
+// Manual LINE notices: admin-only server-validated session, separate history sheet.
+function manualNoticeAdmin_(token) {
+  const value = String(token || "");
+  if (!/^[a-f0-9-]{72}$/.test(value)) throw Error("เซสชันไม่ถูกต้อง กรุณาเข้าสู่ระบบใหม่");
+  const user = CacheService.getScriptCache().get("notice_admin_" + value);
+  if (!user) throw Error("เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่");
+  return user;
+}
+function manualNoticeSheet_() {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  let sheet = ss.getSheetByName("manual_line_notices");
+  if (!sheet) {
+    sheet = ss.insertSheet("manual_line_notices");
+    sheet.appendRow(["วันที่เวลา", "ผู้ส่ง", "ข้อความ", "สถานะ", "LINE HTTP", "รหัสรายการ"]);
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+function manualNoticeHistory_(token) {
+  manualNoticeAdmin_(token);
+  const sheet = manualNoticeSheet_();
+  const count = sheet.getLastRow() - 1;
+  if (count <= 0) return { status: "success", items: [] };
+  const start = Math.max(2, sheet.getLastRow() - 199);
+  const rows = sheet.getRange(start, 1, sheet.getLastRow() - start + 1, 6).getValues();
+  return {
+    status: "success", items: rows.reverse().map(r => ({
+      date: r[0] instanceof Date ? Utilities.formatDate(r[0], "Asia/Bangkok", "dd/MM/yyyy HH:mm:ss") : String(r[0]),
+      sender: String(r[1]), message: String(r[2]), status: String(r[3]), http: String(r[4]), id: String(r[5])
+    }))
+  };
+}
+function manualNoticeSend_(data) {
+  try {
+    const username = manualNoticeAdmin_(data.token);
+    const message = String(data.message || "").trim();
+    if (!message || message.length > 1500) throw Error("ข้อความต้องมีความยาว 1–1,500 ตัวอักษร");
+    const lock = LockService.getScriptLock();
+    if (!lock.tryLock(10000)) throw Error("ระบบกำลังส่งข้อความอื่น กรุณาลองอีกครั้ง");
+    try {
+      const props = PropertiesService.getScriptProperties();
+      const fingerprint = Utilities.base64EncodeWebSafe(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, message));
+      const last = props.getProperty("BURAPA_MANUAL_LAST_NOTICE");
+      if (last) {
+        const previous = JSON.parse(last);
+        if (previous.fingerprint === fingerprint && Date.now() - previous.time < 60000)
+          throw Error("ข้อความเดียวกันเพิ่งถูกส่งไปแล้ว กรุณารอ 60 วินาที");
+      }
+      const lineToken = props.getProperty("LINE_TOKEN");
+      if (!lineToken) throw Error("ยังไม่ได้ตั้งค่า LINE_TOKEN");
+      const id = Utilities.getUuid();
+      const formatted = "📢 ประกาศจากผู้ดูแลระบบ\n\n" + message;
+      const response = UrlFetchApp.fetch("https://api.line.me/v2/bot/message/push", {
+        method: "post", muteHttpExceptions: true,
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + lineToken, "X-Line-Retry-Key": id },
+        payload: JSON.stringify({ to: "Cc1aa912c44ae1bd927d50063da026cec", messages: [{ type: "text", text: formatted }] })
+      });
+      const code = response.getResponseCode();
+      const ok = code >= 200 && code < 300;
+      manualNoticeSheet_().appendRow([new Date(), username, message, ok ? "ส่งสำเร็จ" : "ส่งไม่สำเร็จ", code, id]);
+      if (!ok) throw Error("LINE ตอบกลับ HTTP " + code + " กรุณาตรวจประวัติก่อนลองใหม่");
+      props.setProperty("BURAPA_MANUAL_LAST_NOTICE", JSON.stringify({ fingerprint, time: Date.now() }));
+      return { status: "success", message: "ส่งข้อความเข้ากลุ่มสำเร็จ" };
+    } finally { lock.releaseLock(); }
+  } catch (err) { return { status: "error", message: String(err.message || err) }; }
 }

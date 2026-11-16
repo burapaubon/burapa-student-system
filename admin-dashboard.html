@@ -909,6 +909,100 @@
       overflow-y: auto;
       padding-right: 6px;
     }
+
+    .notice-card {
+      height: auto;
+      min-height: 340px;
+      justify-content: flex-start
+    }
+
+    .notice-card textarea {
+      width: 100%;
+      min-height: 135px;
+      resize: vertical;
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      padding: 12px;
+      font: inherit;
+      font-size: 13px
+    }
+
+    .notice-card .notice-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap
+    }
+
+    .notice-card .notice-actions button {
+      padding: 11px 14px;
+      flex: 1
+    }
+
+    .notice-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, .62);
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px
+    }
+
+    .notice-modal.open {
+      display: flex
+    }
+
+    .notice-dialog {
+      background: white;
+      width: min(100%, 560px);
+      max-height: 85vh;
+      overflow: auto;
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 20px 60px #0003
+    }
+
+    .notice-dialog h3 {
+      margin: 0 0 12px
+    }
+
+    .notice-dialog pre {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      background: #f8fafc;
+      padding: 14px;
+      border-radius: 12px;
+      font: inherit;
+      font-size: 13px
+    }
+
+    .notice-dialog .notice-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px
+    }
+
+    .notice-dialog button {
+      padding: 11px 16px;
+      flex: 1
+    }
+
+    .notice-entry {
+      border-bottom: 1px solid #e5e7eb;
+      padding: 12px 0
+    }
+
+    .notice-entry p {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      font-size: 13px;
+      margin-top: 7px
+    }
+
+    .notice-entry small {
+      color: #64748b
+    }
   </style>
   <link rel="stylesheet" href="burapa-notices.css">
   <script defer src="burapa-notices.js"></script>
@@ -1093,6 +1187,19 @@ font-weight:600;
         <div id="classList"></div>
       </div>
 
+
+      <div class="card notice-card">
+        <div class="card-header"><span>📢 ส่งประกาศเข้ากลุ่มสถิติ</span><button class="btn-sub"
+            onclick="openNoticeHistory()">🕘 ประวัติข้อความ</button></div>
+        <label for="noticeMessage" style="font-size:13px">พิมพ์ข้อความที่ต้องการให้ LINE Bot ส่งเข้ากลุ่ม</label>
+        <textarea id="noticeMessage" maxlength="1500"
+          placeholder="เช่น ขอความร่วมมือคุณครูประจำห้อง ปวช.3 บันทึกสถิติประจำวันด้วยค่ะ"
+          oninput="document.getElementById('noticeCount').textContent=this.value.length+'/1500 ตัวอักษร'"></textarea>
+        <small id="noticeCount" style="color:#64748b">0/1500 ตัวอักษร</small>
+        <div class="notice-actions"><button class="btn-main" onclick="previewNotice()">👁️ ดูตัวอย่างก่อนส่ง</button>
+        </div>
+        <small style="color:#64748b">ส่งด้วยบัญชี Admin ที่เข้าสู่ระบบอยู่ ไม่ต้องกรอกรหัสซ้ำ</small>
+      </div>
       <div class="card system-status">
         <h3>⚙️ สถานะระบบ</h3>
         <div id="sttAPI" class="status-box">🌐 API: -</div>
@@ -1174,6 +1281,26 @@ font-weight:600;
     </div>
   </main>
 
+
+  <div class="notice-modal" id="noticePreviewModal" role="dialog" aria-modal="true" aria-label="ยืนยันส่งประกาศ">
+    <div class="notice-dialog">
+      <h3>ตรวจสอบข้อความก่อนส่ง</h3>
+      <pre id="noticePreviewText"></pre>
+      <p style="font-size:12px;color:#64748b;margin-top:10px">เมื่อกดยืนยัน LINE Bot จะส่งข้อความนี้เข้ากลุ่มสถิติทันที
+      </p>
+      <div class="notice-actions"><button class="btn-sub"
+          onclick="closeNoticeModal('noticePreviewModal')">กลับไปแก้ไข</button><button class="btn-main"
+          id="noticeSendBtn" onclick="sendManualNotice()">ยืนยันส่งข้อความ</button></div>
+    </div>
+  </div>
+  <div class="notice-modal" id="noticeHistoryModal" role="dialog" aria-modal="true" aria-label="ประวัติการส่งประกาศ">
+    <div class="notice-dialog">
+      <h3>🕘 ประวัติข้อความประกาศ</h3>
+      <div id="noticeHistoryList">กำลังโหลด...</div>
+      <div class="notice-actions"><button class="btn-sub"
+          onclick="closeNoticeModal('noticeHistoryModal')">ปิดหน้าต่าง</button></div>
+    </div>
+  </div>
   <footer>
     ระบบบริหารจัดการสถิตินักเรียน (BURAPA STUDENT SYSTEM)
     <br>
@@ -1183,6 +1310,49 @@ font-weight:600;
   </footer>
 
   <script>
+
+
+    let noticeSending = false;
+    function closeNoticeModal(id) { document.getElementById(id).classList.remove('open') }
+    function previewNotice() {
+      const message = document.getElementById('noticeMessage').value.trim();
+      if (!message || message.length > 1500) { BurapaNotice.toast('กรุณากรอกข้อความ 1–1,500 ตัวอักษร'); return }
+      document.getElementById('noticePreviewText').textContent = '📢 ประกาศจากผู้ดูแลระบบ\n\n' + message;
+      document.getElementById('noticePreviewModal').classList.add('open');
+    }
+    async function sendManualNotice() {
+      if (noticeSending) return;
+      const message = document.getElementById('noticeMessage').value.trim();
+      if (!message) return;
+      noticeSending = true;
+      const btn = document.getElementById('noticeSendBtn'); btn.disabled = true; btn.textContent = 'กำลังส่ง...';
+      try {
+        const body = new FormData(); body.append('mode', 'manualnoticesend'); body.append('token', sessionStorage.getItem('adminToken') || ''); body.append('message', message);
+        const res = await fetchWithTimeout(API, { method: 'POST', body }, 30000);
+        const result = await res.json();
+        if (result.status !== 'success') throw Error(result.message || 'ส่งไม่สำเร็จ');
+        closeNoticeModal('noticePreviewModal');
+        document.getElementById('noticeMessage').value = ''; document.getElementById('noticeCount').textContent = '0/1500 ตัวอักษร';
+        showToast('success', 'ส่งข้อความสำเร็จ', 'LINE Bot ส่งประกาศเข้ากลุ่มแล้ว');
+      } catch (err) { BurapaNotice.toast('ส่งไม่สำเร็จ: ' + err.message) }
+      finally { noticeSending = false; btn.disabled = false; btn.textContent = 'ยืนยันส่งข้อความ' }
+    }
+    async function openNoticeHistory() {
+      document.getElementById('noticeHistoryModal').classList.add('open');
+      const target = document.getElementById('noticeHistoryList'); target.textContent = 'กำลังโหลดประวัติ...';
+      try {
+        const res = await fetchWithTimeout(API + '?mode=manualnoticehistory&token=' + encodeURIComponent(sessionStorage.getItem('adminToken') || '') + '&t=' + Date.now(), {}, 25000);
+        const data = await res.json(); if (data.status !== 'success') throw Error(data.message || 'โหลดไม่สำเร็จ');
+        target.replaceChildren();
+        if (!data.items.length) { target.textContent = 'ยังไม่มีประวัติข้อความ'; return }
+        data.items.forEach(item => {
+          const div = document.createElement('div'); div.className = 'notice-entry';
+          const small = document.createElement('small'); small.textContent = item.date + ' น. • ' + item.sender + ' • ' + item.status;
+          const p = document.createElement('p'); p.textContent = item.message;
+          div.append(small, p); target.appendChild(div);
+        });
+      } catch (err) { target.textContent = 'โหลดประวัติไม่สำเร็จ: ' + err.message }
+    }
 
     const token = sessionStorage.getItem("adminToken")
 
@@ -1427,7 +1597,17 @@ font-weight:600;
       let noData = document.getElementById("noData")
       let canvas = document.getElementById("chart")
 
+      animateNumber("total", Number(total) || 0)
+      animateNumber("present", Number(present) || 0)
+      animateNumber("sick", Number(sick) || 0)
+      animateNumber("leave", Number(leave) || 0)
+      animateNumber("absent", Number(absent) || 0)
+
       if (total === 0) {
+        if (chartInstance) {
+          chartInstance.destroy()
+          chartInstance = null
+        }
 
         canvas.style.display = "none"
         noData.style.display = "block"
@@ -1440,12 +1620,6 @@ font-weight:600;
 
       canvas.style.display = "block"
       noData.style.display = "none"
-
-      animateNumber("total", total)
-      animateNumber("present", present)
-      animateNumber("sick", sick)
-      animateNumber("leave", leave)
-      animateNumber("absent", absent)
 
       let labels
       let colors
@@ -1727,7 +1901,7 @@ font-weight:600;
 ${escapeHTML(r.room)}
 <br>
 <small style="color:#888">
-${r.lastUpdateDate ? `มีนักเรียนทั้งหมด ${r.total ?? 0} คน` : "ยังไม่มีข้อมูลในระบบ"}
+${Number(r.total) > 0 || r.lastUpdateDate || String(r.updatedBy || "").startsWith("ข้อมูลจากภาคเรียนที่ 1") ? `มีนักเรียนทั้งหมด ${Number(r.total) || 0} คน${String(r.updatedBy || "").startsWith("ข้อมูลจากภาคเรียนที่ 1") ? " (ยอดอ้างอิงจากภาคเรียนที่ 1)" : ""}` : "ไม่พบข้อมูลจำนวนนักเรียนในภาคเรียนนี้"}
 </small>
 </div>
 
